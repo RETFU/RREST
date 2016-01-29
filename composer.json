@@ -1,0 +1,20 @@
+{
+    "name": "retfu/rrest",
+    "type": "library",
+    "description": "This is a pet work in progress project to easily create REST API in PHP.",
+    "homepage": "https://github.com/RETFU/RREST",
+    "authors": [
+        {
+            "name": "Fabien Furet",
+            "email": "fabien.furet@gmail.com"
+        }
+    ],
+    "autoload": {
+      "psr-4": {
+        "RREST\\": "src/"
+      }
+    },
+    "require": {
+        "jrfnl/PHP-cast-to-type": "~2.0"
+    }
+}
