@@ -15,6 +15,7 @@
       }
     },
     "require": {
+        "symfony/http-kernel": "~2.8",
         "jrfnl/PHP-cast-to-type": "~2.0"
     }
 }
