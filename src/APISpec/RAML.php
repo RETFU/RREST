@@ -193,7 +193,12 @@ class RAML implements APISpecInterface
         try {
             $resource = $this->apiDefinition->getResourceByUri($path);
         } catch (ResourceNotFoundException $e) {
-            throw new NotFoundHttpException($e->getMessage());
+                //Try with a trailing slash to accept /resource/ and /ressource
+            try {
+                $resource = $this->apiDefinition->getResourceByUri($path.'/');
+            } catch (ResourceNotFoundException $e) {
+                throw new NotFoundHttpException($e->getMessage());
+            }
         }
 
         return $resource;
