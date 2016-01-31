@@ -4,6 +4,7 @@ namespace RREST;
 
 use RREST\APISpec\APISpecInterface;
 use RREST\Provider\ProviderInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * ApiSpec + Provider = RREST.
@@ -60,6 +61,7 @@ class RREST
             $this->getControllerNamespaceClass($controllerClassName),
             $this->getActionMethodName($method),
             function () {
+                $this->assertHTTPProtocol();
                 $this->assertHTTPParameters();
                 $this->assertHTTPPayloadBody();
                 $this->hintHTTPParameterValue();
@@ -77,6 +79,18 @@ class RREST
     public function applyCORS($origin = '*', $methods = 'GET,POST,PUT,DELETE,OPTIONS', $headers = '')
     {
         return $this->provider->applyCORS($origin, $methods, $headers);
+    }
+
+    /**
+     * @throw AccessDeniedHttpException
+     */
+    protected function assertHTTPProtocol()
+    {
+        $supportedHTTPProtocols = array_map('strtoupper', $this->apiSpec->getSupportedHTTPProtocols());
+        $httpProtocol = strtoupper($this->provider->getHTTPProtocol());
+        if(in_array($httpProtocol, $supportedHTTPProtocols) === false) {
+            throw new AccessDeniedHttpException();
+        }
     }
 
     /**

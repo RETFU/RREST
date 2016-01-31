@@ -27,6 +27,11 @@ interface ProviderInterface
     public function applyCORS($origin = '*', $methods = 'GET,POST,PUT,DELETE,OPTIONS', $headers = '');
 
     /**
+     * @return string
+     */
+    public function getHTTPProtocol();
+
+    /**
      * Return the parameter typed or raw value.
      *
      * FIXME $type depend of what CastToType can

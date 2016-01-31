@@ -30,6 +30,11 @@ interface APISpecInterface
     public function getRessourcePath();
 
     /**
+     * @return array
+     */
+    public function getSupportedHTTPProtocols();
+
+    /**
      * Validate a parameter
      * If not valid, an exception is throw.
      *
