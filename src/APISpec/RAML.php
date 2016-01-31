@@ -14,6 +14,7 @@ use Raml\NamedParameter;
 use RREST\Exception\InvalidBodyException;
 use RREST\Exception\InvalidParameterException;
 use RREST\Error;
+use RREST\Parameter;
 
 /**
  * RAML APISpec.
@@ -94,21 +95,9 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
-    public function getParameterValueForAssertion($type, $value, $castValue)
+    public function getParameters()
     {
-        if ($type === NamedParameter::TYPE_DATE) {
-            return $value;
-        }
-
-        return $castValue;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function assertHTTPParameters(\Closure $getTypedParameterValue)
-    {
-        $invalidParametersError = [];
+        $parameters = [];
         $namedParameters = array_merge(
             $this->method->getQueryParameters(),
             $this->resource->getUriParameters(),
@@ -116,23 +105,44 @@ class RAML implements APISpecInterface
             $this->method->getBaseUriParameters()
         );
         foreach ($namedParameters as $nameParameter) {
-            try {
-                $value = $getTypedParameterValue(
-                    $nameParameter->getKey(),
-                    $nameParameter->getType()
-                );
-                $nameParameter->validate($value);
-            } catch (ValidationException $e) {
-                $invalidParametersError[] = new Error(
-                    $e->getMessage(),
-                    $e->getCode()
-                );
+            $parameter = new Parameter(
+                $nameParameter->getKey(),
+                $nameParameter->getType(),
+                $nameParameter->isRequired()
+            );
+
+            $parameter->setEnum( (array) $nameParameter->getEnum() );
+            $parameter->setValidationPattern( $nameParameter->getValidationPattern() );
+            switch ($nameParameter->getType()) {
+                case NamedParameter::TYPE_STRING:
+                    $parameter->setMinimum( $nameParameter->getMinLength() );
+                    $parameter->setMaximum( $nameParameter->getMaxLength() );
+                    break;
+                case NamedParameter::TYPE_INTEGER:
+                case NamedParameter::TYPE_NUMBER:
+                    $parameter->setMinimum( $nameParameter->getMinimum() );
+                    $parameter->setMaximum( $nameParameter->getMaximum() );
+                    break;
+                default:
+                    break;
             }
+
+            $parameters[] = $parameter;
         }
 
-        if (empty($invalidParametersError) == false) {
-            throw new InvalidParameterException($invalidParametersError);
+        return $parameters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParameterValueForAssertion($type, $value, $castValue)
+    {
+        if ($type === NamedParameter::TYPE_DATE) {
+            return $value;
         }
+
+        return $castValue;
     }
 
     /**

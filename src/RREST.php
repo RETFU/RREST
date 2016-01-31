@@ -5,6 +5,7 @@ namespace RREST;
 use RREST\APISpec\APISpecInterface;
 use RREST\Provider\ProviderInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use RREST\Exception\InvalidParameterException;
 
 /**
  * ApiSpec + Provider = RREST.
@@ -95,14 +96,18 @@ class RREST
 
     /**
      * @throw InvalidParameterException
-     * @throw InvalidBodyException
      */
     protected function assertHTTPParameters()
     {
-        $this->apiSpec->assertHTTPParameters(function ($key, $type) {
-            $value = $this->provider->getHTTPParameterValue($key, $type, false);
+        $invalidParametersError = [];
+        $parameters = $this->apiSpec->getParameters();
+        foreach ($parameters as $parameter) {
+            $value = $this->provider->getHTTPParameterValue(
+                $parameter->getName(),
+                $parameter->getType()
+            );
             try {
-                $castValue = $this->cast($value, $type);
+                $castValue = $this->cast($value, $parameter->getType());
             } catch (\Exception $e) {
                 throw new InvalidParameterException([
                     new Error(
@@ -111,12 +116,20 @@ class RREST
                     ),
                 ]);
             }
-            $this->hintedHTTPParameters[$key] = $castValue;
-            //Some APISpec are validating sometime a casted value, sometime the raw value
-            $value = $this->apiSpec->getParameterValueForAssertion($type, $value, $castValue);
+            try {
+                $parameter->assertValue($castValue);
+                $this->hintedHTTPParameters[$parameter->getName()] = $castValue;
+            } catch (InvalidParameterException $e) {
+                $invalidParametersError = array_merge(
+                    $e->getErrors(),
+                    $invalidParametersError
+                );
+            }
+        }
 
-            return $value;
-        });
+        if (empty($invalidParametersError) == false) {
+            throw new InvalidParameterException($invalidParametersError);
+        }
     }
 
     protected function hintHTTPParameterValue()

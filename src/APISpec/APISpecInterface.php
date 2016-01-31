@@ -35,13 +35,9 @@ interface APISpecInterface
     public function getSupportedHTTPProtocols();
 
     /**
-     * Validate a parameter
-     * If not valid, an exception is throw.
-     *
-     * @param Closure $getTypedParameterValue
-     * @throw InvalidParameterException
+     * @return Parameter
      */
-    public function assertHTTPParameters(\Closure $getTypedParameterValue);
+    public function getParameters();
 
     /**
      * Validate the payload.
