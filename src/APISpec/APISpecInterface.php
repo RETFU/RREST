@@ -40,12 +40,8 @@ interface APISpecInterface
     public function getParameters();
 
     /**
-     * Validate the payload.
-     * If not valid, an exception is throw.
-     *
-     * @param mixed $bodyValue
-     * 
-     * @throw RREST\Exception\InvalidParameterException
+     * @param  string $contentType
+     * @return string|boolean
      */
-    public function assertHTTPPayloadBody($bodyValue);
+    public function getPayloadBodySchema($contentType);
 }

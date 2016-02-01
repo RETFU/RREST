@@ -2,10 +2,12 @@
 
 namespace RREST;
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use JsonSchema\Validator;
 use RREST\APISpec\APISpecInterface;
 use RREST\Provider\ProviderInterface;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use RREST\Exception\InvalidParameterException;
+use RREST\Exception\InvalidBodyException;
 
 /**
  * ApiSpec + Provider = RREST.
@@ -141,11 +143,53 @@ class RREST
     }
 
     /**
-     * @throw InvalidBodyException
+     * @throw RREST\Exception\InvalidBodyException
+     * @throw RREST\Exception\InvalidParameterException
      */
     protected function assertHTTPPayloadBody()
     {
-        $this->apiSpec->assertHTTPPayloadBody($this->provider->getHTTPPayloadBodyValue());
+        //FIXME: split/refactor the code
+        //FIXME: handle XML
+        $payloadBodySchema = $this->apiSpec->getPayloadBodySchema(
+            $this->provider->getContentType()
+        );
+
+        //No payload body here, on need to assert
+        if($payloadBodySchema === false) {
+            return;
+        }
+
+        //validate json
+        $payloadBodyValueJSON = json_decode($this->provider->getHTTPPayloadBodyValue());
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $error = new Error();
+            $error->message = ucfirst(json_last_error_msg());
+            $error->code = 50;
+            throw new InvalidBodyException([$error]);
+        }
+
+        //validate JsonSchema
+        $invalidBodyError = [];
+        $jsonValidator = new Validator();
+        $jsonValidator->check($payloadBodyValueJSON, json_decode($payloadBodySchema));
+        if ($jsonValidator->isValid() === false) {
+            foreach ($jsonValidator->getErrors() as $jsonError) {
+                $error = new Error();
+                $error->message = ucfirst(
+                    trim(
+                        strtolower(
+                            $jsonError['property'].' property: '.$jsonError['message']
+                        )
+                    )
+                );
+                $error->code = 52;
+                $invalidBodyError[] = $error;
+            }
+
+            if (empty($invalidBodyError) == false) {
+                throw new InvalidParameterException($invalidBodyError);
+            }
+        }
     }
 
     /**

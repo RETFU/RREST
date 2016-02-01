@@ -136,39 +136,16 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
-    //TODO: move this to RREST & drop this for better API see Raml\Schema\Definition
-    //to perform validation
-    public function assertHTTPPayloadBody($bodyValue)
+    public function getPayloadBodySchema($contentType)
     {
-        $invalidBodyError = [];
-        $bodies = $this->method->getBodies();
-        foreach ($bodies as $body) {
-            try {
-                $body->getSchema()->validate($bodyValue);
-            } catch (InvalidSchemaException $e) {
-                foreach ($e->getErrors() as $isError) {
-                    $error = new Error();
-                    $error->message = ucfirst(
-                        trim(
-                            strtolower(
-                                $isError['property'].' property: '.$isError['message']
-                            )
-                        )
-                    );
-                    $error->code = $e->getCode();
-                    $invalidBodyError[] = $error;
-                }
-                throw new InvalidBodyException($invalidBodyError);
-            }
+        if( empty( $this->method->getBodies() ) === false ) {
+            return (string) $this->method->getBodyByType($contentType)->getSchema();
         }
-
-        if (empty($invalidBodyError) == false) {
-            throw new InvalidBodyException($invalidBodyError);
-        }
+        return false;
     }
 
     /**
-     * @param resource $resource
+     * @param Raml\Resource $resource
      *
      * @throw Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      *

@@ -117,4 +117,12 @@ class Silex implements ProviderInterface
     {
         return $this->request->getContent();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContentType()
+    {
+        return $this->request->headers->get('Content-Type');
+    }
 }
