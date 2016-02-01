@@ -63,6 +63,7 @@ class RREST
             $this->getActionMethodName($method),
             function () {
                 $this->assertHTTPProtocol();
+                //TODO: assert content-type
                 $this->assertHTTPParameters();
                 $this->assertHTTPPayloadBody();
                 $this->hintHTTPParameterValue();
@@ -117,7 +118,7 @@ class RREST
                 ]);
             }
             try {
-                $parameter->assertValue($castValue);
+                $parameter->assertValue($castValue, $value);
                 $this->hintedHTTPParameters[$parameter->getName()] = $castValue;
             } catch (InvalidParameterException $e) {
                 $invalidParametersError = array_merge(

@@ -47,16 +47,4 @@ interface APISpecInterface
      * @throw InvalidParameterException
      */
     public function assertHTTPPayloadBody($bodyValue);
-
-    /**
-     * This help giving the right parameter with the right type for assertion
-     * depending on how the APISpec valid parameters.
-     *
-     * @param string $type
-     * @param mixed  $value
-     * @param mixed  $castValue
-     *
-     * @return mixed
-     */
-    public function getParameterValueForAssertion($type, $value, $castValue);
 }

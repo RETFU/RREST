@@ -40,11 +40,11 @@ class RAML implements APISpecInterface
 
     /**
      * @param ApiDefinition $apiDefinition
+     * @param strings       $currentURLPath (PHP_URL_PATH)
      */
-    public function __construct(ApiDefinition $apiDefinition)
+    public function __construct(ApiDefinition $apiDefinition, $currentURLPath)
     {
         $this->apiDefinition = $apiDefinition;
-        $currentURLPath = $this->extractCurrentURLPath();
         $resourcePath = $this->extractRessourcePathFromURL(
             $currentURLPath, $this->apiDefinition->getVersion()
         );
@@ -110,7 +110,7 @@ class RAML implements APISpecInterface
                 $nameParameter->getType(),
                 $nameParameter->isRequired()
             );
-
+            $parameter->setDateFormat('D, d M Y H:i:s T'); //RFC2616 from RAML spec
             $parameter->setEnum( (array) $nameParameter->getEnum() );
             $parameter->setValidationPattern( $nameParameter->getValidationPattern() );
             switch ($nameParameter->getType()) {
@@ -136,18 +136,8 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
-    public function getParameterValueForAssertion($type, $value, $castValue)
-    {
-        if ($type === NamedParameter::TYPE_DATE) {
-            return $value;
-        }
-
-        return $castValue;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
+    //TODO: move this to RREST & drop this for better API see Raml\Schema\Definition
+    //to perform validation
     public function assertHTTPPayloadBody($bodyValue)
     {
         $invalidBodyError = [];
@@ -220,17 +210,6 @@ class RAML implements APISpecInterface
         }
 
         return $resource;
-    }
-
-    /**
-     * @return string
-     */
-    protected function extractCurrentURLPath()
-    {
-        return parse_url(
-            $_SERVER['REQUEST_URI'],
-            PHP_URL_PATH
-        );
     }
 
     /**

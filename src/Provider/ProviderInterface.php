@@ -34,9 +34,6 @@ interface ProviderInterface
     /**
      * Return the parameter typed or raw value.
      *
-     * FIXME $type depend of what CastToType can
-     * handle, not really good
-     *
      * @param string $key
      * @param string $type
      *

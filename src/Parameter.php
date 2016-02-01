@@ -86,6 +86,14 @@ class Parameter
     private $maximum;
 
     /**
+     * A valid DateTime format
+     * Default RFC2616
+     *
+     * @var string
+     */
+    private $dateFormat = 'D, d M Y H:i:s T';
+
+    /**
      * @param string $name
      * @param string $type
      * @param boolean $required
@@ -218,14 +226,37 @@ class Parameter
     }
 
     /**
-     * @param mixed $param The value of the paramater to validate
+     * @return string
+     */
+    public function getDateFormat()
+    {
+        return $this->dateFormat;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @throws \Exception
+     */
+    public function setDateFormat($dateFormat)
+    {
+        if( \DateTime::createFromFormat($dateFormat, '2009-02-15') === false ) {
+            //throw new \RuntimeException($dateFormat.' is not a valid DateTime format!');
+        }
+
+        $this->dateFormat = $dateFormat;
+    }
+
+    /**
+     * @param mixed $castValue The hinted value of the paramater to validate
+     * @param mixed $value The original value of the paramater to validate
      *
      * @throws \InvalidParameterException
      */
-    public function assertValue($param)
+    public function assertValue($castValue, $value)
     {
         // required?
-        if (empty($param)) {
+        if (empty($castValue)) {
             if($this->getRequired()) {
                 $this->throwInvalidParameter($this->getName().' is required');
             }
@@ -235,27 +266,30 @@ class Parameter
         // good type?
         switch ($this->getType()) {
             case static::TYPE_BOOLEAN:
-                if (!is_bool($param)) {
+                if (!is_bool($castValue)) {
                     $this->throwInvalidParameter($this->getName().' is not a boolean');
                 }
                 break;
             case static::TYPE_DATE:
-            //     if (\DateTime::createFromFormat('D, d M Y H:i:s T', $param) === false) {
-            //         $this->throwInvalidParameter($this->getName().' is not a valid date', static::VAL_NOTDATE);
-            //     }
+                if($castValue instanceof \DateTime === false) {
+                    $this->throwInvalidParameter($this->getName().' is not a valid date');
+                }
+                if (\DateTime::createFromFormat( $this->getDateFormat() , $value) === false) {
+                    $this->throwInvalidParameter($this->getName().' is not a valid date');
+                }
                 break;
             case static::TYPE_STRING:
-                if (!is_string($param)) {
+                if (!is_string($castValue)) {
                     $this->throwInvalidParameter($this->getName().' is not a string');
                 }
                 break;
             case static::TYPE_INTEGER:
-                if (!is_int($param)) {
+                if (!is_int($castValue)) {
                     $this->throwInvalidParameter($this->getName().' is not an integer');
                 }
                 break;
             case static::TYPE_NUMBER:
-                if (!is_numeric($param)) {
+                if (!is_numeric($castValue)) {
                     $this->throwInvalidParameter($this->getName().' is not a number');
                 }
                 break;
@@ -266,16 +300,16 @@ class Parameter
 
         //min & max can only be apply to $this->minmaxTypes because make sense :)
         if(in_array($this->getType(), $this->minmaxTypes)) {
-            $min = $this->getMinimum();
             $isNumeric = (
                 $this->getType() === self::TYPE_NUMBER ||
                 $this->getType() === self::TYPE_INTEGER
             );
-            //FIXME: this condition is not working for numeric step, see price example
+            $isString = $this->getType() === self::TYPE_STRING;
+            $min = $this->getMinimum();
             if(empty($min) === false) {
                 if(
-                    ( $isNumeric && $min > $param ) ||
-                    $min > strlen($param)
+                    ( $isNumeric && $min > $castValue ) ||
+                    ( $isString && $min > strlen($castValue) )
                 ) {
                     $this->throwInvalidParameter($this->getName().' minimum size is '.$min);
                 }
@@ -283,8 +317,8 @@ class Parameter
             $max = $this->getMaximum();
             if(empty($max) === false) {
                 if(
-                    ( $isNumeric && $max < $param ) ||
-                    $max < strlen($param)
+                    ( $isNumeric && $max < $castValue ) ||
+                    ( $isString && $max < strlen($castValue) )
                 ) {
                     $this->throwInvalidParameter($this->getName().' maximum size is '.$max);
                 }
@@ -294,7 +328,7 @@ class Parameter
         //valid with a pattern?
         $validationPattern = $this->getValidationPattern();
         if (!empty($validationPattern) &&
-            preg_match('|'.$validationPattern.'|', $param) !== 1
+            preg_match('|'.$validationPattern.'|', $castValue) !== 1
         ) {
             $this->throwInvalidParameter($this->getName().' does not match the specified pattern: '.$validationPattern);
         }
@@ -304,7 +338,7 @@ class Parameter
         if (
             empty($enum) === false &&
             is_array($enum) &&
-            in_array($param, $enum) === false
+            in_array($castValue, $enum) === false
         ) {
             $this->throwInvalidParameter($this->getName().' must be one of the following: '.implode(', ', $enum));
         }
