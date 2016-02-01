@@ -235,15 +235,9 @@ class Parameter
 
     /**
      * @param string $type
-     *
-     * @throws \Exception
      */
     public function setDateFormat($dateFormat)
     {
-        if( \DateTime::createFromFormat($dateFormat, '2009-02-15') === false ) {
-            //throw new \RuntimeException($dateFormat.' is not a valid DateTime format!');
-        }
-
         $this->dateFormat = $dateFormat;
     }
 
@@ -272,9 +266,6 @@ class Parameter
                 break;
             case static::TYPE_DATE:
                 if($castValue instanceof \DateTime === false) {
-                    $this->throwInvalidParameter($this->getName().' is not a valid date');
-                }
-                if (\DateTime::createFromFormat( $this->getDateFormat() , $value) === false) {
                     $this->throwInvalidParameter($this->getName().' is not a valid date');
                 }
                 break;
