@@ -132,12 +132,12 @@ class Parameter
     /**
      * @param string $type
      *
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     public function setType($type)
     {
         if (!in_array($type, $this->validTypes)) {
-            throw new InvalidQueryParameterTypeException($type, $this->validTypes);
+            throw new \RuntimeException($type, $this->validTypes);
         }
 
         $this->type = $type;
