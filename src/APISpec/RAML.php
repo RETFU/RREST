@@ -169,9 +169,10 @@ class RAML implements APISpecInterface
 
     /**
      * @param resource $resource
-     * @throw MethodNotAllowedHttpException
      *
-     * @return Method
+     * @throw Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     *
+     * @return Raml\Method
      */
     protected function getMethodFromResource(Resource $resource)
     {
@@ -192,9 +193,10 @@ class RAML implements APISpecInterface
 
     /**
      * @param string $path
-     * @throw NotFoundHttpException
      *
-     * @return resource|false
+     * @throw Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return \Raml\Resource|false
      */
     protected function getResourceFromPath($path)
     {

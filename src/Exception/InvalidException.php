@@ -10,12 +10,12 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 class InvalidException extends UnprocessableEntityHttpException
 {
     /**
-     * @var array
+     * @var RREST\Error[]
      */
     public $errors;
 
     /**
-     * @param array          $errors   List of errors
+     * @param RREST\Error[]  $errors   List of errors
      * @param Exception|null $previous
      */
     public function __construct(array $errors, $message = 'Invalid', \Exception $previous = null, $code = 0)
@@ -24,6 +24,9 @@ class InvalidException extends UnprocessableEntityHttpException
         parent::__construct($message, $previous, $code);
     }
 
+    /**
+     * @return RREST\Error[]
+     */
     public function getErrors()
     {
         return $this->errors;

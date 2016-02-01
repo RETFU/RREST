@@ -30,12 +30,12 @@ interface APISpecInterface
     public function getRessourcePath();
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getSupportedHTTPProtocols();
 
     /**
-     * @return Parameter
+     * @return RREST\Parameter[]
      */
     public function getParameters();
 
@@ -44,7 +44,8 @@ interface APISpecInterface
      * If not valid, an exception is throw.
      *
      * @param mixed $bodyValue
-     * @throw InvalidParameterException
+     * 
+     * @throw RREST\Exception\InvalidParameterException
      */
     public function assertHTTPPayloadBody($bodyValue);
 }

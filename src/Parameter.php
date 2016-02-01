@@ -14,7 +14,7 @@ class Parameter
     const TYPE_FILE     = 'file';
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $validTypes = [
         self::TYPE_STRING,
@@ -28,7 +28,7 @@ class Parameter
     /**
      * Define types that can have a maximum or a minimum
      *
-     * @var array
+     * @var string[]
      */
     protected $minmaxTypes = [
         self::TYPE_STRING,
@@ -60,7 +60,7 @@ class Parameter
     /**
      * List of valid values for the parameter (optional)
      *
-     * @var array
+     * @var string[]
      */
     private $enum;
 
@@ -144,7 +144,7 @@ class Parameter
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getEnum()
     {
@@ -152,7 +152,7 @@ class Parameter
     }
 
     /**
-     * @param array $enum
+     * @param array string[]
      */
     public function setEnum(array $enum)
     {
@@ -251,7 +251,7 @@ class Parameter
      * @param mixed $castValue The hinted value of the paramater to validate
      * @param mixed $value The original value of the paramater to validate
      *
-     * @throws \InvalidParameterException
+     * @throws RREST\Exception\InvalidParameterException
      */
     public function assertValue($castValue, $value)
     {
@@ -348,7 +348,7 @@ class Parameter
      * @param  string $message
      * @param  string $code
      *
-     * @throws InvalidParameterException
+     * @throws RREST\Exception\InvalidParameterException
      */
     protected function throwInvalidParameter($message)
     {
