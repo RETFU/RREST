@@ -40,6 +40,11 @@ interface APISpecInterface
     public function getParameters();
 
     /**
+     * @return string[]|boolean
+     */
+    public function getContentTypes();
+
+    /**
      * @param  string $contentType
      * @return string|boolean
      */

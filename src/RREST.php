@@ -3,6 +3,7 @@
 namespace RREST;
 
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use JsonSchema\Validator;
 use RREST\APISpec\APISpecInterface;
 use RREST\Provider\ProviderInterface;
@@ -70,7 +71,7 @@ class RREST
             $this->getActionMethodName($method),
             function () {
                 $this->assertHTTPProtocol();
-                //TODO: assert content-type
+                $this->assertHTTPContentType();
                 $this->assertHTTPParameters();
                 $this->assertHTTPPayloadBody();
                 $this->hintHTTPParameterValue();
@@ -100,6 +101,16 @@ class RREST
         $httpProtocol = strtoupper($this->provider->getHTTPProtocol());
         if(in_array($httpProtocol, $supportedHTTPProtocols) === false) {
             throw new AccessDeniedHttpException();
+        }
+    }
+
+    /**
+     * @throw UnsupportedMediaTypeHttpException
+     */
+    protected function assertHTTPContentType()
+    {
+        if( in_array($this->provider->getContentType(), $this->apiSpec->getContentTypes()) === false ) {
+            throw new UnsupportedMediaTypeHttpException();
         }
     }
 
