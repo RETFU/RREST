@@ -30,6 +30,11 @@ interface APISpecInterface
     public function getRessourcePath();
 
     /**
+     * @return integer[]
+     */
+    public function getStatusCodes()
+
+    /**
      * @return string[]
      */
     public function getSupportedHTTPProtocols();

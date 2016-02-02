@@ -79,6 +79,18 @@ class RAML implements APISpecInterface
     /**
      * @inheritdoc
      */
+    public function getStatusCodes()
+    {
+        $statusCodes = [];
+        foreach( $this->method->getResponses() as $response ) {
+            $statusCodes[] = $response->getStatusCode();
+        }
+        return $statusCodes;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSupportedHTTPProtocols()
     {
         return $this->apiDefinition->getProtocols();

@@ -55,20 +55,19 @@ class RREST
 
     public function addRoute()
     {
-        $routePath = $this->apiSpec->getRoutePath();
         $method = $this->apiSpec->getRouteMethod();
         $controllerClassName = $this->getRouteControllerClassName(
             $this->apiSpec->getRessourcePath()
         );
-
         $this->assertControllerClassName($controllerClassName);
         $this->assertActionMethodName($controllerClassName, $method);
 
         $this->provider->addRoute(
-            $routePath,
+            $this->apiSpec->getRoutePath(),
             $method,
             $this->getControllerNamespaceClass($controllerClassName),
             $this->getActionMethodName($method),
+            $this->getHTTPStatusCodeSuccess($method),
             function () {
                 $this->assertHTTPProtocol();
                 $this->assertHTTPContentType();
@@ -90,6 +89,30 @@ class RREST
     public function applyCORS($origin = '*', $methods = 'GET,POST,PUT,DELETE,OPTIONS', $headers = '')
     {
         return $this->provider->applyCORS($origin, $methods, $headers);
+    }
+
+    /**
+     * Find the sucess status code to apply at the end of the request
+     *
+     * @param  string $method
+     *
+     * @return int
+     */
+    protected function getHTTPStatusCodeSuccess($method)
+    {
+        $statusCodes = $this->apiSpec->getStatusCodes();
+        //find a 20x code
+        $statusCodes20x = array_filter($statusCodes, function($value) {
+            return preg_match('/20\d?/', $value);
+        });
+        if(count($statusCodes20x) === 1) {
+            return (int) array_pop($statusCodes20x);
+        }
+        else {
+            throw new \RuntimeException('You can\'t define multiple 20x for one resource path!');
+        }
+        //default
+        return 200;
     }
 
     /**

@@ -13,7 +13,7 @@ interface ProviderInterface
      * @param string  $actionMethodName
      * @param Closure $assertRequestFunction
      */
-    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, \Closure $assertRequestFunction);
+    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, $httpStatusCodeSuccess, \Closure $assertRequestFunction);
 
     /**
      * Apply CORS (cross-origin resource sharing) to answer to an OPTION request.

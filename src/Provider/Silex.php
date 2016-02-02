@@ -31,7 +31,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, \Closure $assertRequestFunction)
+    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, $httpStatusCodeSuccess, \Closure $assertRequestFunction)
     {
         $controller = $this->app->match(
             $routePath,
@@ -48,6 +48,9 @@ class Silex implements ProviderInterface
             $this->request = $request;
             $assertRequestFunction();
         });
+
+        //define the default success code to be apply at the end in the controller
+        $controller->value('httpStatusCodeSuccess', $httpStatusCodeSuccess);
     }
 
     /**
