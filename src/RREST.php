@@ -74,8 +74,8 @@ class RREST
                 $this->assertHTTPContentType();
                 $this->assertHTTPParameters();
                 $this->assertHTTPPayloadBody();
-                $this->hintHTTPParameterValue();
-                $this->hintHTTPPayloadBody();
+                $this->hintHTTPParameterValue($this->hintedHTTPParameters);
+                $this->hintHTTPPayloadBody($this->hintedPayloadBody);
             }
         );
     }
@@ -152,68 +152,125 @@ class RREST
         }
     }
 
-    protected function hintHTTPParameterValue()
+    protected function hintHTTPParameterValue($hintedHTTPParameters)
     {
-        foreach ($this->hintedHTTPParameters as $key => $value) {
+        foreach ($hintedHTTPParameters as $key => $value) {
             $this->provider->setHTTPParameterValue($key, $value);
         }
     }
 
     /**
      * @throw RREST\Exception\InvalidBodyException
-     * @throw RREST\Exception\InvalidParameterException
      */
     protected function assertHTTPPayloadBody()
     {
-        //FIXME: split/refactor the code
-        //FIXME: handle XML
-        $payloadBodySchema = $this->apiSpec->getPayloadBodySchema(
-            $this->provider->getContentType()
-        );
+        $httpContentType = $this->provider->getContentType();
+        $payloadBodySchema = $this->apiSpec->getPayloadBodySchema($httpContentType);
 
-        //No payload body here, on need to assert
+        //No payload body here, no need to assert
         if($payloadBodySchema === false) {
             return;
         }
 
-        //validate json
-        $payloadBodyValueJSON = json_decode($this->provider->getHTTPPayloadBodyValue());
+        $payloadBodyValue = $this->provider->getHTTPPayloadBodyValue();
+
+        switch (true) {
+            case strpos($httpContentType, 'json') !== false:
+                $this->assertHTTPPayloadBodyJSON($payloadBodyValue, $payloadBodySchema);
+                break;
+            case strpos($httpContentType, 'xml') !== false:
+                $this->assertHTTPPayloadBodyXML($payloadBodyValue, $payloadBodySchema);
+                break;
+            default:
+                throw new UnsupportedMediaTypeHttpException();
+                break;
+        }
+    }
+
+    /**
+     * @param  string $payloadBodyValue
+     * @param  string $payloadBodySchema
+     *
+     * @throws RREST\Exception\InvalidBodyException
+     *
+     */
+    protected function assertHTTPPayloadBodyXML($payloadBodyValue, $payloadBodySchema)
+    {
+        $thowInvalidBodyException = function() {
+            $invalidBodyError = [];
+            $libXMLErrors = libxml_get_errors();
+            libxml_clear_errors();
+            if (empty($libXMLErrors) === false) {
+                foreach ($libXMLErrors as $libXMLError) {
+                    $message = $libXMLError->message.' (line: '.$libXMLError->line.')';
+                    $invalidBodyError[] = new Error(
+                        $message,
+                        'invalid-payloadbody-xml'
+                    );
+                }
+                if (empty($invalidBodyError) == false) {
+                    throw new InvalidBodyException($invalidBodyError);
+                }
+            }
+        };
+
+        //validate XML
+        $originalErrorLevel = libxml_use_internal_errors(true);
+        $dom = new \DOMDocument;
+        $dom->loadXML($payloadBodyValue);
+        $thowInvalidBodyException();
+
+        //validate XMLSchema
+        $invalidBodyError = [];
+        $dom->schemaValidateSource($payloadBodySchema);
+        $thowInvalidBodyException();
+
+        libxml_use_internal_errors($originalErrorLevel);
+        $this->hintedPayloadBody= $payloadBodyValueXML;
+    }
+
+    /**
+     * @param  string $payloadBodyValue
+     * @param  string $payloadBodySchema
+     *
+     * @throws RREST\Exception\InvalidBodyException
+     *
+     */
+    protected function assertHTTPPayloadBodyJSON($payloadBodyValue, $payloadBodySchema)
+    {
+        //validate JSON
+        $payloadBodyValueJSON = json_decode($payloadBodyValue);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $error = new Error();
-            $error->message = ucfirst(json_last_error_msg());
-            $error->code = 50;
-            throw new InvalidBodyException([$error]);
+            throw new InvalidBodyException([new Error(
+                ucfirst(json_last_error_msg()),
+                'invalid-payloadbody-json'
+            )]);
         }
 
         //validate JsonSchema
-        $invalidBodyError = [];
         $jsonValidator = new Validator();
         $jsonValidator->check($payloadBodyValueJSON, json_decode($payloadBodySchema));
         if ($jsonValidator->isValid() === false) {
+            $invalidBodyError = [];
             foreach ($jsonValidator->getErrors() as $jsonError) {
-                $error = new Error();
-                $error->message = ucfirst(
-                    trim(
-                        strtolower(
-                            $jsonError['property'].' property: '.$jsonError['message']
-                        )
-                    )
+                $invalidBodyError[] = new Error(
+                    ucfirst(trim(strtolower(
+                        $jsonError['property'].' property: '.$jsonError['message']
+                    ))),
+                    'invalid-payloadbody-json'
                 );
-                $error->code = 52;
-                $invalidBodyError[] = $error;
             }
-
             if (empty($invalidBodyError) == false) {
-                throw new InvalidParameterException($invalidBodyError);
+                throw new InvalidBodyException($invalidBodyError);
             }
         }
 
         $this->hintedPayloadBody= $payloadBodyValueJSON;
     }
 
-    protected function hintHTTPPayloadBody()
+    protected function hintHTTPPayloadBody($hintedPayloadBody)
     {
-        $this->provider->setHTTPPayloadBodyValue( $this->hintedPayloadBody );
+        $this->provider->setHTTPPayloadBodyValue( $hintedPayloadBody );
     }
 
     /**
