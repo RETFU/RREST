@@ -52,9 +52,14 @@ interface ProviderInterface
     /**
      * Return the payload body content.
      *
-     * TODO automatic decode JSON for example
-     *
      * @return string
      */
     public function getHTTPPayloadBodyValue();
+
+    /**
+     * Set the payload body
+     *
+     * @param string $key
+     */
+    public function setHTTPPayloadBodyValue($payloadBodyJSON);
 }

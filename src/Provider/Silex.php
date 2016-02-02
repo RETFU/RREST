@@ -121,6 +121,14 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
+    public function setHTTPPayloadBodyValue($payloadBodyJSON)
+    {
+        $this->request->request->replace((array) $payloadBodyJSON);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getContentType()
     {
         return $this->request->headers->get('Content-Type');

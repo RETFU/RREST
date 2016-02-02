@@ -35,6 +35,11 @@ class RREST
     protected $hintedHTTPParameters;
 
     /**
+     * @var array|stdClass
+     */
+    protected $hintedPayloadBody;
+
+    /**
      * @param APISpecInterface  $apiSpec
      * @param ProviderInterface $provider
      * @param string            $controllerNamespace
@@ -69,6 +74,7 @@ class RREST
                 $this->assertHTTPParameters();
                 $this->assertHTTPPayloadBody();
                 $this->hintHTTPParameterValue();
+                $this->hintHTTPPayloadBody();
             }
         );
     }
@@ -190,6 +196,13 @@ class RREST
                 throw new InvalidParameterException($invalidBodyError);
             }
         }
+
+        $this->hintedPayloadBody= $payloadBodyValueJSON;
+    }
+
+    protected function hintHTTPPayloadBody()
+    {
+        $this->provider->setHTTPPayloadBodyValue( $this->hintedPayloadBody );
     }
 
     /**
