@@ -109,7 +109,11 @@ class RREST
      */
     protected function assertHTTPContentType()
     {
-        if( in_array($this->provider->getContentType(), $this->apiSpec->getContentTypes()) === false ) {
+        $contentTypes = $this->apiSpec->getContentTypes();
+        if(
+            empty($contentTypes) === false &&
+            in_array($this->provider->getContentType(),$contentTypes) === false
+        ) {
             throw new UnsupportedMediaTypeHttpException();
         }
     }
