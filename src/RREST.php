@@ -120,9 +120,9 @@ class RREST
      */
     protected function assertHTTPProtocol()
     {
-        $supportedHTTPProtocols = array_map('strtoupper', $this->apiSpec->getSupportedHTTPProtocols());
+        $httpProtocols = array_map('strtoupper', $this->apiSpec->getHTTPProtocols());
         $httpProtocol = strtoupper($this->provider->getHTTPProtocol());
-        if(in_array($httpProtocol, $supportedHTTPProtocols) === false) {
+        if(in_array($httpProtocol, $httpProtocols) === false) {
             throw new AccessDeniedHttpException();
         }
     }

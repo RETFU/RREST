@@ -91,7 +91,7 @@ class RAML implements APISpecInterface
     /**
      * @inheritdoc
      */
-    public function getSupportedHTTPProtocols()
+    public function getHTTPProtocols()
     {
         return $this->apiDefinition->getProtocols();
     }
