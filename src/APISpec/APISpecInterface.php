@@ -32,7 +32,7 @@ interface APISpecInterface
     /**
      * @return integer[]
      */
-    public function getStatusCodes()
+    public function getStatusCodes();
 
     /**
      * @return string[]
