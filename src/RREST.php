@@ -99,6 +99,9 @@ class RREST
     protected function getResponse()
     {
         $contentTypes = $this->apiSpec->getResponseContentTypes();
+        if(empty($contentTypes)) {
+            throw new \RuntimeException('No content type defined for this response');
+        }
         $contentType = $this->provider->getHTTPHeaderAccept();
         if( in_array($contentType, $contentTypes) == false ) {
             throw new NotAcceptableHttpException();
