@@ -71,6 +71,9 @@ class RREST
         );
         $this->assertControllerClassName($controllerClassName);
         $this->assertActionMethodName($controllerClassName, $method);
+        $this->assertHTTPProtocol();
+        $this->assertHTTPAccept();
+        $this->assertHTTPContentType();
 
         $this->provider->addRoute(
             $this->apiSpec->getRoutePath(),
@@ -79,9 +82,6 @@ class RREST
             $this->getActionMethodName($method),
             $this->getResponse(),
             function () {
-                $this->assertHTTPProtocol();
-                $this->assertHTTPAccept();
-                $this->assertHTTPContentType();
                 $this->assertHTTPParameters();
                 $this->assertHTTPPayloadBody();
                 $this->hintHTTPParameterValue($this->hintedHTTPParameters);
