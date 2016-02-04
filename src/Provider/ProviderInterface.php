@@ -34,6 +34,16 @@ interface ProviderInterface
     public function getHTTPProtocol();
 
     /**
+     * @return string
+     */
+    public function getHTTPHeaderContentType();
+
+    /**
+     * @return string
+     */
+    public function getHTTPHeaderAccept();
+
+    /**
      * Return the parameter typed or raw value.
      *
      * @param string $key
@@ -73,5 +83,5 @@ interface ProviderInterface
      *
      * @return mixed
      */
-    public function getHTTPResponse($statusCode, $contentType);
+    public function getResponse($statusCode, $contentType);
 }

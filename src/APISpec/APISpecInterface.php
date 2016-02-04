@@ -37,7 +37,7 @@ interface APISpecInterface
     /**
      * @return string[]
      */
-    public function getHTTPProtocols();
+    public function getProtocols();
 
     /**
      * @return RREST\Parameter[]

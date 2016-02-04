@@ -69,7 +69,7 @@ class RREST
             $method,
             $this->getControllerNamespaceClass($controllerClassName),
             $this->getActionMethodName($method),
-            $this->getHTTPResponse(),
+            $this->getResponse(),
             function () {
                 $this->assertHTTPProtocol();
                 $this->assertHTTPContentType();
@@ -96,10 +96,10 @@ class RREST
     /**
      * @return boolean
      */
-    protected function getHTTPResponse()
+    protected function getResponse()
     {
         $contentTypes = $this->apiSpec->getResponseContentTypes();
-        $contentType = $this->provider->getAccept();
+        $contentType = $this->provider->getHTTPHeaderAccept();
         if( in_array($contentType, $contentTypes) == false ) {
             throw new NotAcceptableHttpException();
         }
@@ -118,10 +118,10 @@ class RREST
         }
 
         $response = new Response(
-            $this->provider->getHTTPResponse($statusCode, $contentType),
+            $this->provider->getResponse($statusCode, $contentType),
             $format,
             function($response, $content) {
-                return $this->provider->setHTTPResponseContent($response, $content);
+                return $this->provider->setResponseContent($response, $content);
             }
         );
         return $response;
@@ -154,7 +154,7 @@ class RREST
      */
     protected function assertHTTPProtocol()
     {
-        $httpProtocols = array_map('strtoupper', $this->apiSpec->getHTTPProtocols());
+        $httpProtocols = array_map('strtoupper', $this->apiSpec->getProtocols());
         $httpProtocol = strtoupper($this->provider->getHTTPProtocol());
         if(in_array($httpProtocol, $httpProtocols) === false) {
             throw new AccessDeniedHttpException();
@@ -169,7 +169,7 @@ class RREST
         $contentTypes = $this->apiSpec->getBodyContentTypes();
         if(
             empty($contentTypes) === false &&
-            in_array($this->provider->getContentType(),$contentTypes) === false
+            in_array($this->provider->getHTTPHeaderContentType(),$contentTypes) === false
         ) {
             throw new UnsupportedMediaTypeHttpException();
         }
@@ -225,7 +225,7 @@ class RREST
      */
     protected function assertHTTPPayloadBody()
     {
-        $httpContentType = $this->provider->getContentType();
+        $httpContentType = $this->provider->getHTTPHeaderContentType();
         $payloadBodySchema = $this->apiSpec->getPayloadBodySchema($httpContentType);
 
         //No payload body here, no need to assert

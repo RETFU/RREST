@@ -135,7 +135,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getContentType()
+    public function getHTTPHeaderContentType()
     {
         return $this->request->headers->get('Content-Type');
     }
@@ -143,7 +143,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getAccept()
+    public function getHTTPHeaderAccept()
     {
         return $this->request->headers->get('Accept');
     }
@@ -151,7 +151,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getHTTPResponse($statusCode, $contentType)
+    public function getResponse($statusCode, $contentType)
     {
         return new HttpFoundationResponse('', $statusCode, [
             'Content-Type' => $contentType,
@@ -162,7 +162,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function setHTTPResponseContent(Response $response, $content)
+    public function setResponseContent(Response $response, $content)
     {
         return $response->getProviderResponse()->setContent($content);
     }
