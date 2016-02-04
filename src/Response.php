@@ -6,6 +6,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use RREST\Provider\ProviderInterface;
 
 class Response extends HttpFoundationResponse
 {
@@ -32,23 +33,27 @@ class Response extends HttpFoundationResponse
     protected $supportedFormat = ['json','xml'];
 
     /**
-     * The callback to set the serialized content into
-     * this provider response
-     *
-     * @var \Closure
+     * @var ProviderInterface
      */
-    protected $contentCallBack;
+    protected $provider;
+
+    /**
+     * The URL of a resource, useful when POST a new one
+     *
+     * @var string
+     */
+    protected $resourceLocation;
 
     /**
      * @param mixed $providerResponse
      * @param string $format
-     * @param \Closure $contentCallBack
+     * @param ProviderInterface provider
      */
-    public function __construct($providerResponse, $format, $contentCallBack)
+    public function __construct($providerResponse, $format, ProviderInterface $provider)
     {
         $this->setProviderResponse($providerResponse);
         $this->setFormat($format);
-        $this->setContentCallBack($contentCallBack);
+        $this->setProvider($provider);
     }
 
     /**
@@ -89,19 +94,36 @@ class Response extends HttpFoundationResponse
     }
 
     /**
-     * @param Closure $contentCallBack
+     * @return mixed
      */
-    public function setContentCallBack(\Closure $contentCallBack)
+    public function getResourceLocation()
     {
-        $this->contentCallBack = $contentCallBack;
+        return $this->resourceLocation;
     }
 
     /**
-     * @return Closure $contentCallBack
+     * @param mixed
      */
-    public function getContentCallBack()
+    public function setResourceLocation($resourceLocation)
     {
-        return $this->contentCallBack;
+        $this->resourceLocation = $resourceLocation;
+
+    }
+
+    /**
+     * @param ProviderInterface $provider
+     */
+    public function setProvider(ProviderInterface $provider)
+    {
+        $this->provider = $provider;
+    }
+
+    /**
+     * @return ProviderInterface
+     */
+    public function getProvider()
+    {
+        return $this->provider;
     }
 
     /**
@@ -112,6 +134,10 @@ class Response extends HttpFoundationResponse
     public function setContent($content)
     {
         $this->content = $content;
+    }
+
+    public function build()
+    {
         $serializer = new Serializer([
                 new ObjectNormalizer()
             ],[
@@ -120,9 +146,7 @@ class Response extends HttpFoundationResponse
             ]
         );
         $content = $serializer->serialize($this->getContent(), $this->getFormat());
-        return call_user_func_array(
-            $this->contentCallBack, [$this,$content]
-        );
+        $this->provider->configureResponse($this, $content);
     }
 
     /**
