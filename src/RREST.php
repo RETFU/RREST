@@ -4,11 +4,13 @@ namespace RREST;
 
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use JsonSchema\Validator;
 use RREST\APISpec\APISpecInterface;
 use RREST\Provider\ProviderInterface;
 use RREST\Exception\InvalidParameterException;
 use RREST\Exception\InvalidBodyException;
+use RREST\Response;
 
 /**
  * ApiSpec + Provider = RREST.
@@ -67,7 +69,7 @@ class RREST
             $method,
             $this->getControllerNamespaceClass($controllerClassName),
             $this->getActionMethodName($method),
-            $this->getHTTPStatusCodeSuccess($method),
+            $this->getHTTPResponse(),
             function () {
                 $this->assertHTTPProtocol();
                 $this->assertHTTPContentType();
@@ -92,13 +94,45 @@ class RREST
     }
 
     /**
+     * @return boolean
+     */
+    protected function getHTTPResponse()
+    {
+        $contentTypes = $this->apiSpec->getResponseContentTypes();
+        $contentType = $this->provider->getAccept();
+        if( in_array($contentType, $contentTypes) == false ) {
+            throw new NotAcceptableHttpException();
+        }
+        $statusCode = $this->getHTTPStatusCodeSuccess();
+
+        $formats = [
+            'json' => ['application/json', 'application/x-json'],
+            'xml' => ['text/xml', 'application/xml', 'application/x-xml'],
+        ];
+
+        $format = 'json';
+        foreach ($formats as $format => $mimeTypes) {
+            if (in_array($contentType, $mimeTypes)) {
+                break;
+            }
+        }
+
+        $response = new Response(
+            $this->provider->getHTTPResponse($statusCode, $contentType),
+            $format,
+            function($response, $content) {
+                return $this->provider->setHTTPResponseContent($response, $content);
+            }
+        );
+        return $response;
+    }
+
+    /**
      * Find the sucess status code to apply at the end of the request
-     *
-     * @param  string $method
      *
      * @return int
      */
-    protected function getHTTPStatusCodeSuccess($method)
+    protected function getHTTPStatusCodeSuccess()
     {
         $statusCodes = $this->apiSpec->getStatusCodes();
         //find a 20x code
@@ -132,7 +166,7 @@ class RREST
      */
     protected function assertHTTPContentType()
     {
-        $contentTypes = $this->apiSpec->getContentTypes();
+        $contentTypes = $this->apiSpec->getBodyContentTypes();
         if(
             empty($contentTypes) === false &&
             in_array($this->provider->getContentType(),$contentTypes) === false

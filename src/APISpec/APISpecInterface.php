@@ -47,7 +47,12 @@ interface APISpecInterface
     /**
      * @return string[]|boolean
      */
-    public function getContentTypes();
+    public function getBodyContentTypes();
+
+    /**
+     * @return string[]|boolean
+     */
+    public function getResponseContentTypes();
 
     /**
      * @param  string $contentType

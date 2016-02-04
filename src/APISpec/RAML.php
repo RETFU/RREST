@@ -148,11 +148,25 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
-    public function getContentTypes()
+    public function getBodyContentTypes()
     {
         $contentTypes = [];
         foreach ($this->method->getBodies() as $body) {
             $contentTypes[] = $body->getMediaType();
+        }
+        return $contentTypes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponseContentTypes()
+    {
+        $contentTypes = [];
+        foreach ($this->method->getResponses() as $response) {
+            foreach ($response->getBodies() as $body) {
+                $contentTypes[] = $body->getMediaType();
+            }
         }
         return $contentTypes;
     }

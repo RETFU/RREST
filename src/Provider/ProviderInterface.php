@@ -2,6 +2,8 @@
 
 namespace RREST\Provider;
 
+use RREST\Response;
+
 interface ProviderInterface
 {
     /**
@@ -13,7 +15,7 @@ interface ProviderInterface
      * @param string  $actionMethodName
      * @param Closure $assertRequestFunction
      */
-    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, $httpStatusCodeSuccess, \Closure $assertRequestFunction);
+    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $assertRequestFunction);
 
     /**
      * Apply CORS (cross-origin resource sharing) to answer to an OPTION request.
@@ -62,4 +64,14 @@ interface ProviderInterface
      * @param string $key
      */
     public function setHTTPPayloadBodyValue($payloadBodyJSON);
+
+    /**
+     * The response provide by the provider
+     *
+     * @param  int $statusCode
+     * @param  string $contentType
+     *
+     * @return mixed
+     */
+    public function getHTTPResponse($statusCode, $contentType);
 }

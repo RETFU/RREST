@@ -3,6 +3,8 @@
 namespace RREST\Provider;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
+use RREST\Response;
 use Silex\Application;
 
 /**
@@ -26,12 +28,13 @@ class Silex implements ProviderInterface
     public function __construct(Application $app)
     {
         $this->app = $app;
+        $this->request = Request::createFromGlobals();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, $httpStatusCodeSuccess, \Closure $assertRequestFunction)
+    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $assertRequestFunction)
     {
         $controller = $this->app->match(
             $routePath,
@@ -43,14 +46,14 @@ class Silex implements ProviderInterface
         // So we can't validate baseUriParameter like itemId -> /item/{itemId}/
         // That's why we must wait app routing & use a closure to keep the Logic
         // in the RREST class.
-        // $this->request = Request::createFromGlobals();
+
         $controller->before(function (Request $request) use ($assertRequestFunction) {
             $this->request = $request;
             $assertRequestFunction();
         });
 
-        //define the default success code to be apply at the end in the controller
-        $controller->value('httpStatusCodeSuccess', $httpStatusCodeSuccess);
+        //define a response configured
+        $controller->value('response', $response);
     }
 
     /**
@@ -135,5 +138,32 @@ class Silex implements ProviderInterface
     public function getContentType()
     {
         return $this->request->headers->get('Content-Type');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccept()
+    {
+        return $this->request->headers->get('Accept');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHTTPResponse($statusCode, $contentType)
+    {
+        return new HttpFoundationResponse('', $statusCode, [
+            'Content-Type' => $contentType,
+            //FIXME: add others useful headers
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHTTPResponseContent(Response $response, $content)
+    {
+        return $response->getProviderResponse()->setContent($content);
     }
 }
