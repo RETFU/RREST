@@ -80,6 +80,7 @@ class RREST
             $this->getResponse(),
             function () {
                 $this->assertHTTPProtocol();
+                $this->assertHTTPAccept();
                 $this->assertHTTPContentType();
                 $this->assertHTTPParameters();
                 $this->assertHTTPPayloadBody();
@@ -108,6 +109,7 @@ class RREST
     {
         $statusCode = $this->getHTTPStatusCodeSuccess();
         $format = $this->getResponseFormat();
+        $contentType = $this->provider->getHTTPHeaderAccept();
         $response = new Response(
             $this->provider->getResponse($statusCode, $contentType),
             $format,
@@ -184,6 +186,21 @@ class RREST
             in_array($this->provider->getHTTPHeaderContentType(),$contentTypes) === false
         ) {
             throw new UnsupportedMediaTypeHttpException();
+        }
+    }
+
+    /**
+     * @throw UnsupportedMediaTypeHttpException
+     */
+    protected function assertHTTPAccept()
+    {
+        $contentTypes = $this->apiSpec->getResponseContentTypes();
+        if(empty($contentTypes)) {
+            throw new \RuntimeException('No content type defined for this response');
+        }
+        $contentType = $this->provider->getHTTPHeaderAccept();
+        if( in_array($contentType,$contentTypes) === false ) {
+            throw new NotAcceptableHttpException();
         }
     }
 
