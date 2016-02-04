@@ -16,6 +16,8 @@
     },
     "require": {
         "symfony/http-kernel": "~2.8",
+        "symfony/serializer": "~2.8",
+		"symfony/property-access": "~2.8",
         "justinrainbow/json-schema": "~1.6",
         "jrfnl/PHP-cast-to-type": "~2.0"
     }
