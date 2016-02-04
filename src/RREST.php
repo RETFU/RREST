@@ -43,6 +43,14 @@ class RREST
     protected $hintedPayloadBody;
 
     /**
+     * @var array[]
+     */
+    protected $formats = [
+        'json' => ['application/json', 'application/x-json'],
+        'xml' => ['text/xml', 'application/xml', 'application/x-xml'],
+    ];
+
+    /**
      * @param APISpecInterface  $apiSpec
      * @param ProviderInterface $provider
      * @param string            $controllerNamespace
@@ -94,9 +102,26 @@ class RREST
     }
 
     /**
-     * @return boolean
+     * @return Response
      */
     protected function getResponse()
+    {
+        $statusCode = $this->getHTTPStatusCodeSuccess();
+        $format = $this->getResponseFormat();
+        $response = new Response(
+            $this->provider->getResponse($statusCode, $contentType),
+            $format,
+            function($response, $content) {
+                return $this->provider->setResponseContent($response, $content);
+            }
+        );
+        return $response;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getResponseFormat($format = 'json')
     {
         $contentTypes = $this->apiSpec->getResponseContentTypes();
         if(empty($contentTypes)) {
@@ -106,28 +131,12 @@ class RREST
         if( in_array($contentType, $contentTypes) == false ) {
             throw new NotAcceptableHttpException();
         }
-        $statusCode = $this->getHTTPStatusCodeSuccess();
-
-        $formats = [
-            'json' => ['application/json', 'application/x-json'],
-            'xml' => ['text/xml', 'application/xml', 'application/x-xml'],
-        ];
-
-        $format = 'json';
-        foreach ($formats as $format => $mimeTypes) {
+        foreach ($this->formats as $format => $mimeTypes) {
             if (in_array($contentType, $mimeTypes)) {
                 break;
             }
         }
-
-        $response = new Response(
-            $this->provider->getResponse($statusCode, $contentType),
-            $format,
-            function($response, $content) {
-                return $this->provider->setResponseContent($response, $content);
-            }
-        );
-        return $response;
+        return $format;
     }
 
     /**

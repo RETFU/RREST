@@ -119,7 +119,6 @@ class Response extends HttpFoundationResponse
                 'json' => new JsonEncoder(),
             ]
         );
-
         $content = $serializer->serialize($this->getContent(), $this->getFormat());
         return call_user_func_array(
             $this->contentCallBack, [$this,$content]
