@@ -72,8 +72,8 @@ class RREST
         $this->assertControllerClassName($controllerClassName);
         $this->assertActionMethodName($controllerClassName, $method);
         $this->assertHTTPProtocol();
-        $this->assertHTTPAccept();
-        $this->assertHTTPContentType();
+        $this->assertHTTPHeaderAccept();
+        $this->assertHTTPHeaderContentType();
 
         $this->provider->addRoute(
             $this->apiSpec->getRoutePath(),
@@ -178,7 +178,7 @@ class RREST
     /**
      * @throw UnsupportedMediaTypeHttpException
      */
-    protected function assertHTTPContentType()
+    protected function assertHTTPHeaderContentType()
     {
         $contentTypes = $this->apiSpec->getBodyContentTypes();
         if(
@@ -192,7 +192,7 @@ class RREST
     /**
      * @throw UnsupportedMediaTypeHttpException
      */
-    protected function assertHTTPAccept()
+    protected function assertHTTPHeaderAccept()
     {
         $contentTypes = $this->apiSpec->getResponseContentTypes();
         if(empty($contentTypes)) {
