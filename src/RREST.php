@@ -124,7 +124,7 @@ class RREST
     {
         $contentTypes = $this->apiSpec->getResponseContentTypes();
         if(empty($contentTypes)) {
-            throw new \RuntimeException('No content type defined for this response');
+            throw new \RuntimeException('No content type defined for this response in your APISpec');
         }
         $contentType = $this->provider->getHTTPHeaderAccept();
         if( in_array($contentType, $contentTypes) == false ) {
