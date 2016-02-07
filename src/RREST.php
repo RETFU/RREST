@@ -107,12 +107,13 @@ class RREST
     {
         $statusCode = $this->getHTTPStatusCodeSuccess();
         $format = $this->getResponseFormat();
-        $contentType = $this->provider->getHTTPHeaderAccept();
         $response = new Response(
-            //FIXME: refactor this to only pass provider, format & statusCode
-            $this->provider->getResponse($statusCode, $contentType),
+            $this->provider,
             $format,
-            $this->provider
+            $statusCode
+        );
+        $response->setHeaderContentType(
+            $this->provider->getHTTPHeaderAccept()
         );
         return $response;
     }

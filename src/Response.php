@@ -1,22 +1,14 @@
 <?php
 namespace RREST;
 
-use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use RREST\Provider\ProviderInterface;
 
-class Response extends HttpFoundationResponse
+class Response
 {
-    /**
-     * The provider response
-     *
-     * @var mixed
-     */
-    protected $providerResponse;
-
     /**
      * @var mixed
      */
@@ -26,6 +18,11 @@ class Response extends HttpFoundationResponse
      * @var string
      */
     protected $format;
+
+    /**
+     * @var string
+     */
+    protected $statusCode;
 
     /**
      * @var string[]
@@ -42,18 +39,18 @@ class Response extends HttpFoundationResponse
      *
      * @var string
      */
-    protected $resourceLocation;
+    protected $headerLocation;
 
     /**
-     * @param mixed $providerResponse
-     * @param string $format
-     * @param ProviderInterface provider
+     * @var string
      */
-    public function __construct($providerResponse, $format, ProviderInterface $provider)
+    protected $headerContentType;
+
+    public function __construct(ProviderInterface $provider, $format, $statusCode)
     {
-        $this->setProviderResponse($providerResponse);
         $this->setFormat($format);
         $this->setProvider($provider);
+        $this->setStatusCode($statusCode);
     }
 
     /**
@@ -78,36 +75,89 @@ class Response extends HttpFoundationResponse
     }
 
     /**
+     * @return string
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
+    }
+
+    /**
+     * @param string
+     */
+    public function setStatusCode($statusCode)
+    {
+        $this->statusCode = $statusCode;
+    }
+
+    /**
      * @return mixed
      */
-    public function getProviderResponse()
+    public function getHeaderLocation()
     {
-        return $this->providerResponse;
+        return $this->headerLocation;
     }
 
     /**
      * @param mixed
      */
-    public function setProviderResponse($providerResponse)
+    public function setHeaderLocation($headerLocation)
     {
-        $this->providerResponse = $providerResponse;
+        $this->headerLocation = $headerLocation;
+
     }
 
     /**
      * @return mixed
      */
-    public function getResourceLocation()
+    public function getHeaderContentType()
     {
-        return $this->resourceLocation;
+        return $this->headerContentType;
     }
 
     /**
      * @param mixed
      */
-    public function setResourceLocation($resourceLocation)
+    public function setHeaderContentType($headerContentType)
     {
-        $this->resourceLocation = $resourceLocation;
+        $this->headerContentType = $headerContentType;
+    }
 
+    /**
+     * All headers configured, index by header name
+     *
+     * @return string[]
+     */
+    public function getHeaders()
+    {
+        $headers = [];
+        $contentType = $this->getHeaderContentType();
+        if(empty($contentType)===false) {
+            $headers['Content-Type'] = $contentType;
+        }
+        $location = $this->getHeaderLocation();
+        if(empty($location)===false) {
+            $headers['Location'] = $location;
+        }
+        return $headers;
+    }
+
+    /**
+     * @param mixed $content
+     *
+     * @return boolean
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContent()
+    {
+        return $this->content;
     }
 
     /**
@@ -127,16 +177,33 @@ class Response extends HttpFoundationResponse
     }
 
     /**
-     * @param mixed $content
+     * Get a provider configured response with:
+     * - content serialized
+     * - success status code
+     * - header Content-Type
+     * - header Location
      *
-     * @return boolean
+     * @param  boolean $autoSerializeContent
+     *
+     * @return mixed
      */
-    public function setContent($content)
+    public function getProviderResponse($autoSerializeContent=true)
     {
-        $this->content = $content;
+        $content = $this->getContent();
+        if($autoSerializeContent) {
+            $content = $this->serialized($content, $this->getFormat());
+        }
+        return $this->provider->getResponse(
+            $content, $this->getStatusCode(), $this->getHeaders()
+        );
     }
 
-    public function build()
+    /**
+     * @param  mixed $data
+     * @param  string $format
+     * @return string
+     */
+    protected function serialized($data, $format)
     {
         $serializer = new Serializer([
                 new ObjectNormalizer()
@@ -145,15 +212,7 @@ class Response extends HttpFoundationResponse
                 'json' => new JsonEncoder(),
             ]
         );
-        $content = $serializer->serialize($this->getContent(), $this->getFormat());
-        $this->provider->configureResponse($this, $content);
-    }
 
-    /**
-     * @return mixed
-     */
-    public function getContent()
-    {
-        return $this->content;
+        return $serializer->serialize($data, $format);
     }
 }

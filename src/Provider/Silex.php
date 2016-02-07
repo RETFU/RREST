@@ -142,26 +142,8 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponse($statusCode, $contentType)
+    public function getResponse($content = '', $statusCode = 200, $headers = array())
     {
-        return new HttpFoundationResponse('', $statusCode, [
-            'Content-Type' => $contentType,
-            //FIXME: add others useful headers
-        ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureResponse(Response $response, $content)
-    {
-        $providerResponse = $response->getProviderResponse();
-        $return = $providerResponse->setContent($content);
-        $location = $response->getResourceLocation();
-        if(empty($location)===false) {
-            $return = $return && $providerResponse->headers->set('Location', $location);
-        }
-
-        return $return;
+        return new HttpFoundationResponse($content, $statusCode, $headers);
     }
 }

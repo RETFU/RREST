@@ -76,12 +76,13 @@ interface ProviderInterface
     public function setHTTPPayloadBodyValue($payloadBodyJSON);
 
     /**
-     * The response provide by the provider
+     * The provider response
      *
      * @param  int $statusCode
      * @param  string $contentType
+     * @param  string[] $headers
      *
      * @return mixed
      */
-    public function getResponse($statusCode, $contentType);
+    public function getResponse($content = '', $statusCode = 200, $headers = array());
 }
