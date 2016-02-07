@@ -213,6 +213,11 @@ class Response
             ]
         );
 
+        //serializer can handle stdClass for JSON
+        if($data instanceof \stdClass) {
+            $data = (array) $data;
+        }
+
         return $serializer->serialize($data, $format);
     }
 }
