@@ -9,13 +9,13 @@ interface ProviderInterface
     /**
      * Adding a new provider route.
      *
-     * @param string  $routePath
-     * @param string  $method
-     * @param string  $controllerClassName
-     * @param string  $actionMethodName
-     * @param Closure $assertRequestFunction
+     * @param string    $routePath
+     * @param string    $method
+     * @param string    $controllerClassName
+     * @param string    $actionMethodName
+     * @param Response  $response
      */
-    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $assertRequestFunction);
+    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response);
 
     /**
      * Apply CORS (cross-origin resource sharing) to answer to an OPTION request.

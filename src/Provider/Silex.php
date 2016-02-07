@@ -34,26 +34,15 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $assertRequestFunction)
+    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response)
     {
         $controller = $this->app->match(
             $routePath,
             $controllerClassName.'::'.$actionMethodName
         )
-        ->method(strtoupper($method));
-
-        // In Silex, at this point, $this->request->attribute is not set.
-        // So we can't validate baseUriParameter like itemId -> /item/{itemId}/
-        // That's why we must wait app routing & use a closure to keep the Logic
-        // in the RREST class.
-
-        $controller->before(function (Request $request) use ($assertRequestFunction) {
-            $this->request = $request;
-            $assertRequestFunction();
-        });
-
+        ->method(strtoupper($method))
         //define a response configured
-        $controller->value('response', $response);
+        ->value('response', $response);
     }
 
     /**
@@ -87,7 +76,7 @@ class Silex implements ProviderInterface
      */
     public function getHTTPParameterValue($key, $type)
     {
-        $parameterBags = ['query', 'attributes', 'request'];
+        $parameterBags = ['query', 'request', 'attributes'];
         // Search in all Silex Request parameters
         foreach ($parameterBags as $parameterBag) {
             $requestParam = $this->request->{$parameterBag};
@@ -96,7 +85,7 @@ class Silex implements ProviderInterface
             }
         }
 
-        return;
+        return null;
     }
 
     /**
@@ -104,7 +93,7 @@ class Silex implements ProviderInterface
      */
     public function setHTTPParameterValue($key, $value)
     {
-        $parameterBags = ['query', 'attributes', 'request'];
+        $parameterBags = ['query', 'request', 'attributes'];
         // Search in Silex Request parameters
         foreach ($parameterBags as $parameterBag) {
             $requestParam = $this->request->{$parameterBag};
@@ -145,7 +134,9 @@ class Silex implements ProviderInterface
      */
     public function getHTTPHeaderAccept()
     {
-        return $this->request->headers->get('Accept');
+        //Accept is empty in header, a bug?
+        //return $this->request->headers->get('Accept');
+        return $this->request->server->get('HTTP_ACCEPT');
     }
 
     /**

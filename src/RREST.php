@@ -74,19 +74,17 @@ class RREST
         $this->assertHTTPProtocol();
         $this->assertHTTPHeaderAccept();
         $this->assertHTTPHeaderContentType();
+        $this->assertHTTPParameters();
+        $this->assertHTTPPayloadBody();
+        $this->hintHTTPParameterValue($this->hintedHTTPParameters);
+        $this->hintHTTPPayloadBody($this->hintedPayloadBody);
 
         $this->provider->addRoute(
             $this->apiSpec->getRoutePath(),
             $method,
             $this->getControllerNamespaceClass($controllerClassName),
             $this->getActionMethodName($method),
-            $this->getResponse(),
-            function () {
-                $this->assertHTTPParameters();
-                $this->assertHTTPPayloadBody();
-                $this->hintHTTPParameterValue($this->hintedHTTPParameters);
-                $this->hintHTTPPayloadBody($this->hintedPayloadBody);
-            }
+            $this->getResponse()
         );
     }
 
