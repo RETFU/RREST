@@ -53,7 +53,7 @@ class RAML implements APISpecInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getRoutePath()
     {
@@ -61,7 +61,7 @@ class RAML implements APISpecInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getRessourcePath()
     {
@@ -69,7 +69,7 @@ class RAML implements APISpecInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getRouteMethod()
     {
@@ -77,7 +77,7 @@ class RAML implements APISpecInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getStatusCodes()
     {
@@ -89,20 +89,12 @@ class RAML implements APISpecInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getProtocols()
     {
         return $this->apiDefinition->getProtocols();
     }
-
-    /**
-     * @return string
-     */
-    // public function getRouteHeader($headerName)
-    // {
-    //     return $this->method->getHeaders();
-    // }
 
     /**
      * {@inheritdoc}
