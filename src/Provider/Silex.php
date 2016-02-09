@@ -34,7 +34,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response)
+    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $init)
     {
         $controller = $this->app->match(
             $routePath,
@@ -42,7 +42,11 @@ class Silex implements ProviderInterface
         )
         ->method(strtoupper($method))
         //define a response configured
-        ->value('response', $response);
+        ->value('response', $response)
+        ->before(function(Request $request) use ($init) {
+            $this->request = $request;
+            $init();
+        });
     }
 
     /**

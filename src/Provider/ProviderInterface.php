@@ -14,8 +14,9 @@ interface ProviderInterface
      * @param string    $controllerClassName
      * @param string    $actionMethodName
      * @param Response  $response
+     * @param \Closure  $init  A callback to call when the provider is initialized
      */
-    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response);
+    public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $init);
 
     /**
      * Apply CORS (cross-origin resource sharing) to answer to an OPTION request.
