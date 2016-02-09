@@ -231,7 +231,11 @@ class RAML implements APISpecInterface
      */
     private function extractRessourcePathFromURL($url, $split)
     {
-        $resourcePath = explode($split, $url)[1];
+        $resourcePath = '';
+        $parts = explode($split, $url);
+        if(count($parts) === 2) {
+            $resourcePath = explode($split, $url)[1];
+        }
 
         return $resourcePath;
     }
