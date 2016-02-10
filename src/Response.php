@@ -205,19 +205,17 @@ class Response
      */
     protected function serialized($data, $format)
     {
-        $serializer = new Serializer([
-                new ObjectNormalizer()
-            ],[
-                'xml' => new XmlEncoder(),
-                'json' => new JsonEncoder(),
-            ]
-        );
-
-        //serializer can handle stdClass for JSON
-        if($data instanceof \stdClass) {
-            $data = (array) $data;
+        if( $format === 'json' ) {
+            return json_encode($data);
         }
-
-        return $serializer->serialize($data, $format);
+        elseif( $format === 'xml' ) {
+            $serializer = new Serializer([
+                    new ObjectNormalizer()
+                ],[
+                    'xml' => new XmlEncoder(),
+                ]
+            );
+            return $serializer->serialize($data, $format);
+        }
     }
 }
