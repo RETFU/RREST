@@ -73,22 +73,26 @@ class RREST
         $this->assertControllerClassName($controllerClassName);
         $this->assertActionMethodName($controllerClassName, $method);
 
-        $this->provider->addRoute(
-            $this->apiSpec->getRoutePath(),
-            $method,
-            $this->getControllerNamespaceClass($controllerClassName),
-            $this->getActionMethodName($method),
-            $this->getResponse(),
-            function () {
-                $this->assertHTTPProtocol();
-                $this->assertHTTPHeaderAccept();
-                $this->assertHTTPHeaderContentType();
-                $this->assertHTTPParameters();
-                $this->assertHTTPPayloadBody();
-                $this->hintHTTPParameterValue($this->hintedHTTPParameters);
-                $this->hintHTTPPayloadBody($this->hintedPayloadBody);
-            }
-        );
+        $routPaths = $this->getRoutePaths($this->apiSpec->getRoutePath());
+
+        foreach ($routPaths as $routPath) {
+            $this->provider->addRoute(
+                $routPath,
+                $method,
+                $this->getControllerNamespaceClass($controllerClassName),
+                $this->getActionMethodName($method),
+                $this->getResponse(),
+                function () {
+                    $this->assertHTTPProtocol();
+                    $this->assertHTTPHeaderAccept();
+                    $this->assertHTTPHeaderContentType();
+                    $this->assertHTTPParameters();
+                    $this->assertHTTPPayloadBody();
+                    $this->hintHTTPParameterValue($this->hintedHTTPParameters);
+                    $this->hintHTTPPayloadBody($this->hintedPayloadBody);
+                }
+            );
+        }
     }
 
     /**
@@ -101,6 +105,28 @@ class RREST
     public function applyCORS($origin = '*', $methods = 'GET,POST,PUT,DELETE,OPTIONS', $headers = '')
     {
         return $this->provider->applyCORS($origin, $methods, $headers);
+    }
+
+    /**
+     * Return all routes path for the the APISpec.
+     * This help to no worry about calling the API
+     * with or without a trailing slash.
+     *
+     * @param  string $apiSpecRoutePath
+     *
+     * @return string[]
+     */
+    protected function getRoutePaths($apiSpecRoutePath)
+    {
+        $routePaths = [];
+        $routePaths[] = $apiSpecRoutePath;
+        if( substr($apiSpecRoutePath, -1) === '/' ) {
+            $routePaths[] = substr($apiSpecRoutePath, 0, -1);
+        } else {
+            $routePaths[] = $apiSpecRoutePath.'/';
+        }
+
+        return $routePaths;
     }
 
     /**
