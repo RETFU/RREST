@@ -168,7 +168,8 @@ class RAML implements APISpecInterface
      */
     public function getPayloadBodySchema($contentType)
     {
-        if( empty( $this->method->getBodies() ) === false ) {
+        $bodies = $this->method->getBodies();
+        if( empty( $bodies ) === false ) {
             return (string) $this->method->getBodyByType($contentType)->getSchema();
         }
         return false;
