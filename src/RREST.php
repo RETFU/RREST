@@ -134,12 +134,12 @@ class RREST
      */
     protected function getResponse()
     {
-        $statusCode = $this->getHTTPStatusCodeSuccess();
+        $statusCodeSucess = $this->getHTTPStatusCodeSuccess();
         $format = $this->getResponseFormat();
         $response = new Response(
             $this->provider,
             $format,
-            $statusCode
+            $statusCodeSucess
         );
         $response->setHeaderContentType(
             $this->provider->getHTTPHeaderAccept()
@@ -157,14 +157,17 @@ class RREST
             throw new \RuntimeException('No content type defined for this response in your APISpec');
         }
         $contentType = $this->provider->getHTTPHeaderAccept();
-        if( in_array($contentType, $contentTypes) == false ) {
-            throw new NotAcceptableHttpException();
-        }
         foreach ($this->formats as $format => $mimeTypes) {
             if (in_array($contentType, $mimeTypes)) {
                 break;
             }
         }
+        //if no mimeType match the contentType of the request, take the
+        //default one json. We don't throw new NotAcceptableHttpException()
+        //here because it will invalid request like OPTIONS where you can't
+        //easily set headers, especialy with an ajax request in a browser
+        //but the assertHTTPHeaderAccept will do the job after that
+
         return $format;
     }
 
