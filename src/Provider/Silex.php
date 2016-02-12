@@ -123,7 +123,16 @@ class Silex implements ProviderInterface
      */
     public function setHTTPPayloadBodyValue($payloadBodyJSON)
     {
-        $this->request->request->replace((array) $payloadBodyJSON);
+        //no better way to setContent of the Request
+        $this->request->initialize(
+            $this->request->query->all(),
+            $this->request->request->all(),
+            $this->request->attributes->all(),
+            $this->request->cookies->all(),
+            $this->request->files->all(),
+            $this->request->server->all(),
+            $payloadBodyJSON
+        );
     }
 
     /**
