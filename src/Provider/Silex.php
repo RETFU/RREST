@@ -56,11 +56,12 @@ class Silex implements ProviderInterface
     {
         $this->app->before(function (Request $request) use ($origin, $methods, $headers) {
             if ($request->getMethod() === 'OPTIONS') {
-                return $this->app->json(null, 200, [
-                    'Access-Control-Allow-Origin' => $origin,
-                    'Access-Control-Allow-Methods' => $methods,
-                    'Access-Control-Allow-Headers' => $headers,
-                ]);
+                $response = new HttpFoundationResponse();
+                $response->headers->set("Access-Control-Allow-Origin",$origin);
+                $response->headers->set("Access-Control-Allow-Methods",$methods);
+                $response->headers->set("Access-Control-Allow-Headers",$headers);
+                $response->setStatusCode(200);
+                return $response;
             }
         }, Application::EARLY_EVENT);
 
