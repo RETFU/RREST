@@ -215,6 +215,8 @@ class Response
                     'xml' => new XmlEncoder(),
                 ]
             );
+            //fix stdClass not serialize vy default
+            $data = json_decode(json_encode($data), true);
             return $serializer->serialize($data, $format);
         }
     }

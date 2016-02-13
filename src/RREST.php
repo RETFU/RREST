@@ -336,17 +336,21 @@ class RREST
 
         //validate XML
         $originalErrorLevel = libxml_use_internal_errors(true);
-        $dom = new \DOMDocument;
-        $dom->loadXML($payloadBodyValue);
+        $payloadBodyValueDOM = new \DOMDocument;
+        $payloadBodyValueDOM->loadXML($payloadBodyValue);
         $thowInvalidBodyException();
 
         //validate XMLSchema
         $invalidBodyError = [];
-        $dom->schemaValidateSource($payloadBodySchema);
+        $payloadBodyValueDOM->schemaValidateSource($payloadBodySchema);
         $thowInvalidBodyException();
 
         libxml_use_internal_errors($originalErrorLevel);
-        $this->hintedPayloadBody= $payloadBodyValueXML;
+
+        //use json to convert the XML to a \stdClass object
+        $payloadBodyValueJSON= json_decode(json_encode(simplexml_load_string($payloadBodyValue)));
+
+        $this->hintedPayloadBody= $payloadBodyValueJSON;
     }
 
     /**
