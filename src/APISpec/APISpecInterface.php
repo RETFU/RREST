@@ -47,16 +47,19 @@ interface APISpecInterface
     /**
      * @return string[]|boolean
      */
-    public function getBodyContentTypes();
-
-    /**
-     * @return string[]|boolean
-     */
-    public function getResponseContentTypes();
+    public function getRequestPayloadBodyContentTypes();
 
     /**
      * @param  string $contentType
      * @return string|boolean
      */
-    public function getPayloadBodySchema($contentType);
+    public function getRequestPayloadBodySchema($contentType);
+
+    /**
+     * @return string[]|boolean
+     */
+    public function getResponsePayloadBodyContentTypes();
+
+    //TODO: add response validation against schema
+    //public function getResponsePayloadBodySchema($contentType);
 }

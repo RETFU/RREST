@@ -83,11 +83,21 @@ class RREST
                 $this->getActionMethodName($method),
                 $this->getResponse(),
                 function () {
-                    $this->assertHTTPProtocol();
-                    $this->assertHTTPHeaderAccept();
-                    $this->assertHTTPHeaderContentType();
+                    $contentType = $this->provider->getHTTPHeaderContentType();
+                    $contentTypeSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
+                    $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
+                    $accept = $this->provider->getHTTPHeaderAccept();
+                    $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
+                    $protocol = $this->provider->getHTTPProtocol();
+                    $availableProtocols = $this->apiSpec->getProtocols();
+                    $payloadBodyValue = $this->provider->getHTTPPayloadBodyValue();
+
+                    $this->assertHTTPProtocol($availableProtocols,$protocol);
+                    $this->assertHTTPHeaderAccept($availableAcceptContentTypes,$accept);
+                    $this->assertHTTPHeaderContentType($availableContentTypes,$contentType);
                     $this->assertHTTPParameters();
-                    $this->assertHTTPPayloadBody();
+                    $this->assertHTTPPayloadBody($contentType,$contentTypeSchema,$payloadBodyValue);
+
                     $this->hintHTTPParameterValue($this->hintedHTTPParameters);
                     $this->hintHTTPPayloadBody($this->hintedPayloadBody);
                 }
@@ -152,7 +162,7 @@ class RREST
      */
     protected function getResponseFormat($format = 'json')
     {
-        $contentTypes = $this->apiSpec->getResponseContentTypes();
+        $contentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
         if(empty($contentTypes)) {
             throw new \RuntimeException('No content type defined for this response in your APISpec');
         }
@@ -194,42 +204,52 @@ class RREST
     }
 
     /**
+     * @param  string $availableHTTPProtocols
+     * @param  string $currentHTTPProtocol
+     *
      * @throw AccessDeniedHttpException
      */
-    protected function assertHTTPProtocol()
+    protected function assertHTTPProtocol($availableHTTPProtocols, $currentHTTPProtocol)
     {
-        $httpProtocols = array_map('strtoupper', $this->apiSpec->getProtocols());
-        $httpProtocol = strtoupper($this->provider->getHTTPProtocol());
-        if(in_array($httpProtocol, $httpProtocols) === false) {
+        $availableHTTPProtocols = array_map('strtoupper', $availableHTTPProtocols);
+        $currentHTTPProtocol = strtoupper($currentHTTPProtocol);
+        if(in_array($currentHTTPProtocol, $availableHTTPProtocols) === false) {
             throw new AccessDeniedHttpException();
         }
     }
 
     /**
+     * @param  string $availableContentTypes
+     * @param  string $contentType
+     *
      * @throw UnsupportedMediaTypeHttpException
      */
-    protected function assertHTTPHeaderContentType()
+    protected function assertHTTPHeaderContentType($availableContentTypes, $contentType)
     {
-        $contentTypes = $this->apiSpec->getBodyContentTypes();
+        $availableContentTypes = array_map('strtolower', $availableContentTypes);
+        $contentType = strtolower($contentType);
         if(
-            empty($contentTypes) === false &&
-            in_array($this->provider->getHTTPHeaderContentType(),$contentTypes) === false
+            empty($availableContentTypes) === false &&
+            in_array($contentType,$availableContentTypes) === false
         ) {
             throw new UnsupportedMediaTypeHttpException();
         }
     }
 
     /**
+     * @param  string $availableContentTypes
+     * @param  string $acceptContentType
+     *
      * @throw UnsupportedMediaTypeHttpException
      */
-    protected function assertHTTPHeaderAccept()
+    protected function assertHTTPHeaderAccept($availableContentTypes, $acceptContentType)
     {
-        $contentTypes = $this->apiSpec->getResponseContentTypes();
-        if(empty($contentTypes)) {
+        $availableContentTypes = array_map('strtolower', $availableContentTypes);
+        $acceptContentType = strtolower($acceptContentType);
+        if(empty($availableContentTypes)) {
             throw new \RuntimeException('No content type defined for this response');
         }
-        $contentType = $this->provider->getHTTPHeaderAccept();
-        if( in_array($contentType,$contentTypes) === false ) {
+        if( in_array($acceptContentType,$availableContentTypes) === false ) {
             throw new NotAcceptableHttpException();
         }
     }
@@ -280,26 +300,26 @@ class RREST
     }
 
     /**
+     * @param  string $contentType
+     * @param  string $schema
+     * @param  string $value
+     *
      * @throw RREST\Exception\InvalidBodyException
      */
-    protected function assertHTTPPayloadBody()
+    protected function assertHTTPPayloadBody($contentType, $schema, $value)
     {
-        $httpContentType = $this->provider->getHTTPHeaderContentType();
-        $payloadBodySchema = $this->apiSpec->getPayloadBodySchema($httpContentType);
-
         //No payload body here, no need to assert
-        if($payloadBodySchema === false) {
+        if($schema === false) {
             return;
         }
 
-        $payloadBodyValue = $this->provider->getHTTPPayloadBodyValue();
-
+        $value = $this->provider->getHTTPPayloadBodyValue();
         switch (true) {
-            case strpos($httpContentType, 'json') !== false:
-                $this->assertHTTPPayloadBodyJSON($payloadBodyValue, $payloadBodySchema);
+            case strpos($contentType, 'json') !== false:
+                $this->assertHTTPPayloadBodyJSON($value, $schema);
                 break;
-            case strpos($httpContentType, 'xml') !== false:
-                $this->assertHTTPPayloadBodyXML($payloadBodyValue, $payloadBodySchema);
+            case strpos($contentType, 'xml') !== false:
+                $this->assertHTTPPayloadBodyXML($value, $schema);
                 break;
             default:
                 throw new UnsupportedMediaTypeHttpException();
@@ -308,13 +328,13 @@ class RREST
     }
 
     /**
-     * @param  string $payloadBodyValue
-     * @param  string $payloadBodySchema
+     * @param  string $value
+     * @param  string $schema
      *
      * @throws RREST\Exception\InvalidBodyException
      *
      */
-    protected function assertHTTPPayloadBodyXML($payloadBodyValue, $payloadBodySchema)
+    protected function assertHTTPPayloadBodyXML($value, $schema)
     {
         $thowInvalidBodyException = function() {
             $invalidBodyError = [];
@@ -336,34 +356,34 @@ class RREST
 
         //validate XML
         $originalErrorLevel = libxml_use_internal_errors(true);
-        $payloadBodyValueDOM = new \DOMDocument;
-        $payloadBodyValueDOM->loadXML($payloadBodyValue);
+        $valueDOM = new \DOMDocument;
+        $valueDOM->loadXML($value);
         $thowInvalidBodyException();
 
         //validate XMLSchema
         $invalidBodyError = [];
-        $payloadBodyValueDOM->schemaValidateSource($payloadBodySchema);
+        $valueDOM->schemaValidateSource($schema);
         $thowInvalidBodyException();
 
         libxml_use_internal_errors($originalErrorLevel);
 
         //use json to convert the XML to a \stdClass object
-        $payloadBodyValueJSON= json_decode(json_encode(simplexml_load_string($payloadBodyValue)));
+        $valueJSON= json_decode(json_encode(simplexml_load_string($value)));
 
-        $this->hintedPayloadBody= $payloadBodyValueJSON;
+        $this->hintedPayloadBody= $valueJSON;
     }
 
     /**
-     * @param  string $payloadBodyValue
-     * @param  string $payloadBodySchema
+     * @param  string $value
+     * @param  string $schema
      *
      * @throws RREST\Exception\InvalidBodyException
      *
      */
-    protected function assertHTTPPayloadBodyJSON($payloadBodyValue, $payloadBodySchema)
+    protected function assertHTTPPayloadBodyJSON($value, $schema)
     {
         //validate JSON
-        $payloadBodyValueJSON = json_decode($payloadBodyValue);
+        $valueJSON = json_decode($value);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new InvalidBodyException([new Error(
                 ucfirst(json_last_error_msg()),
@@ -373,7 +393,7 @@ class RREST
 
         //validate JsonSchema
         $jsonValidator = new Validator();
-        $jsonValidator->check($payloadBodyValueJSON, json_decode($payloadBodySchema));
+        $jsonValidator->check($valueJSON, json_decode($schema));
         if ($jsonValidator->isValid() === false) {
             $invalidBodyError = [];
             foreach ($jsonValidator->getErrors() as $jsonError) {
@@ -389,7 +409,7 @@ class RREST
             }
         }
 
-        $this->hintedPayloadBody= $payloadBodyValueJSON;
+        $this->hintedPayloadBody= $valueJSON;
     }
 
     protected function hintHTTPPayloadBody($hintedPayloadBody)

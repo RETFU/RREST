@@ -140,7 +140,7 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
-    public function getBodyContentTypes()
+    public function getRequestPayloadBodyContentTypes()
     {
         $contentTypes = [];
         foreach ($this->method->getBodies() as $body) {
@@ -152,7 +152,7 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponseContentTypes()
+    public function getResponsePayloadBodyContentTypes()
     {
         $contentTypes = [];
         foreach ($this->method->getResponses() as $response) {
@@ -166,7 +166,7 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
-    public function getPayloadBodySchema($contentType)
+    public function getRequestPayloadBodySchema($contentType)
     {
         $bodies = $this->method->getBodies();
         if( empty( $bodies ) === false ) {
