@@ -93,7 +93,7 @@ class Response
     /**
      * @return mixed
      */
-    public function getHeaderLocation()
+    public function getLocation()
     {
         return $this->headerLocation;
     }
@@ -101,7 +101,7 @@ class Response
     /**
      * @param mixed
      */
-    public function setHeaderLocation($headerLocation)
+    public function setLocation($headerLocation)
     {
         $this->headerLocation = $headerLocation;
 
@@ -110,7 +110,7 @@ class Response
     /**
      * @return mixed
      */
-    public function getHeaderContentType()
+    public function getContentType()
     {
         return $this->headerContentType;
     }
@@ -118,7 +118,7 @@ class Response
     /**
      * @param mixed
      */
-    public function setHeaderContentType($headerContentType)
+    public function setContentType($headerContentType)
     {
         $this->headerContentType = $headerContentType;
     }
@@ -128,14 +128,14 @@ class Response
      *
      * @return string[]
      */
-    public function getHeaders()
+    public function gets()
     {
         $headers = [];
-        $contentType = $this->getHeaderContentType();
+        $contentType = $this->getContentType();
         if(empty($contentType)===false) {
             $headers['Content-Type'] = $contentType;
         }
-        $location = $this->getHeaderLocation();
+        $location = $this->getLocation();
         if(empty($location)===false) {
             $headers['Location'] = $location;
         }
@@ -194,7 +194,7 @@ class Response
             $content = $this->serialized($content, $this->getFormat());
         }
         return $this->provider->getResponse(
-            $content, $this->getStatusCode(), $this->getHeaders()
+            $content, $this->getStatusCode(), $this->gets()
         );
     }
 

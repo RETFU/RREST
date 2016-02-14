@@ -83,14 +83,14 @@ class RREST
                 $this->getActionMethodName($method),
                 $this->getResponse(),
                 function () {
-                    $contentType = $this->provider->getHTTPHeaderContentType();
+                    $contentType = $this->provider->getContentType();
                     $contentTypeSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
                     $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
-                    $accept = $this->provider->getHTTPHeaderAccept();
+                    $accept = $this->provider->getAccept();
                     $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
-                    $protocol = $this->provider->getHTTPProtocol();
+                    $protocol = $this->provider->getProtocol();
                     $availableProtocols = $this->apiSpec->getProtocols();
-                    $payloadBodyValue = $this->provider->getHTTPPayloadBodyValue();
+                    $payloadBodyValue = $this->provider->getPayloadBodyValue();
 
                     $this->assertHTTPProtocol($availableProtocols,$protocol);
                     $this->assertHTTPHeaderAccept($availableAcceptContentTypes,$accept);
@@ -144,15 +144,15 @@ class RREST
      */
     protected function getResponse()
     {
-        $statusCodeSucess = $this->getHTTPStatusCodeSuccess();
+        $statusCodeSucess = $this->getStatusCodeSuccess();
         $format = $this->getResponseFormat();
         $response = new Response(
             $this->provider,
             $format,
             $statusCodeSucess
         );
-        $response->setHeaderContentType(
-            $this->provider->getHTTPHeaderAccept()
+        $response->setContentType(
+            $this->provider->getAccept()
         );
         return $response;
     }
@@ -166,7 +166,7 @@ class RREST
         if(empty($contentTypes)) {
             throw new \RuntimeException('No content type defined for this response in your APISpec');
         }
-        $contentType = $this->provider->getHTTPHeaderAccept();
+        $contentType = $this->provider->getAccept();
         foreach ($this->formats as $format => $mimeTypes) {
             if (in_array($contentType, $mimeTypes)) {
                 break;
@@ -186,7 +186,7 @@ class RREST
      *
      * @return int
      */
-    protected function getHTTPStatusCodeSuccess()
+    protected function getStatusCodeSuccess()
     {
         $statusCodes = $this->apiSpec->getStatusCodes();
         //find a 20x code
@@ -262,7 +262,7 @@ class RREST
         $invalidParametersError = [];
         $parameters = $this->apiSpec->getParameters();
         foreach ($parameters as $parameter) {
-            $value = $this->provider->getHTTPParameterValue(
+            $value = $this->provider->getParameterValue(
                 $parameter->getName(),
                 $parameter->getType()
             );
@@ -295,7 +295,7 @@ class RREST
     protected function hintHTTPParameterValue($hintedHTTPParameters)
     {
         foreach ($hintedHTTPParameters as $key => $value) {
-            $this->provider->setHTTPParameterValue($key, $value);
+            $this->provider->setParameterValue($key, $value);
         }
     }
 
@@ -313,7 +313,7 @@ class RREST
             return;
         }
 
-        $value = $this->provider->getHTTPPayloadBodyValue();
+        $value = $this->provider->getPayloadBodyValue();
         switch (true) {
             case strpos($contentType, 'json') !== false:
                 $this->assertHTTPPayloadBodyJSON($value, $schema);
@@ -414,7 +414,7 @@ class RREST
 
     protected function hintHTTPPayloadBody($hintedPayloadBody)
     {
-        $this->provider->setHTTPPayloadBodyValue( $hintedPayloadBody );
+        $this->provider->setPayloadBodyValue( $hintedPayloadBody );
     }
 
     /**

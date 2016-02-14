@@ -30,29 +30,35 @@ interface ProviderInterface
     public function applyCORS($origin = '*', $methods = 'GET,POST,PUT,DELETE,OPTIONS', $headers = '');
 
     /**
+     * Return the protocol (http or https) used
+     *
      * @return string
      */
-    public function getHTTPProtocol();
+    public function getProtocol();
 
     /**
+     * Return the Content-type header value
+     *
      * @return string
      */
-    public function getHTTPHeaderContentType();
+    public function getContentType();
 
     /**
+     * Return the Accept header value
+     *
      * @return string
      */
-    public function getHTTPHeaderAccept();
+    public function getAccept();
 
     /**
-     * Return the parameter typed or raw value.
+     * Return the parameter typed or raw value if can't be hinted
      *
      * @param string $key
      * @param string $type
      *
      * @return mixed
      */
-    public function getHTTPParameterValue($key, $type);
+    public function getParameterValue($key, $type);
 
     /**
      * Set the parameter value.
@@ -60,21 +66,21 @@ interface ProviderInterface
      * @param string $key
      * @param mixed  $value
      */
-    public function setHTTPParameterValue($key, $value);
+    public function setParameterValue($key, $value);
 
     /**
      * Return the payload body content.
      *
      * @return string
      */
-    public function getHTTPPayloadBodyValue();
+    public function getPayloadBodyValue();
 
     /**
-     * Set the payload body
+     * Set the payload body content.
      *
      * @param string $key
      */
-    public function setHTTPPayloadBodyValue($payloadBodyJSON);
+    public function setPayloadBodyValue($payloadBodyJSON);
 
     /**
      * The provider response

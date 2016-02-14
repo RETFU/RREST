@@ -71,7 +71,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getHTTPProtocol()
+    public function getProtocol()
     {
         return $this->request->getScheme();
     }
@@ -79,7 +79,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getHTTPParameterValue($key, $type)
+    public function getParameterValue($key, $type)
     {
         $parameterBags = ['query', 'request', 'attributes'];
         // Search in all Silex Request parameters
@@ -96,7 +96,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function setHTTPParameterValue($key, $value)
+    public function setParameterValue($key, $value)
     {
         $parameterBags = ['query', 'request', 'attributes'];
         // Search in Silex Request parameters
@@ -113,7 +113,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getHTTPPayloadBodyValue()
+    public function getPayloadBodyValue()
     {
         return $this->request->getContent();
     }
@@ -121,7 +121,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function setHTTPPayloadBodyValue($payloadBodyJSON)
+    public function setPayloadBodyValue($payloadBodyJSON)
     {
         //no better way to setContent of the Request
         $this->request->initialize(
@@ -138,7 +138,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getHTTPHeaderContentType()
+    public function getContentType()
     {
         return $this->request->headers->get('Content-Type');
     }
@@ -146,7 +146,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getHTTPHeaderAccept()
+    public function getAccept()
     {
         //Accept is empty in header, a bug?
         //return $this->request->headers->get('Accept');
