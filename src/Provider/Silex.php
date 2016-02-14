@@ -111,24 +111,6 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getContentType()
-    {
-        return $this->request->headers->get('Content-Type');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccept()
-    {
-        //Accept is empty in header, a bug?
-        //return $this->request->headers->get('Accept');
-        return $this->request->server->get('HTTP_ACCEPT');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getResponse($content = '', $statusCode = 200, $headers = array())
     {
         return new HttpFoundationResponse($content, $statusCode, $headers);

@@ -19,20 +19,6 @@ interface ProviderInterface
     public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $init);
 
     /**
-     * Return the Content-type header value
-     *
-     * @return string
-     */
-    public function getContentType();
-
-    /**
-     * Return the Accept header value
-     *
-     * @return string
-     */
-    public function getAccept();
-
-    /**
      * Return the parameter typed or raw value if can't be hinted
      *
      * @param string $key

@@ -51,6 +51,11 @@ class RREST
     protected $hintedPayloadBody;
 
     /**
+     * @var string[]
+     */
+    private $headers;
+
+    /**
      * @param APISpecInterface  $apiSpec
      * @param ProviderInterface $provider
      * @param string            $controllerNamespace
@@ -74,10 +79,10 @@ class RREST
         $this->assertActionMethodName($controllerClassName, $method);
 
         $routPaths = $this->getRoutePaths($this->apiSpec->getRoutePath());
-        $contentType = $this->provider->getContentType();
+        $contentType = $this->getHeader('Content-Type');
         $contentTypeSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
         $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
-        $accept = $this->provider->getAccept();
+        $accept = $this->getHeader('Accept');
         $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
         $protocol = $this->getProtocol();
         $availableProtocols = $this->apiSpec->getProtocols();
@@ -545,5 +550,21 @@ class RREST
         }
 
         return $castValue;
+    }
+
+    /**
+     * @param  string $name
+     *
+     * @return string
+     */
+    private function getHeader($name)
+    {
+        if( empty($this->headers) ) {
+            $this->headers = apache_request_headers();
+        }
+        if( isset($this->headers[$name]) ) {
+            return $this->headers[$name];
+        }
+        return null;
     }
 }

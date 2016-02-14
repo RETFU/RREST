@@ -170,7 +170,11 @@ class RAML implements APISpecInterface
     {
         $bodies = $this->method->getBodies();
         if( empty( $bodies ) === false ) {
-            return (string) $this->method->getBodyByType($contentType)->getSchema();
+            try {
+                return (string) $this->method->getBodyByType($contentType)->getSchema();
+            } catch (\Exception $e) {
+                
+            }
         }
         return false;
     }
