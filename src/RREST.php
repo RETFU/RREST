@@ -18,6 +18,14 @@ use RREST\Response;
 class RREST
 {
     /**
+     * @var array[]
+     */
+    public static $supportedFormats = [
+        'json' => ['application/json', 'application/x-json'],
+        'xml' => ['text/xml', 'application/xml', 'application/x-xml'],
+    ];
+
+    /**
      * @var APISpecInterface
      */
     protected $apiSpec;
@@ -43,14 +51,6 @@ class RREST
     protected $hintedPayloadBody;
 
     /**
-     * @var array[]
-     */
-    protected $formats = [
-        'json' => ['application/json', 'application/x-json'],
-        'xml' => ['text/xml', 'application/xml', 'application/x-xml'],
-    ];
-
-    /**
      * @param APISpecInterface  $apiSpec
      * @param ProviderInterface $provider
      * @param string            $controllerNamespace
@@ -74,6 +74,21 @@ class RREST
         $this->assertActionMethodName($controllerClassName, $method);
 
         $routPaths = $this->getRoutePaths($this->apiSpec->getRoutePath());
+        $contentType = $this->provider->getContentType();
+        $contentTypeSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
+        $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
+        $accept = $this->provider->getAccept();
+        $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
+        $protocol = $this->provider->getProtocol();
+        $availableProtocols = $this->apiSpec->getProtocols();
+        $payloadBodyValue = $this->provider->getPayloadBodyValue();
+        $statCodeSucess = $this->getStatusCodeSuccess();
+        $format = $this->getFormat($accept,self::$supportedFormats);
+        $mimeType = $this->getMimeType($format,self::$supportedFormats);
+
+        $this->assertHTTPProtocol($availableProtocols,$protocol);
+        $this->assertHTTPHeaderAccept($availableAcceptContentTypes,$accept);
+        $this->assertHTTPHeaderContentType($availableContentTypes,$contentType);
 
         foreach ($routPaths as $routPath) {
             $this->provider->addRoute(
@@ -81,23 +96,10 @@ class RREST
                 $method,
                 $this->getControllerNamespaceClass($controllerClassName),
                 $this->getActionMethodName($method),
-                $this->getResponse(),
-                function () {
-                    $contentType = $this->provider->getContentType();
-                    $contentTypeSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
-                    $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
-                    $accept = $this->provider->getAccept();
-                    $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
-                    $protocol = $this->provider->getProtocol();
-                    $availableProtocols = $this->apiSpec->getProtocols();
-                    $payloadBodyValue = $this->provider->getPayloadBodyValue();
-
-                    $this->assertHTTPProtocol($availableProtocols,$protocol);
-                    $this->assertHTTPHeaderAccept($availableAcceptContentTypes,$accept);
-                    $this->assertHTTPHeaderContentType($availableContentTypes,$contentType);
+                $this->getResponse($this->provider,$statCodeSucess,$format,$mimeType),
+                function () use ($contentType,$contentTypeSchema,$payloadBodyValue) {
                     $this->assertHTTPParameters();
                     $this->assertHTTPPayloadBody($contentType,$contentTypeSchema,$payloadBodyValue);
-
                     $this->hintHTTPParameterValue($this->hintedHTTPParameters);
                     $this->hintHTTPPayloadBody($this->hintedPayloadBody);
                 }
@@ -140,45 +142,24 @@ class RREST
     }
 
     /**
+     * @param  ProviderInterface $provider
+     * @param  string            $statusCodeSucess
+     * @param  string            $format
+     * @param  string            $mimeType
+     *
      * @return Response
      */
-    protected function getResponse()
+    protected function getResponse(ProviderInterface $provider, $statusCodeSucess, $format, $mimeType)
     {
-        $statusCodeSucess = $this->getStatusCodeSuccess();
-        $format = $this->getResponseFormat();
-        $response = new Response(
-            $this->provider,
-            $format,
-            $statusCodeSucess
-        );
-        $response->setContentType(
-            $this->provider->getAccept()
-        );
+        if($format === false) {
+            throw new \RuntimeException(
+                'Can\'t find a supported format for this Accept header.
+                RRest only support json & xml.'
+            );
+        }
+        $response = new Response($provider,$format,$statusCodeSucess);
+        $response->setContentType($mimeType);
         return $response;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getResponseFormat($format = 'json')
-    {
-        $contentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
-        if(empty($contentTypes)) {
-            throw new \RuntimeException('No content type defined for this response in your APISpec');
-        }
-        $contentType = $this->provider->getAccept();
-        foreach ($this->formats as $format => $mimeTypes) {
-            if (in_array($contentType, $mimeTypes)) {
-                break;
-            }
-        }
-        //if no mimeType match the contentType of the request, take the
-        //default one json. We don't throw new NotAcceptableHttpException()
-        //here because it will invalid request like OPTIONS where you can't
-        //easily set headers, especialy with an ajax request in a browser
-        //but the assertHTTPHeaderAccept will do the job after that
-
-        return $format;
     }
 
     /**
@@ -492,6 +473,39 @@ class RREST
     private function getControllerNamespaceClass($controllerClassName)
     {
         return $this->controllerNamespace.'\\'.$controllerClassName;
+    }
+
+    /**
+     * @param  string $mimeType
+     * @param  string[] $availableMimeTypes
+     *
+     * @return string|boolean
+     */
+    private function getFormat($mimeType, $availableMimeTypes)
+    {
+        $format = false;
+        foreach ($availableMimeTypes as $format => $mimeTypes) {
+            if (in_array($mimeType, $mimeTypes)) {
+                break;
+            }
+        }
+
+        return $format;
+    }
+
+    /**
+     * @param  string $format
+     * @param  string[] $availableMimeTypes
+     *
+     * @return string|boolean
+     */
+    private function getMimeType($format, $availableMimeTypes)
+    {
+        $mimeType = false;
+        if( array_key_exists($format, $availableMimeTypes) ) {
+            $mimeType = $availableMimeTypes[$format][0];
+        }
+        return $mimeType;
     }
 
     /**
