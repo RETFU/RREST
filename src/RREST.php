@@ -79,7 +79,7 @@ class RREST
         $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
         $accept = $this->provider->getAccept();
         $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
-        $protocol = $this->provider->getProtocol();
+        $protocol = $this->getProtocol();
         $availableProtocols = $this->apiSpec->getProtocols();
         $payloadBodyValue = $this->provider->getPayloadBodyValue();
         $statCodeSucess = $this->getStatusCodeSuccess();
@@ -461,6 +461,29 @@ class RREST
     private function getControllerNamespaceClass($controllerClassName)
     {
         return $this->controllerNamespace.'\\'.$controllerClassName;
+    }
+
+    /**
+     * Return the protocol (http or https) used
+     *
+     * @return string
+     */
+    public function getProtocol()
+    {
+        $isSecure = false;
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+            $isSecure = true;
+        }
+        elseif(
+            !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
+            $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ||
+            !empty($_SERVER['HTTP_X_FORWARDED_SSL']) &&
+            $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on'
+        ) {
+            $isSecure = true;
+        }
+
+        return $isSecure ? 'HTTPS' : 'HTTP';
     }
 
     /**

@@ -52,14 +52,6 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getProtocol()
-    {
-        return $this->request->getScheme();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterValue($key, $type)
     {
         $parameterBags = ['query', 'request', 'attributes'];

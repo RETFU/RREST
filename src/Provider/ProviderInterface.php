@@ -19,13 +19,6 @@ interface ProviderInterface
     public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $init);
 
     /**
-     * Return the protocol (http or https) used
-     *
-     * @return string
-     */
-    public function getProtocol();
-
-    /**
      * Return the Content-type header value
      *
      * @return string
