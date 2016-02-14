@@ -451,34 +451,6 @@ class RREST
     }
 
     /**
-     * @param mixed  $value
-     * @param string $type
-     *
-     * @return mixed
-     */
-    protected function cast($value, $type)
-    {
-        $castValue = $value;
-        if ($type == 'number') {
-            $type = 'num';
-        }
-
-        if ($type != 'date') {
-            $castValue = \CastToType::cast($value, $type, false, true);
-        } else {
-            //Specific case for date
-            $castValue = new \DateTime($value);
-        }
-
-        //The cast not working, parameters is probably not this $type
-        if (is_null($castValue)) {
-            return $value;
-        }
-
-        return $castValue;
-    }
-
-    /**
      * Return the Controller class name depending of a route path
      * By convention:
      *  - /item/{itemId}/ -> Item
@@ -520,5 +492,33 @@ class RREST
     private function getControllerNamespaceClass($controllerClassName)
     {
         return $this->controllerNamespace.'\\'.$controllerClassName;
+    }
+
+    /**
+     * @param mixed  $value
+     * @param string $type
+     *
+     * @return mixed
+     */
+    private function cast($value, $type)
+    {
+        $castValue = $value;
+        if ($type == 'number') {
+            $type = 'num';
+        }
+
+        if ($type != 'date') {
+            $castValue = \CastToType::cast($value, $type, false, true);
+        } else {
+            //Specific case for date
+            $castValue = new \DateTime($value);
+        }
+
+        //The cast not working, parameters is probably not this $type
+        if (is_null($castValue)) {
+            return $value;
+        }
+
+        return $castValue;
     }
 }
