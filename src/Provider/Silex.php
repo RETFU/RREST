@@ -52,25 +52,6 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function applyCORS($origin = '*', $methods = 'GET,POST,PUT,DELETE,OPTIONS', $headers = '')
-    {
-        $this->app->before(function (Request $request) use ($origin, $methods, $headers) {
-            if ($request->getMethod() === 'OPTIONS') {
-                $response = new HttpFoundationResponse();
-                $response->headers->set("Access-Control-Allow-Origin",$origin);
-                $response->headers->set("Access-Control-Allow-Methods",$methods);
-                $response->headers->set("Access-Control-Allow-Headers",$headers);
-                $response->setStatusCode(200);
-                return $response;
-            }
-        }, Application::EARLY_EVENT);
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getProtocol()
     {
         return $this->request->getScheme();

@@ -19,17 +19,6 @@ interface ProviderInterface
     public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $init);
 
     /**
-     * Apply CORS (cross-origin resource sharing) to answer to an OPTION request.
-     *
-     * @param string $origin
-     * @param string $methods
-     * @param string $headers
-     *
-     * @return bool
-     */
-    public function applyCORS($origin = '*', $methods = 'GET,POST,PUT,DELETE,OPTIONS', $headers = '');
-
-    /**
      * Return the protocol (http or https) used
      *
      * @return string

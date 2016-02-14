@@ -108,18 +108,6 @@ class RREST
     }
 
     /**
-     * @param string $origin
-     * @param string $methods
-     * @param string $headers
-     *
-     * @return bool
-     */
-    public function applyCORS($origin = '*', $methods = 'GET,POST,PUT,DELETE,OPTIONS', $headers = '')
-    {
-        return $this->provider->applyCORS($origin, $methods, $headers);
-    }
-
-    /**
      * Return all routes path for the the APISpec.
      * This help to no worry about calling the API
      * with or without a trailing slash.

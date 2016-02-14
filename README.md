@@ -40,14 +40,6 @@ $apiSpec = new APISpec\RAML($apiDefinition);
 $provider = new Provider\Silex($app);
 $rrest = new RREST\RREST($apiSpec, $provider, 'Controllers');
 $rrest->addRoute();
-// RAML 0.8 doesn't define OPTIONS methods, so the provider can't
-// handle this automaticaly for now (RAML 1.0 define OPTION but we need
-// the parser to be updated to support 1.0)
-$rrest->applyCORS(
-    $apiDefinition->getBaseUrl(),
-    'GET,POST,PUT,DELETE,OPTIONS',
-    []
-);
 
 // [...]
 
