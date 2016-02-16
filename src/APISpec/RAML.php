@@ -79,6 +79,15 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
+    public function useAuthentificationMechanism()
+    {
+        $securitySchemes = $this->method->getSecuritySchemes();
+        return !empty($securitySchemes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStatusCodes()
     {
         $statusCodes = [];
@@ -173,7 +182,7 @@ class RAML implements APISpecInterface
             try {
                 return (string) $this->method->getBodyByType($contentType)->getSchema();
             } catch (\Exception $e) {
-                
+
             }
         }
         return false;

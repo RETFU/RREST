@@ -21,6 +21,13 @@ interface APISpecInterface
     public function getRouteMethod();
 
     /**
+     * Indicate if the route need to be authenticated.
+     *
+     * @return boolean
+     */
+    public function useAuthentificationMechanism();
+
+    /**
      * Return the ressource matched in the APISpec.
      *
      * @example: /item/id
