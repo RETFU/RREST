@@ -93,7 +93,7 @@ $rrest->addRoute();
 $app->run();
 //after app apply routing logic, validate parameters and body payload against the APISpec
 //hint parameters & body payload (only for JSON)
-    ```
+```
 
 ## Support
 
