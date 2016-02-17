@@ -436,14 +436,16 @@ class RREST
      */
     protected function getRouteControllerClassName($routePath)
     {
-        // remove URI parameters like controller/id/subcontroller/50
-        $controllerClassName = preg_replace('/\{[^}]+\}/', ' ', $routePath);
-        $controllerClassName = trim(str_replace('/ /', ' ', $controllerClassName));
-        $controllerClassName = trim(str_replace('/', '', $controllerClassName));
-        // uppercase the first character of each word
+        // remove URI parameters like controller/90/subcontroller/50
+        $controllerClassName = preg_replace('/\{[^}]+\}/', '', $routePath);
+        $controllerClassName = trim(str_replace('//', '', $controllerClassName));
+        $controllerClassName = trim($controllerClassName, '/');
+        $chunks = explode('/', $controllerClassName);
         $controllerClassName = ucwords($controllerClassName);
-        // namespace
-        $controllerClassName = str_replace(' ', '\\', $controllerClassName);
+        if(count($chunks) > 1) {
+            $chunks = array_map('ucwords',$chunks);
+            $controllerClassName = implode('\\', $chunks);
+        }
 
         return $controllerClassName;
     }
