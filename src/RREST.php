@@ -6,6 +6,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use JsonSchema\Validator;
+use Negotiation\Negotiator;
 use RREST\APISpec\APISpecInterface;
 use RREST\Provider\ProviderInterface;
 use RREST\Exception\InvalidParameterException;
@@ -20,7 +21,7 @@ class RREST
     /**
      * @var array[]
      */
-    public static $supportedFormats = [
+    public static $supportedMimeTypes = [
         'json' => ['application/json', 'application/x-json'],
         'xml' => ['text/xml', 'application/xml', 'application/x-xml'],
     ];
@@ -78,22 +79,25 @@ class RREST
         $this->assertControllerClassName($controllerClassName);
         $this->assertActionMethodName($controllerClassName, $method);
 
-        $routPaths = $this->getRoutePaths($this->apiSpec->getRoutePath());
-        $contentType = $this->getHeader('Content-Type');
-        $contentTypeSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
-        $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
-        $accept = $this->getHeader('Accept');
         $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
+        $accept = $this->getBestHeaderAccept( $this->getHeader('Accept'), $availableAcceptContentTypes );
+        $this->assertHTTPHeaderAccept($availableAcceptContentTypes,$accept);
+
+        $contentType = $this->getHeader('Content-Type');
+        $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
+        $this->assertHTTPHeaderContentType($availableContentTypes,$contentType);
+
         $protocol = $this->getProtocol();
         $availableProtocols = $this->apiSpec->getProtocols();
+        $this->assertHTTPProtocol($availableProtocols,$protocol);
+
+        $contentTypeSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
         $payloadBodyValue = $this->provider->getPayloadBodyValue();
         $statCodeSucess = $this->getStatusCodeSuccess();
-        $format = $this->getFormat($accept,self::$supportedFormats);
-        $mimeType = $this->getMimeType($format,self::$supportedFormats);
+        $format = $this->getFormat($accept,self::$supportedMimeTypes);
+        $mimeType = $this->getMimeType($format,self::$supportedMimeTypes);
+        $routPaths = $this->getRoutePaths($this->apiSpec->getRoutePath());
 
-        $this->assertHTTPProtocol($availableProtocols,$protocol);
-        $this->assertHTTPHeaderAccept($availableAcceptContentTypes,$accept);
-        $this->assertHTTPHeaderContentType($availableContentTypes,$contentType);
 
         foreach ($routPaths as $routPath) {
             $this->provider->addRoute(
@@ -211,18 +215,21 @@ class RREST
     }
 
     /**
-     * @param  string $availableContentTypes
-     * @param  string $acceptContentType
+     * @param  string           $availableContentTypes
+     * @param  string|boolean   $acceptContentType
      *
      * @throw UnsupportedMediaTypeHttpException
      */
     protected function assertHTTPHeaderAccept($availableContentTypes, $acceptContentType)
     {
+        if(empty($acceptContentType)) {
+            throw new NotAcceptableHttpException();
+        }
         $availableContentTypes = array_map('strtolower', $availableContentTypes);
-        $acceptContentType = strtolower($acceptContentType);
         if(empty($availableContentTypes)) {
             throw new \RuntimeException('No content type defined for this response');
         }
+        $acceptContentType = strtolower($acceptContentType);
         if( in_array($acceptContentType,$availableContentTypes) === false ) {
             throw new NotAcceptableHttpException();
         }
@@ -552,6 +559,24 @@ class RREST
         }
 
         return $castValue;
+    }
+
+    /**
+     * Find the best Accept header depending of priorities
+     *
+     * @param  string  $acceptRaw
+     * @param  array  $priorities
+     *
+     * @return string|null
+     */
+    private function getBestHeaderAccept($acceptRaw, array $priorities)
+    {
+        $negotiaor = new Negotiator();
+        $accept = $negotiaor->getBest($acceptRaw, $priorities);
+        if(is_null($accept)) {
+            return null;
+        }
+        return $accept->getValue();
     }
 
     /**
