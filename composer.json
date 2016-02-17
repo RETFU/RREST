@@ -1,12 +1,14 @@
 {
     "name": "retfu/rrest",
     "type": "library",
-    "description": "This is a pet work in progress project to easily create REST API in PHP.",
+    "description": "RREST helps to build good REST API in PHP.",
+    "keywords": ["api","REST","RAML","Swagger","API Blueprint","Open API Initiative"],
     "homepage": "https://github.com/RETFU/RREST",
+    "license": "MIT",
     "authors": [
         {
             "name": "Fabien Furet",
-            "email": "fabien.furet@gmail.com"
+            "homepage": "http://fabienfuret.net"
         }
     ],
     "autoload": {
@@ -15,11 +17,16 @@
       }
     },
     "require": {
-        "symfony/http-kernel": "~2.8",
-        "symfony/serializer": "~2.8",
-		"symfony/property-access": "~2.8",
-        "justinrainbow/json-schema": "~1.6",
-        "jrfnl/PHP-cast-to-type": "~2.0",
+        "php": "^5.4",
+        "symfony/http-kernel": "^2.8",
+        "symfony/serializer": "^2.8",
+		"symfony/property-access": "^2.8",
+        "justinrainbow/json-schema": "^1.6",
+        "jrfnl/PHP-cast-to-type": "^2.0",
         "willdurand/negotiation": "^2.0"
+    },
+    "suggest": {
+        "silex/silex": "To use the Silex Provider",
+        "alecsammon/php-raml-parser": "To use the RAML APISpec"
     }
 }
