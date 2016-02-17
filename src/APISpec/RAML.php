@@ -40,16 +40,17 @@ class RAML implements APISpecInterface
 
     /**
      * @param ApiDefinition $apiDefinition
+     * @param string        $httpMethod
      * @param strings       $currentURLPath (PHP_URL_PATH)
      */
-    public function __construct(ApiDefinition $apiDefinition, $currentURLPath)
+    public function __construct(ApiDefinition $apiDefinition, $httpMethod, $currentURLPath)
     {
         $this->apiDefinition = $apiDefinition;
         $resourcePath = $this->extractRessourcePathFromURL(
             $currentURLPath, $this->apiDefinition->getVersion()
         );
         $this->resource = $this->getResourceFromPath($resourcePath);
-        $this->method = $this->getMethodFromResource($this->resource);
+        $this->method = $this->getMethodFromResource($this->resource, $httpMethod);
     }
 
     /**
@@ -190,21 +191,23 @@ class RAML implements APISpecInterface
 
     /**
      * @param Raml\Resource $resource
+     * @param string $httpMethod
      *
      * @throw Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      *
      * @return Raml\Method
      */
-    protected function getMethodFromResource(Resource $resource)
+    protected function getMethodFromResource(Resource $resource, $httpMethod)
     {
         try {
-            $method = $resource->getMethod($_SERVER['REQUEST_METHOD']);
+            $httpMethod = strtoupper($httpMethod);
+            $method = $resource->getMethod($httpMethod);
         } catch (\Exception $e) {
             $methods = [];
             foreach ($resource->getMethods() as $method) {
                 $methods[] = $method->getType();
             }
-            if ($_SERVER['REQUEST_METHOD'] !== 'OPTIONS') {
+            if ($httpMethod !== 'OPTIONS') {
                 throw new MethodNotAllowedHttpException($methods, $e->getMessage());
             }
         }
