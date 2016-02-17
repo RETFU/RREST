@@ -97,15 +97,15 @@ $app->run();
 
 ## Support
 
-Format input/output
+##### Format input/output
 * JSON
 * XML
 
-APISPec
+##### APISPec
 * RAML
 * More coming soon
 
-Provider
+##### Provider
 * Silex
 * More coming soon
 
