@@ -28,7 +28,7 @@ I need to add a new resource in my API:
 * update the API specification with new resource and all parameters, headers... needed.
 * create the Controller for the resource
 
-That's all, you're resource if ready to use:
+That's all, your resource if ready to use:
 * the route is ready
 * the validations are ready
 * the response is ready
