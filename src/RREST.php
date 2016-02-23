@@ -571,6 +571,8 @@ class RREST
      */
     private function getBestHeaderAccept($acceptRaw, array $priorities)
     {
+        if(empty($acceptRaw)) return null;
+
         $negotiaor = new Negotiator();
         $accept = $negotiaor->getBest($acceptRaw, $priorities);
         if(is_null($accept)) {
