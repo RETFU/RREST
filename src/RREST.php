@@ -445,10 +445,12 @@ class RREST
     {
         // remove URI parameters like controller/90/subcontroller/50
         $controllerClassName = preg_replace('/\{[^}]+\}/', '', $routePath);
-        $controllerClassName = trim(str_replace('//', '', $controllerClassName));
+        $controllerClassName = trim(str_replace('//', '/', $controllerClassName));
         $controllerClassName = trim($controllerClassName, '/');
+
         $chunks = explode('/', $controllerClassName);
         $controllerClassName = ucwords($controllerClassName);
+
         if(count($chunks) > 1) {
             $chunks = array_map('ucwords',$chunks);
             $controllerClassName = implode('\\', $chunks);
