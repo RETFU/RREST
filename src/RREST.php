@@ -588,8 +588,9 @@ class RREST
      */
     private function getHeader($name)
     {
+        $name = strtolower($name);
         if( empty($this->headers) ) {
-            $this->headers = apache_request_headers();
+            $this->headers = array_change_key_case( apache_request_headers() );
         }
         if( isset($this->headers[$name]) ) {
             return $this->headers[$name];
