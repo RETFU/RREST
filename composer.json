@@ -17,7 +17,7 @@
       }
     },
     "require": {
-        "php": "^5.4",
+        "php": ">=5.4",
         "symfony/http-kernel": "^2.8",
         "symfony/serializer": "^2.8",
 		"symfony/property-access": "^2.8",
