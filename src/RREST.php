@@ -447,6 +447,7 @@ class RREST
         $controllerClassName = preg_replace('/\{[^}]+\}/', '', $routePath);
         $controllerClassName = trim(str_replace('//', '/', $controllerClassName));
         $controllerClassName = trim($controllerClassName, '/');
+        $controllerClassName = preg_replace('/[^a-z\/]/', '', $controllerClassName);
 
         $chunks = explode('/', $controllerClassName);
         $controllerClassName = ucwords($controllerClassName);
