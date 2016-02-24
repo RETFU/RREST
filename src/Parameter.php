@@ -137,7 +137,9 @@ class Parameter
     public function setType($type)
     {
         if (!in_array($type, $this->validTypes)) {
-            throw new \RuntimeException($type, $this->validTypes);
+            throw new \RuntimeException(
+                $type.' is not a valid type ('.implode(',', $this->validTypes).')'
+            );
         }
 
         $this->type = $type;
