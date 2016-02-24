@@ -11,8 +11,7 @@ php:
 before_script:
   #use --ignore-platform-reqs because waiting to move on 5.6 by default
   #some dependencies are working fine with 5.4 but are configured in composer for ^5.5
-  - composer install --ignore-platform-reqs
-  - wget http://downloads.atoum.org/nightly/mageekguy.atoum.phar
+  - composer install --ignore-platform-reqs --dev
 
 script:
-  - php mageekguy.atoum.phar -d tests/units
+  - ./vendor/bin/atoum -d tests/units
