@@ -331,7 +331,7 @@ class Parameter
         if (
             empty($enum) === false &&
             is_array($enum) &&
-            in_array($castValue, $enum) === false
+            in_array($castValue, $enum, true) === false
         ) {
             $this->throwInvalidParameter($this->getName().' must be one of the following: '.implode(', ', $enum));
         }
