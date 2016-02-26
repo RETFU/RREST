@@ -77,7 +77,7 @@ class Response
     /**
      * @return string
      */
-    public function getStatusCode()
+    public function getConfiguredHeaderstatusCode()
     {
         return $this->statusCode;
     }
@@ -128,7 +128,7 @@ class Response
      *
      * @return string[]
      */
-    public function gets()
+    public function getConfiguredHeaders()
     {
         $headers = [];
         $contentType = $this->getContentType();
@@ -194,7 +194,7 @@ class Response
             $content = $this->serialized($content, $this->getFormat());
         }
         return $this->provider->getResponse(
-            $content, $this->getStatusCode(), $this->gets()
+            $content, $this->getConfiguredHeaderstatusCode(), $this->getConfiguredHeaders()
         );
     }
 
