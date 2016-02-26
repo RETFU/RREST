@@ -68,5 +68,15 @@ class Response extends atoum
             ->string($this->testedInstance->serialize($data,'xml'))
             ->isEqualTo("<?xml version=\"1.0\"?>\n<response><name>diego</name><age>3</age><moods>angry</moods><moods>cool</moods><moods>happy</moods></response>\n");
         ;
+
+        $this
+            ->exception(
+                function() use ($data) {
+                    $this->testedInstance->serialize($data,'xxx');
+                }
+            )
+            ->isInstanceOf('\RuntimeException')
+            ->message->contains('format not supported')
+        ;
     }
 }

@@ -219,5 +219,10 @@ class Response
             $data = json_decode(json_encode($data), true);
             return $serializer->serialize($data, $format);
         }
+        else {
+            throw new \RuntimeException(
+                'format not supported, only are '.implode(', ', $this->supportedFormat).' availables'
+            );
+        }
     }
 }
