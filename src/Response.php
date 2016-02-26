@@ -178,7 +178,7 @@ class Response
 
     /**
      * Get a provider configured response with:
-     * - content serialized
+     * - content serialize
      * - success status code
      * - header Content-Type
      * - header Location
@@ -191,7 +191,7 @@ class Response
     {
         $content = $this->getContent();
         if($autoSerializeContent) {
-            $content = $this->serialized($content, $this->getFormat());
+            $content = $this->serialize($content, $this->getFormat());
         }
         return $this->provider->getResponse(
             $content, $this->getConfiguredHeaderstatusCode(), $this->getConfiguredHeaders()
@@ -203,7 +203,7 @@ class Response
      * @param  string $format
      * @return string
      */
-    protected function serialized($data, $format)
+    public function serialize($data, $format)
     {
         if( $format === 'json' ) {
             return json_encode($data);
