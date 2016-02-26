@@ -45,4 +45,28 @@ class Response extends atoum
             ))
         ;
     }
+
+    public function testSerialize()
+    {
+        $app = new Application();
+        $provider = new Silex($app);
+        $this->newTestedInstance($provider,'json',200);
+        $data = new \stdClass;
+        $data->name = 'diego';
+        $data->age = 3;
+        $data->moods = new \stdClass;
+        $data->moods = ['angry','cool','happy'];
+
+        $this
+            ->given( $this->testedInstance )
+            ->string($this->testedInstance->serialize($data,'json'))
+            ->isEqualTo('{"name":"diego","age":3,"moods":["angry","cool","happy"]}');
+        ;
+
+        $this
+            ->given( $this->testedInstance )
+            ->string($this->testedInstance->serialize($data,'xml'))
+            ->isEqualTo("<?xml version=\"1.0\"?>\n<response><name>diego</name><age>3</age><moods>angry</moods><moods>cool</moods><moods>happy</moods></response>\n");
+        ;
+    }
 }
