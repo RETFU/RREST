@@ -37,8 +37,9 @@ class Silex extends atoum
     public function testGetResponse()
     {
         $app = new Application();
+        $this->newTestedInstance($app);
         $this
-            ->given( $this->newTestedInstance($app) )
+            ->given( $this->testedInstance )
             ->object($this->testedInstance->getResponse('XXX'))
             ->isInstanceOf('Symfony\Component\HttpFoundation\Response');
         ;

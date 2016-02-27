@@ -9,8 +9,9 @@ class Parameter extends atoum
 {
     public function testGetName()
     {
+        $this->newTestedInstance('name','string',true);
         $this
-            ->given($this->newTestedInstance('name','string',true))
+            ->given($this->testedInstance)
             ->string($this->testedInstance->getName())
             ->isEqualTo('name')
         ;
@@ -18,8 +19,9 @@ class Parameter extends atoum
 
     public function testGetType()
     {
+        $this->newTestedInstance('name','string',true);
         $this
-            ->given($this->newTestedInstance('name','string',true))
+            ->given($this->testedInstance)
             ->string($this->testedInstance->getType())
             ->isEqualTo('string')
         ;
