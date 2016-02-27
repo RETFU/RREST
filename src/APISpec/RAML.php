@@ -41,13 +41,13 @@ class RAML implements APISpecInterface
     /**
      * @param ApiDefinition $apiDefinition
      * @param string        $httpMethod
-     * @param strings       $currentURLPath (PHP_URL_PATH)
+     * @param strings       $routePath (PHP_URL_PATH)
      */
-    public function __construct(ApiDefinition $apiDefinition, $httpMethod, $currentURLPath)
+    public function __construct(ApiDefinition $apiDefinition, $httpMethod, $routePath)
     {
         $this->apiDefinition = $apiDefinition;
         $resourcePath = $this->extractRessourcePathFromURL(
-            $currentURLPath, $this->apiDefinition->getVersion()
+            $routePath, $this->apiDefinition->getVersion()
         );
         $this->resource = $this->getResourceFromPath($resourcePath);
         $this->method = $this->getMethodFromResource($this->resource, $httpMethod);
