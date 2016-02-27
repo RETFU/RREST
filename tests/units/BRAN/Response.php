@@ -60,13 +60,13 @@ class Response extends atoum
         $this
             ->given( $this->testedInstance )
             ->string($this->testedInstance->serialize($data,'json'))
-            ->isEqualTo('{"name":"diego","age":3,"moods":["angry","cool","happy"]}');
+            ->isEqualTo('{"name":"diego","age":3,"moods":["angry","cool","happy"]}')
         ;
 
         $this
             ->given( $this->testedInstance )
             ->string($this->testedInstance->serialize($data,'xml'))
-            ->isEqualTo("<?xml version=\"1.0\"?>\n<response><name>diego</name><age>3</age><moods>angry</moods><moods>cool</moods><moods>happy</moods></response>\n");
+            ->isEqualTo("<?xml version=\"1.0\"?>\n<response><name>diego</name><age>3</age><moods>angry</moods><moods>cool</moods><moods>happy</moods></response>\n")
         ;
 
         $this
@@ -77,6 +77,55 @@ class Response extends atoum
             )
             ->isInstanceOf('\RuntimeException')
             ->message->contains('format not supported')
+        ;
+    }
+
+    public function testGetProviderResponse()
+    {
+        $app = new Application();
+        $provider = new Silex($app);
+        $this->newTestedInstance($provider,'json',201);
+        $data = new \stdClass;
+        $data->name = 'diego';
+        $data->age = 3;
+        $data->moods = new \stdClass;
+        $data->moods = ['angry','cool','happy'];
+
+        $this
+            ->given( $this->testedInstance )
+            ->object($this->testedInstance->getProviderResponse())
+            ->isInstanceOf('Symfony\Component\HttpFoundation\Response');
+        ;
+
+        $this->testedInstance->setContent($data);
+        $this
+            ->given( $this->testedInstance )
+            ->string($this->testedInstance->getProviderResponse()->getContent())
+            ->isEqualTo('{"name":"diego","age":3,"moods":["angry","cool","happy"]}')
+        ;
+
+        $this->testedInstance->setContent('ABC');
+        $this
+            ->given( $this->testedInstance )
+            ->string($this->testedInstance->getProviderResponse(false)->getContent())
+            ->isEqualTo('ABC')
+        ;
+
+        $this
+            ->given( $this->testedInstance )
+            ->integer($this->testedInstance->getProviderResponse()->getStatusCode())
+            ->isEqualTo(201)
+        ;
+
+        $this->testedInstance->setContentType('application/xml');
+        $this->testedInstance->setLocation('https://api.domain.com/items/uuid');
+
+        $this
+            ->given( $this->testedInstance )
+            ->string($this->testedInstance->getProviderResponse()->headers->get('Content-Type'))
+            ->isEqualTo('application/xml')
+            ->string($this->testedInstance->getProviderResponse()->headers->get('Location'))
+            ->isEqualTo('https://api.domain.com/items/uuid')
         ;
     }
 }
