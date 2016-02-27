@@ -38,10 +38,12 @@ schemas:
           application/json:
             schema: !include songs.json
   /{songId}:
-    post:
+    put:
       body:
         application/json:
           schema: !include song.json
+        application/xml:
+            schema:
     get:
       securedBy: [JWT]
       responses:

@@ -43,4 +43,17 @@ class RAML extends atoum
             ->strictlyContainsValues(array(200))
         ;
     }
+
+    public function testGetRequestPayloadBodyContentTypes()
+    {
+        $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
+
+        $this->newTestedInstance($apiDefinition, 'PUT', '/v1/songs/90');
+        $this
+            ->given( $this->testedInstance )
+            ->array($this->testedInstance->getRequestPayloadBodyContentTypes())
+            ->hasSize(2)
+            ->strictlyContainsValues(array('application/json','application/xml'))
+        ;
+    }
 }
