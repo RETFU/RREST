@@ -76,4 +76,21 @@ class RAML extends atoum
             ->hasSize(0)
         ;
     }
+
+    public function testGetRequestPayloadBodySchema()
+    {
+        $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
+
+        $this->newTestedInstance($apiDefinition, 'PUT', '/v1/songs/90');
+        $this
+            ->given( $this->testedInstance )
+            ->string($this->testedInstance->getRequestPayloadBodySchema('application/json'))
+            ->contains('$schema')
+        ;
+        $this
+            ->given( $this->testedInstance )
+            ->string($this->testedInstance->getRequestPayloadBodySchema('application/xml'))
+            ->isEmpty()
+        ;
+    }
 }
