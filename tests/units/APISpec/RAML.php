@@ -30,4 +30,17 @@ class RAML extends atoum
             ->isTrue()
         ;
     }
+
+    public function testGetStatusCodes()
+    {
+        $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
+
+        $this->newTestedInstance($apiDefinition, 'GET', '/v1/songs');
+        $this
+            ->given( $this->testedInstance )
+            ->array($this->testedInstance->getStatusCodes())
+            ->hasSize(1)
+            ->strictlyContainsValues(array(200))
+        ;
+    }
 }
