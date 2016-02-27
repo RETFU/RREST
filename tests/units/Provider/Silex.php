@@ -12,6 +12,28 @@ use RREST\Response;
 
 class Silex extends atoum
 {
+    public function testAddRoute()
+    {
+        //just check if adding a route with the Silex Provider
+        //work when a request happen on the route GET /
+        $app = new Application();
+        $this->newTestedInstance($app);
+        $this
+            ->given( $this->testedInstance )
+            ->and(
+                $this->testedInstance->addRoute(
+                    '/','GET','RREST\tests\units\Provider\Controller','getAction',
+                    new Response($this->testedInstance,'json',201),
+                    function(){}
+                ),
+                $request = Request::create('/','GET',[],[],[],[],'YYY'),
+                $response = $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
+            )
+            ->object($response)
+            ->isInstanceOf('Symfony\Component\HttpFoundation\Response')
+        ;
+    }
+
     public function testGetResponse()
     {
         $app = new Application();
