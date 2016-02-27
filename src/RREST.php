@@ -243,10 +243,7 @@ class RREST
         $invalidParametersError = [];
         $parameters = $this->apiSpec->getParameters();
         foreach ($parameters as $parameter) {
-            $value = $this->provider->getParameterValue(
-                $parameter->getName(),
-                $parameter->getType()
-            );
+            $value = $this->provider->getParameterValue($parameter->getName());
             try {
                 $castValue = $this->cast($value, $parameter->getType());
             } catch (\Exception $e) {

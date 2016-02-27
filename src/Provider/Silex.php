@@ -52,7 +52,7 @@ class Silex implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getParameterValue($key, $type)
+    public function getParameterValue($key)
     {
         $parameterBags = ['query', 'request', 'attributes'];
         // Search in all Silex Request parameters

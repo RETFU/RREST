@@ -22,11 +22,10 @@ interface ProviderInterface
      * Return the parameter typed or raw value if can't be hinted
      *
      * @param string $key
-     * @param string $type
      *
      * @return mixed
      */
-    public function getParameterValue($key, $type);
+    public function getParameterValue($key);
 
     /**
      * Set the parameter value.
