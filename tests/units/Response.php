@@ -1,7 +1,7 @@
 <?php
 namespace RREST\tests\units;
 
-require_once __DIR__ . '/../boostrap.php';
+require_once __DIR__ . '/boostrap.php';
 
 use atoum;
 use RREST\Provider\Silex;
