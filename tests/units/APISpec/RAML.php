@@ -12,6 +12,19 @@ use RREST\Response;
 
 class RAML extends atoum
 {
+    public function testRouteNotFound()
+    {
+        $this
+            ->exception(
+                function() {
+                    $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
+                    $this->newTestedInstance($apiDefinition, 'GET', '/v1/songsX');
+                }
+            )
+            ->isInstanceOf('Symfony\Component\HttpKernel\Exception\NotFoundHttpException')
+        ;
+    }
+
     public function testUseAuthentificationMechanism()
     {
         $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
