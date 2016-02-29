@@ -95,6 +95,8 @@ class Silex extends atoum
             )
             ->string($this->testedInstance->getParameterValue('parameter','string'))
             ->isEqualTo('5')
+            ->variable($this->testedInstance->getParameterValue('notexisting','string'))
+            ->isNull('5')
         ;
     }
 
