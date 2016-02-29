@@ -33,6 +33,6 @@
         "atoum/atoum": "^2.5",
         "atoum/stubs": "*",
         "silex/silex": "~2.0@dev",
-        "alecsammon/php-raml-parser": "~2.0"
+        "alecsammon/php-raml-parser": "^2.0"
     }
 }
