@@ -113,7 +113,7 @@ $app->run();
 
 ## Contributing
 
-Lauch unit test:
+Launch unit test:
 ```bash
 ./vendor/bin/atoum
 ```
