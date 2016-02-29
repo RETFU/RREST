@@ -196,5 +196,26 @@ class Parameter extends atoum
             )
             ->isInstanceOf('RREST\Exception\InvalidParameterException')
         ;
+
+        // empty value assert
+        $this->newTestedInstance('name','string',false);
+        $this
+            ->exception(
+                function() {
+                    $this->testedInstance->assertValue(null);
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidParameterException')
+        ;
+
+        // bad type
+        $this
+            ->exception(
+                function() {
+                    $this->newTestedInstance('name','toto',false);
+                }
+            )
+            ->isInstanceOf('\RuntimeException')
+        ;
     }
 }
