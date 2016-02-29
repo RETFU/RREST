@@ -255,7 +255,6 @@ class Parameter
             if($this->getRequired()) {
                 $this->throwInvalidParameter($this->getName().' is required');
             }
-            return;
         }
 
         // good type?
