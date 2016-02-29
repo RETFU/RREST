@@ -25,6 +25,19 @@ class RAML extends atoum
         ;
     }
 
+    public function testBadMethod()
+    {
+        $this
+            ->exception(
+                function() {
+                    $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
+                    $this->newTestedInstance($apiDefinition, 'DELETE', '/v1/songs');
+                }
+            )
+            ->isInstanceOf('Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException')
+        ;
+    }
+
     public function testUseAuthentificationMechanism()
     {
         $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
