@@ -111,6 +111,13 @@ $app->run();
 * Silex
 * More coming soon
 
+## Contributing
+
+Lauch unit test:
+```bash
+./vendor/bin/atoum
+```
+
 ## Why RREST
 
 All those projects make an **amazing work**:
