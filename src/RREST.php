@@ -462,7 +462,7 @@ class RREST
      *
      * @return string
      */
-    protected function getActionMethodName($action)
+    public function getActionMethodName($action)
     {
         return $action.'Action';
     }
@@ -472,7 +472,7 @@ class RREST
      *
      * @return string
      */
-    private function getControllerNamespaceClass($controllerClassName)
+    public function getControllerNamespaceClass($controllerClassName)
     {
         return $this->controllerNamespace.'\\'.$controllerClassName;
     }
