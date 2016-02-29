@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "01977f42180fcbde6e43b23b8f501089",
-    "content-hash": "3666b050463f0df6a310a09c4b4255af",
+    "hash": "3fb4999d8034cc5de240f1461ca2803b",
+    "content-hash": "4daac684fa6e005cbdecde023b539e01",
     "packages": [
         {
             "name": "ircmaxell/password-compat",
@@ -802,6 +802,53 @@
                 "unit testing"
             ],
             "time": "2016-01-28 15:46:28"
+        },
+        {
+            "name": "atoum/stubs",
+            "version": "2.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/atoum/stubs.git",
+                "reference": "45babf1aa5042a99c68fe8a17e1229d7c21407cb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/atoum/stubs/zipball/45babf1aa5042a99c68fe8a17e1229d7c21407cb",
+                "reference": "45babf1aa5042a99c68fe8a17e1229d7c21407cb",
+                "shasum": ""
+            },
+            "suggest": {
+                "atoum/atoum": "Include atoum in your projet dependencies"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD"
+            ],
+            "authors": [
+                {
+                    "name": "Julien Bianchi",
+                    "email": "julien.bianchi@atoum.org"
+                },
+                {
+                    "name": "Ludovic Fleury",
+                    "email": "ludovic.fleury@atoum.org"
+                }
+            ],
+            "description": "Stubs for atoum, the simple modern and intuitive unit testing framework for PHP 5.3+",
+            "homepage": "http://www.atoum.org",
+            "keywords": [
+                "TDD",
+                "atoum",
+                "test",
+                "unit testing"
+            ],
+            "time": "2016-01-07 19:57:29"
         },
         {
             "name": "oodle/inflect",
