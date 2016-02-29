@@ -9,14 +9,36 @@ use Silex\Application;
 
 class Response extends atoum
 {
+    /**
+     * @var Silex
+     */
+    public $provider;
+
+    /**
+     * @var \stdClass
+     */
+    public $data;
+
+    public function beforeTestMethod($method)
+    {
+        if(is_null($this->provider)) {
+            $app = new Application();
+            $this->provider = new Silex($app);
+
+            $this->data = new \stdClass;
+            $this->data->name = 'diego';
+            $this->data->age = 3;
+            $this->data->moods = new \stdClass;
+            $this->data->moods = ['angry','cool','happy'];
+        }
+    }
+
     public function testSetFormat()
     {
         $this
             ->exception(
                 function() {
-                    $app = new Application();
-                    $provider = new Silex($app);
-                    $this->newTestedInstance($provider,'json',200);
+                    $this->newTestedInstance($this->provider,'json',200);
                     $this->testedInstance->setFormat('xxx');
                 }
             )
@@ -27,9 +49,7 @@ class Response extends atoum
 
     public function testGetConfiguredHeaders()
     {
-        $app = new Application();
-        $provider = new Silex($app);
-        $this->newTestedInstance($provider,'json',200);
+        $this->newTestedInstance($this->provider,'json',200);
         $this->testedInstance->setContentType('application/xml');
         $this->testedInstance->setLocation('https://api.domain.com/items/uuid');
 
@@ -48,31 +68,23 @@ class Response extends atoum
 
     public function testSerialize()
     {
-        $app = new Application();
-        $provider = new Silex($app);
-        $this->newTestedInstance($provider,'json',200);
-        $data = new \stdClass;
-        $data->name = 'diego';
-        $data->age = 3;
-        $data->moods = new \stdClass;
-        $data->moods = ['angry','cool','happy'];
-
+        $this->newTestedInstance($this->provider,'json',200);
         $this
             ->given( $this->testedInstance )
-            ->string($this->testedInstance->serialize($data,'json'))
+            ->string($this->testedInstance->serialize($this->data,'json'))
             ->isEqualTo('{"name":"diego","age":3,"moods":["angry","cool","happy"]}')
         ;
 
         $this
             ->given( $this->testedInstance )
-            ->string($this->testedInstance->serialize($data,'xml'))
+            ->string($this->testedInstance->serialize($this->data,'xml'))
             ->isEqualTo("<?xml version=\"1.0\"?>\n<response><name>diego</name><age>3</age><moods>angry</moods><moods>cool</moods><moods>happy</moods></response>\n")
         ;
 
         $this
             ->exception(
-                function() use ($data) {
-                    $this->testedInstance->serialize($data,'xxx');
+                function() {
+                    $this->testedInstance->serialize($this->data,'xxx');
                 }
             )
             ->isInstanceOf('\RuntimeException')
@@ -82,14 +94,7 @@ class Response extends atoum
 
     public function testGetProviderResponse()
     {
-        $app = new Application();
-        $provider = new Silex($app);
-        $this->newTestedInstance($provider,'json',201);
-        $data = new \stdClass;
-        $data->name = 'diego';
-        $data->age = 3;
-        $data->moods = new \stdClass;
-        $data->moods = ['angry','cool','happy'];
+        $this->newTestedInstance($this->provider,'json',201);
 
         $this
             ->given( $this->testedInstance )
@@ -97,7 +102,7 @@ class Response extends atoum
             ->isInstanceOf('Symfony\Component\HttpFoundation\Response');
         ;
 
-        $this->testedInstance->setContent($data);
+        $this->testedInstance->setContent($this->data);
         $this
             ->given( $this->testedInstance )
             ->string($this->testedInstance->getProviderResponse()->getContent())

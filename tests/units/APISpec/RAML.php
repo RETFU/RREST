@@ -12,13 +12,24 @@ use RREST\Response;
 
 class RAML extends atoum
 {
+    /**
+     * @var \Raml\Parser
+     */
+    public $apiDefinition;
+
+    public function beforeTestMethod($method)
+    {
+        if(is_null($this->apiDefinition)) {
+            $this->apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
+        }
+    }
+
     public function testRouteNotFound()
     {
         $this
             ->exception(
                 function() {
-                    $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
-                    $this->newTestedInstance($apiDefinition, 'GET', '/v1/songsX');
+                    $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songsX');
                 }
             )
             ->isInstanceOf('Symfony\Component\HttpKernel\Exception\NotFoundHttpException')
@@ -30,8 +41,7 @@ class RAML extends atoum
         $this
             ->exception(
                 function() {
-                    $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
-                    $this->newTestedInstance($apiDefinition, 'DELETE', '/v1/songs');
+                    $this->newTestedInstance($this->apiDefinition, 'DELETE', '/v1/songs');
                 }
             )
             ->isInstanceOf('Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException')
@@ -40,16 +50,14 @@ class RAML extends atoum
 
     public function testUseAuthentificationMechanism()
     {
-        $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
-
-        $this->newTestedInstance($apiDefinition, 'GET', '/v1/songs');
+        $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs');
         $this
             ->given( $this->testedInstance )
             ->boolean($this->testedInstance->useAuthentificationMechanism())
             ->isFalse()
         ;
 
-        $this->newTestedInstance($apiDefinition, 'GET', '/v1/songs/85');
+        $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs/85');
         $this
             ->given( $this->testedInstance )
             ->boolean($this->testedInstance->useAuthentificationMechanism())
@@ -59,9 +67,7 @@ class RAML extends atoum
 
     public function testGetParameters()
     {
-        $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
-
-        $this->newTestedInstance($apiDefinition, 'GET', '/v1/songs/98');
+        $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs/98');
         $this
             ->given( $this->testedInstance )
             ->array($this->testedInstance->getParameters())
@@ -71,9 +77,7 @@ class RAML extends atoum
 
     public function testGetStatusCodes()
     {
-        $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
-
-        $this->newTestedInstance($apiDefinition, 'GET', '/v1/songs');
+        $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs');
         $this
             ->given( $this->testedInstance )
             ->array($this->testedInstance->getStatusCodes())
@@ -84,9 +88,7 @@ class RAML extends atoum
 
     public function testGetRequestPayloadBodyContentTypes()
     {
-        $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
-
-        $this->newTestedInstance($apiDefinition, 'PUT', '/v1/songs/90');
+        $this->newTestedInstance($this->apiDefinition, 'PUT', '/v1/songs/90');
         $this
             ->given( $this->testedInstance )
             ->array($this->testedInstance->getRequestPayloadBodyContentTypes())
@@ -97,9 +99,7 @@ class RAML extends atoum
 
     public function testGetResponsePayloadBodyContentTypes()
     {
-        $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
-
-        $this->newTestedInstance($apiDefinition, 'GET', '/v1/songs');
+        $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs');
         $this
             ->given( $this->testedInstance )
             ->array($this->testedInstance->getResponsePayloadBodyContentTypes())
@@ -107,7 +107,7 @@ class RAML extends atoum
             ->strictlyContainsValues(array('application/json'))
         ;
 
-        $this->newTestedInstance($apiDefinition, 'DELETE', '/v1/songs/89');
+        $this->newTestedInstance($this->apiDefinition, 'DELETE', '/v1/songs/89');
         $this
             ->given( $this->testedInstance )
             ->array($this->testedInstance->getResponsePayloadBodyContentTypes())
@@ -117,9 +117,7 @@ class RAML extends atoum
 
     public function testGetRequestPayloadBodySchema()
     {
-        $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
-
-        $this->newTestedInstance($apiDefinition, 'PUT', '/v1/songs/90');
+        $this->newTestedInstance($this->apiDefinition, 'PUT', '/v1/songs/90');
         $this
             ->given( $this->testedInstance )
             ->string($this->testedInstance->getRequestPayloadBodySchema('application/json'))

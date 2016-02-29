@@ -12,12 +12,23 @@ use RREST\Response;
 
 class Silex extends atoum
 {
+    /**
+     * @var Application
+     */
+    public $app;
+
+    public function beforeTestMethod($method)
+    {
+        if(is_null($this->app)) {
+            $this->app = new Application();
+        }
+    }
+
     public function testAddRoute()
     {
         //just check if adding a route with the Silex Provider
         //work when a request happen on the route GET /
-        $app = new Application();
-        $this->newTestedInstance($app);
+        $this->newTestedInstance($this->app);
         $this
             ->given( $this->testedInstance )
             ->and(
@@ -27,7 +38,7 @@ class Silex extends atoum
                     function(){}
                 ),
                 $request = Request::create('/','GET',[],[],[],[],'YYY'),
-                $response = $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
+                $response = $this->app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
             )
             ->object($response)
             ->isInstanceOf('Symfony\Component\HttpFoundation\Response')
@@ -36,8 +47,7 @@ class Silex extends atoum
 
     public function testGetResponse()
     {
-        $app = new Application();
-        $this->newTestedInstance($app);
+        $this->newTestedInstance($this->app);
         $this
             ->given( $this->testedInstance )
             ->object($this->testedInstance->getResponse('XXX'))
@@ -47,8 +57,7 @@ class Silex extends atoum
 
     public function testGetPayloadBodyValue()
     {
-        $app = new Application();
-        $this->newTestedInstance($app);
+        $this->newTestedInstance($this->app);
         $this
             ->given( $this->testedInstance )
             ->and(
@@ -58,8 +67,7 @@ class Silex extends atoum
             ->isEqualTo('XXX');
         ;
 
-        $app = new Application();
-        $this->newTestedInstance($app);
+        $this->newTestedInstance($this->app);
         $this
             ->given( $this->testedInstance )
             ->and(
@@ -69,7 +77,7 @@ class Silex extends atoum
                     function(){}
                 ),
                 $request = Request::create('/','GET',[],[],[],[],'YYY'),
-                $response = $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
+                $response = $this->app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
             )
             ->string($this->testedInstance->getPayloadBodyValue())
             ->isEqualTo('YYY');
@@ -79,8 +87,7 @@ class Silex extends atoum
 
     public function testGetParameterValue()
     {
-        $app = new Application();
-        $this->newTestedInstance($app);
+        $this->newTestedInstance($this->app);
         $this
             ->given( $this->testedInstance )
             ->and(
@@ -91,7 +98,7 @@ class Silex extends atoum
                 ),
                 $parameters = ['parameter'=>'5'],
                 $request = Request::create('/','GET',$parameters,[],[],[],'YYY'),
-                $response = $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
+                $response = $this->app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
             )
             ->string($this->testedInstance->getParameterValue('parameter','string'))
             ->isEqualTo('5')
@@ -102,8 +109,7 @@ class Silex extends atoum
 
     public function testSetParameterValue()
     {
-        $app = new Application();
-        $this->newTestedInstance($app);
+        $this->newTestedInstance($this->app);
         $this
             ->given( $this->testedInstance )
             ->and(
@@ -114,7 +120,7 @@ class Silex extends atoum
                 ),
                 $parameters = ['parameter'=>'5'],
                 $request = Request::create('/','GET',$parameters,[],[],[],'YYY'),
-                $response = $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
+                $response = $this->app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
                 $this->testedInstance->setParameterValue('parameter',5)
             )
             ->integer($this->testedInstance->getParameterValue('parameter','string'))
