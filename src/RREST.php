@@ -255,7 +255,7 @@ class RREST
                 ]);
             }
             try {
-                $parameter->assertValue($castValue, $value);
+                $parameter->assertValue($castValue);
                 $this->hintedHTTPParameters[$parameter->getName()] = $castValue;
             } catch (InvalidParameterException $e) {
                 $invalidParametersError = array_merge(

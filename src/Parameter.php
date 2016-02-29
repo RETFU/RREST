@@ -244,15 +244,14 @@ class Parameter
     }
 
     /**
-     * @param mixed $castValue The hinted value of the paramater to validate
-     * @param mixed $value The original value of the paramater to validate
+     * @param mixed $value The value of the paramater to validate
      *
      * @throws RREST\Exception\InvalidParameterException
      */
-    public function assertValue($castValue, $value)
+    public function assertValue($value)
     {
         // required?
-        if (empty($castValue)) {
+        if (empty($value)) {
             if($this->getRequired()) {
                 $this->throwInvalidParameter($this->getName().' is required');
             }
@@ -262,27 +261,27 @@ class Parameter
         // good type?
         switch ($this->getType()) {
             case static::TYPE_BOOLEAN:
-                if (!is_bool($castValue)) {
+                if (!is_bool($value)) {
                     $this->throwInvalidParameter($this->getName().' is not a boolean');
                 }
                 break;
             case static::TYPE_DATE:
-                if($castValue instanceof \DateTime === false) {
+                if($value instanceof \DateTime === false) {
                     $this->throwInvalidParameter($this->getName().' is not a valid date');
                 }
                 break;
             case static::TYPE_STRING:
-                if (!is_string($castValue)) {
+                if (!is_string($value)) {
                     $this->throwInvalidParameter($this->getName().' is not a string');
                 }
                 break;
             case static::TYPE_INTEGER:
-                if (!is_int($castValue)) {
+                if (!is_int($value)) {
                     $this->throwInvalidParameter($this->getName().' is not an integer');
                 }
                 break;
             case static::TYPE_NUMBER:
-                if (!is_numeric($castValue)) {
+                if (!is_numeric($value)) {
                     $this->throwInvalidParameter($this->getName().' is not a number');
                 }
                 break;
@@ -301,8 +300,8 @@ class Parameter
             $min = $this->getMinimum();
             if(empty($min) === false) {
                 if(
-                    ( $isNumeric && $min > $castValue ) ||
-                    ( $isString && $min > strlen($castValue) )
+                    ( $isNumeric && $min > $value ) ||
+                    ( $isString && $min > strlen($value) )
                 ) {
                     $this->throwInvalidParameter($this->getName().' minimum size is '.$min);
                 }
@@ -310,8 +309,8 @@ class Parameter
             $max = $this->getMaximum();
             if(empty($max) === false) {
                 if(
-                    ( $isNumeric && $max < $castValue ) ||
-                    ( $isString && $max < strlen($castValue) )
+                    ( $isNumeric && $max < $value ) ||
+                    ( $isString && $max < strlen($value) )
                 ) {
                     $this->throwInvalidParameter($this->getName().' maximum size is '.$max);
                 }
@@ -321,7 +320,7 @@ class Parameter
         //valid with a pattern?
         $validationPattern = $this->getValidationPattern();
         if (!empty($validationPattern) &&
-            preg_match('|'.$validationPattern.'|', $castValue) !== 1
+            preg_match('|'.$validationPattern.'|', $value) !== 1
         ) {
             $this->throwInvalidParameter($this->getName().' does not match the specified pattern: '.$validationPattern);
         }
@@ -331,7 +330,7 @@ class Parameter
         if (
             empty($enum) === false &&
             is_array($enum) &&
-            in_array($castValue, $enum, true) === false
+            in_array($value, $enum, true) === false
         ) {
             $this->throwInvalidParameter($this->getName().' must be one of the following: '.implode(', ', $enum));
         }
