@@ -1,7 +1,11 @@
 #%RAML 0.8
 
 title: World Music API
-baseUri: http://example.api.com/{version}
+baseUri: http://{bucketName}.api.com/{version}
+baseUriParameters:
+  bucketName:
+    description: The name of the bucket
+    type: string
 version: v1
 securitySchemes:
     - JWT:
@@ -46,6 +50,46 @@ schemas:
             schema:
     get:
       securedBy: [JWT]
+      uriParameters:
+          songId:
+              type: integer
+              required: true
+      queryParameters:
+          isActivated:
+              description: Filter by activate
+              type: boolean
+              example: true
+          id:
+              description: Filter by id
+              type: integer
+              minimum: 1
+              example: 55
+          price:
+              description: Filter by price
+              type: number
+              maximum: 100
+              minimum: 10
+              example: 55.6
+          vendor:
+              description: Filter by vendor
+              type: string
+              enum: [test1,test2,test3]
+              example: 55.6
+          email:
+              description: Filter by email (test pattern)
+              type: string
+              pattern: ^\w+@[a-zA-Z_]+?.[a-zA-Z]{2,3}$
+              minLength: 7
+              maxLength: 20
+              example: diego.maradonna@argentina.com
+          # array like parameters are not validated/converted
+          choice[]:
+              description: Filter by choice
+              type: string
+              repeat: true
+          modificationDate:
+              description: Modification date
+              type: date
       responses:
         200:
           body:

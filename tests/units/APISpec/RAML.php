@@ -57,6 +57,18 @@ class RAML extends atoum
         ;
     }
 
+    public function testGetParameters()
+    {
+        $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
+
+        $this->newTestedInstance($apiDefinition, 'GET', '/v1/songs/98');
+        $this
+            ->given( $this->testedInstance )
+            ->array($this->testedInstance->getParameters())
+            ->hasSize(8)
+        ;
+    }
+
     public function testGetStatusCodes()
     {
         $apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
