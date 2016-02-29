@@ -118,5 +118,10 @@ class RAML extends atoum
             ->string($this->testedInstance->getRequestPayloadBodySchema('application/xml'))
             ->isEmpty()
         ;
+        $this
+            ->given( $this->testedInstance )
+            ->boolean($this->testedInstance->getRequestPayloadBodySchema('text/xml'))
+            ->isFalse()
+        ;
     }
 }
