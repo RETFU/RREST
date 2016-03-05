@@ -13,6 +13,7 @@ use RREST\Exception\InvalidParameterException;
 use RREST\Exception\InvalidPayloadBodyException;
 use RREST\Exception\InvalidJSONException;
 use RREST\Exception\InvalidXMLException;
+use RREST\Route;
 use RREST\Response;
 
 /**
@@ -71,6 +72,9 @@ class RREST
         $this->hintedHTTPParameters = [];
     }
 
+    /**
+     * @return Route
+     */
     public function addRoute()
     {
         $method = $this->apiSpec->getRouteMethod();
@@ -100,7 +104,6 @@ class RREST
         $mimeType = $this->getMimeType($format,self::$supportedMimeTypes);
         $routPaths = $this->getRoutePaths($this->apiSpec->getRoutePath());
 
-
         foreach ($routPaths as $routPath) {
             $this->provider->addRoute(
                 $routPath,
@@ -116,6 +119,10 @@ class RREST
                 }
             );
         }
+
+        $route = new Route($routPath, $method, $this->apiSpec->getAuthTypes());
+
+        return $route;
     }
 
     /**

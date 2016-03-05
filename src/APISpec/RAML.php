@@ -78,10 +78,13 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
-    public function useAuthentificationMechanism()
+    public function getAuthTypes()
     {
-        $securitySchemes = $this->method->getSecuritySchemes();
-        return !empty($securitySchemes);
+        $authTypes = [];
+        foreach ($this->method->getSecuritySchemes() as $sheme) {
+            $authTypes[] = $sheme->getType();
+        }
+        return $authTypes;
     }
 
     /**
