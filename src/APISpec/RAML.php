@@ -11,8 +11,6 @@ use Raml\Exception\BadParameter\ResourceNotFoundException;
 use Raml\Exception\ValidationException;
 use Raml\Exception\InvalidSchemaException;
 use Raml\NamedParameter;
-use RREST\Exception\InvalidBodyException;
-use RREST\Exception\InvalidParameterException;
 use RREST\Error;
 use RREST\Parameter;
 
