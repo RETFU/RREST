@@ -10,7 +10,9 @@ use Negotiation\Negotiator;
 use RREST\APISpec\APISpecInterface;
 use RREST\Provider\ProviderInterface;
 use RREST\Exception\InvalidParameterException;
-use RREST\Exception\InvalidBodyException;
+use RREST\Exception\InvalidPayloadBodyException;
+use RREST\Exception\InvalidJSONException;
+use RREST\Exception\InvalidXMLException;
 use RREST\Response;
 
 /**
@@ -282,7 +284,9 @@ class RREST
      * @param  string $schema
      * @param  string $value
      *
-     * @throw RREST\Exception\InvalidBodyException
+     * @throw RREST\Exception\InvalidPayloadBodyException
+     * @throw RREST\Exception\InvalidJSONException
+     * @throw RREST\Exception\InvalidXMLException
      */
     protected function assertHTTPPayloadBody($contentType, $schema, $value)
     {
@@ -309,12 +313,13 @@ class RREST
      * @param  string $value
      * @param  string $schema
      *
-     * @throws RREST\Exception\InvalidBodyException
+     * @throws RREST\Exception\InvalidXMLException
+     * @throws RREST\Exception\InvalidPayloadBodyException
      *
      */
     protected function assertHTTPPayloadBodyXML($value, $schema)
     {
-        $thowInvalidBodyException = function() {
+        $thowInvalidXMLException = function($exceptionClassName) {
             $invalidBodyError = [];
             $libXMLErrors = libxml_get_errors();
             libxml_clear_errors();
@@ -327,7 +332,7 @@ class RREST
                     );
                 }
                 if (empty($invalidBodyError) == false) {
-                    throw new InvalidBodyException($invalidBodyError);
+                    throw new $exceptionClassName($invalidBodyError);
                 }
             }
         };
@@ -336,12 +341,12 @@ class RREST
         $originalErrorLevel = libxml_use_internal_errors(true);
         $valueDOM = new \DOMDocument;
         $valueDOM->loadXML($value);
-        $thowInvalidBodyException();
+        $thowInvalidXMLException('RREST\Exception\InvalidXMLException');
 
         //validate XMLSchema
         $invalidBodyError = [];
         $valueDOM->schemaValidateSource($schema);
-        $thowInvalidBodyException();
+        $thowInvalidXMLException('RREST\Exception\InvalidPayloadBodyException');
 
         libxml_use_internal_errors($originalErrorLevel);
 
@@ -355,7 +360,8 @@ class RREST
      * @param  string $value
      * @param  string $schema
      *
-     * @throws RREST\Exception\InvalidBodyException
+     * @throws RREST\Exception\InvalidJSONException
+     * @throws RREST\Exception\InvalidPayloadBodyException
      *
      */
     protected function assertHTTPPayloadBodyJSON($value, $schema)
@@ -363,7 +369,7 @@ class RREST
         //validate JSON
         $valueJSON = json_decode($value);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new InvalidBodyException([new Error(
+            throw new InvalidJSONException([new Error(
                 ucfirst(json_last_error_msg()),
                 'invalid-payloadbody-json'
             )]);
@@ -383,7 +389,7 @@ class RREST
                 );
             }
             if (empty($invalidBodyError) == false) {
-                throw new InvalidBodyException($invalidBodyError);
+                throw new InvalidPayloadBodyException($invalidBodyError);
             }
         }
 

@@ -2,9 +2,9 @@
 
 namespace RREST\Exception;
 
-use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class InvalidBodyException extends UnsupportedMediaTypeHttpException implements ErrorExceptionInterface
+class InvalidJSONException extends BadRequestHttpException implements ErrorExceptionInterface
 {
     /**
      * @var RREST\Error[]
