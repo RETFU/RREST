@@ -48,23 +48,6 @@ class RAML extends atoum
         ;
     }
 
-    public function testUseAuthentificationMechanism()
-    {
-        $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs');
-        $this
-            ->given( $this->testedInstance )
-            ->boolean($this->testedInstance->useAuthentificationMechanism())
-            ->isFalse()
-        ;
-
-        $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs/85');
-        $this
-            ->given( $this->testedInstance )
-            ->boolean($this->testedInstance->useAuthentificationMechanism())
-            ->isTrue()
-        ;
-    }
-
     public function testGetParameters()
     {
         $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs/98');
