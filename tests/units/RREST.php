@@ -43,6 +43,52 @@ class RREST extends atoum
         return $apiSpec;
     }
 
+    public function testAddRoute()
+    {
+        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
+        $provider = $this->getSilexProvider();
+
+        //good
+        $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
+        $this
+            ->given($this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units'))
+            ->object($this->testedInstance->addRoute())
+            ->isInstanceOf('RRest\Route')
+        ;
+
+        //bad accept
+        $this
+            ->exception(
+                function() use ($apiSpec, $provider) {
+                    $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/jxson';
+                    $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
+                    $this->testedInstance->addRoute();
+                }
+            )
+            ->isInstanceOf('Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException')
+        ;
+
+        //bad content-type
+        // $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/98');
+        // $provider = $this->getSilexProvider();
+        // $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
+        // //$_SERVER['Content-Type'] = 'application/xml';
+        // $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
+        // $this->testedInstance->addRoute();
+        // $this
+        //     ->exception(
+        //         function() use ($provider) {
+        //             $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/98');
+        //             $_SERVER['Accept'] = 'application/xml';
+        //             $_SERVER['Content-Type'] = 'application/json';
+        //             $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
+        //             $this->testedInstance->addRoute();
+        //         }
+        //     )
+        //     ->isInstanceOf('Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException')
+        // ;
+    }
+
     public function testGetActionMethodName()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
@@ -106,5 +152,18 @@ class RREST extends atoum
             ->string($this->testedInstance->getProtocol())
             ->isEqualTo('HTTPS')
         ;
+    }
+}
+
+class Songs
+{
+    public function getAction(Application $app, Request $request, Response $response, $slotId=null)
+    {
+        return $response->getProviderResponse();
+    }
+
+    public function putAction(Application $app, Request $request, Response $response, $slotId)
+    {
+        return $response->getProviderResponse();
     }
 }
