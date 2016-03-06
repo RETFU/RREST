@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use JsonSchema\Validator;
 use Negotiation\Negotiator;
+use Negotiation\Exception\InvalidArgument;
 use RREST\APISpec\APISpecInterface;
 use RREST\Provider\ProviderInterface;
 use RREST\Exception\InvalidParameterException;
@@ -224,20 +225,20 @@ class RREST
     }
 
     /**
-     * @param  string           $availableContentTypes
+     * @param  string[]          $availableContentTypes
      * @param  string|boolean   $acceptContentType
      *
      * @throw UnsupportedMediaTypeHttpException
      */
-    protected function assertHTTPHeaderAccept($availableContentTypes, $acceptContentType)
+    protected function assertHTTPHeaderAccept(array $availableContentTypes, $acceptContentType)
     {
         if(empty($acceptContentType)) {
             throw new NotAcceptableHttpException();
         }
-        $availableContentTypes = array_map('strtolower', $availableContentTypes);
         if(empty($availableContentTypes)) {
             throw new \RuntimeException('No content type defined for this response');
         }
+        $availableContentTypes = array_map('strtolower', $availableContentTypes);
         $acceptContentType = strtolower($acceptContentType);
         if( in_array($acceptContentType,$availableContentTypes) === false ) {
             throw new NotAcceptableHttpException();
@@ -586,8 +587,13 @@ class RREST
     {
         if(empty($acceptRaw)) return null;
 
-        $negotiaor = new Negotiator();
-        $accept = $negotiaor->getBest($acceptRaw, $priorities);
+        try {
+            $negotiaor = new Negotiator();
+            $accept = $negotiaor->getBest($acceptRaw, $priorities);
+        } catch (InvalidArgument $e) {
+            $accept = null;
+        }
+
         if(is_null($accept)) {
             return null;
         }
