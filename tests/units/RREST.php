@@ -97,25 +97,18 @@ class RREST extends atoum
         ;
 
         //bad content-type
-        // $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/98');
-        // $provider = $this->getSilexProvider();
-        // $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
-        // //$_SERVER['Content-Type'] = 'application/xml';
-        // $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
-        // $this->testedInstance->addRoute();
-        // $this
-        //     ->exception(
-        //         function() use ($provider) {
-        //             $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/98');
-        //             $_SERVER['Accept'] = 'application/xml';
-        //             $_SERVER['Content-Type'] = 'application/json';
-        //             $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
-        //             $this->testedInstance->addRoute();
-        //         }
-        //     )
-        //     ->isInstanceOf('Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException')
-        // ;
-
+        $this
+            ->exception(
+                function() use ($provider) {
+                    $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/98');
+                    $_SERVER['Accept'] = 'application/json';
+                    $_SERVER['Content-Type'] = 'application/jsonx';
+                    $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
+                    $this->testedInstance->addRoute();
+                }
+            )
+            ->isInstanceOf('Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException')
+        ;
 
         //bad protocol
         $_SERVER['HTTPS'] = true;
