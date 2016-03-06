@@ -56,6 +56,20 @@ class RREST extends atoum
             ->isInstanceOf('RRest\Route')
         ;
 
+        //missing controller
+        $this
+            ->exception(
+                function() use ($provider) {
+                    $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
+                    $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
+                    $this->newTestedInstance($apiSpec, $provider, 'RREST\tests');
+                    $this->testedInstance->addRoute();
+                }
+            )
+            ->isInstanceOf('\RuntimeException')
+            ->message->contains('RREST\tests\Songs not found')
+        ;
+
         //missing controller method
         $this
             ->exception(
