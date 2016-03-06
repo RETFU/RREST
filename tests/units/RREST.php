@@ -87,6 +87,20 @@ class RREST extends atoum
         //     )
         //     ->isInstanceOf('Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException')
         // ;
+
+
+        //bad protocol
+        $_SERVER['HTTPS'] = true;
+        $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
+        $this
+            ->exception(
+                function() use ($apiSpec, $provider) {
+                    $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
+                    $this->testedInstance->addRoute();
+                }
+            )
+            ->isInstanceOf('Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException')
+        ;
     }
 
     public function testGetActionMethodName()
