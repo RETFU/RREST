@@ -477,7 +477,7 @@ class RREST
      */
     public function getActionMethodName($action)
     {
-        return $action.'Action';
+        return strtolower($action).'Action';
     }
 
     /**
