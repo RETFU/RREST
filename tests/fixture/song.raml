@@ -42,6 +42,10 @@ schemas:
           application/json:
             schema: !include songs.json
   /{songId}:
+    uriParameters:
+      songId:
+          type: integer
+          required: true
     put:
       body:
         application/json:
@@ -50,10 +54,6 @@ schemas:
             schema:
     get:
       securedBy: [JWT]
-      uriParameters:
-          songId:
-              type: integer
-              required: true
       queryParameters:
           isActivated:
               description: Filter by activate

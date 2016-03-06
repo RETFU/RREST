@@ -58,6 +58,17 @@ class RAML extends atoum
         ;
     }
 
+    public function testGetAuthTypes()
+    {
+        $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs/98');
+        $this
+            ->given( $this->testedInstance )
+            ->array($this->testedInstance->getAuthTypes())
+            ->hasSize(1)
+            ->contains('x-jwt')
+        ;
+    }
+
     public function testGetStatusCodes()
     {
         $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs');
