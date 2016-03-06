@@ -54,7 +54,7 @@ class RAML extends atoum
         $this
             ->given( $this->testedInstance )
             ->array($this->testedInstance->getParameters())
-            ->hasSize(8)
+            ->hasSize(9)
         ;
     }
 
