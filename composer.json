@@ -23,7 +23,8 @@
 		"symfony/property-access": "^2.8",
         "justinrainbow/json-schema": "^1.6",
         "jrfnl/PHP-cast-to-type": "^2.0",
-        "willdurand/negotiation": "^2.0"
+        "willdurand/negotiation": "^2.0",
+        "ralouphie/getallheaders": "^2.0"
     },
     "suggest": {
         "silex/silex": "To use the Silex Provider",

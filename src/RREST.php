@@ -609,7 +609,10 @@ class RREST
     {
         $name = strtolower($name);
         if( empty($this->headers) ) {
-            $this->headers = array_change_key_case( apache_request_headers() );
+            $this->headers = array_change_key_case( getallheaders(), CASE_LOWER );
+            if( empty($this->headers) ) {
+                $this->headers = array_change_key_case( $_SERVER, CASE_LOWER );
+            }
         }
         if( isset($this->headers[$name]) ) {
             return $this->headers[$name];
