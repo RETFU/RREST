@@ -303,7 +303,6 @@ class RREST
             return;
         }
 
-        $value = $this->provider->getPayloadBodyValue();
         switch (true) {
             case strpos($contentType, 'json') !== false:
                 $this->assertHTTPPayloadBodyJSON($value, $schema);
@@ -374,18 +373,24 @@ class RREST
      */
     protected function assertHTTPPayloadBodyJSON($value, $schema)
     {
-        //validate JSON
+        $assertInvalidJSONException = function() {
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new InvalidJSONException([new Error(
+                    ucfirst(json_last_error_msg()),
+                    'invalid-payloadbody-json'
+                )]);
+            }
+        };
+
+        //validate JSON format
         $valueJSON = json_decode($value);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new InvalidJSONException([new Error(
-                ucfirst(json_last_error_msg()),
-                'invalid-payloadbody-json'
-            )]);
-        }
+        $assertInvalidJSONException();
+        $schemaJSON = json_decode($schema);
+        $assertInvalidJSONException();
 
         //validate JsonSchema
         $jsonValidator = new Validator();
-        $jsonValidator->check($valueJSON, json_decode($schema));
+        $jsonValidator->check($valueJSON, $schemaJSON);
         if ($jsonValidator->isValid() === false) {
             $invalidBodyError = [];
             foreach ($jsonValidator->getErrors() as $jsonError) {
