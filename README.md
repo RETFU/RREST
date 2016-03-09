@@ -5,7 +5,7 @@
 [![Build Status](https://api.travis-ci.org/RETFU/RREST.svg?branch=master)](https://travis-ci.org/RETFU/RREST)
 [![Coverage Status](https://coveralls.io/repos/github/RETFU/RREST/badge.svg?branch=master)](https://coveralls.io/github/RETFU/RREST?branch=master)
 ![WIP](https://img.shields.io/badge/unstable-master-red.svg)
-
+![PHP7 supported](http://php7ready.timesplinter.ch/RETFU/RREST/badge.svg)
 > Important: **RREST** is in active development. The API is not frozen and BC break can happen at any time.
 
 **RREST** do the glue between an [API specification language](https://en.wikipedia.org/wiki/Overview_of_RESTful_API_Description_Languages) (APISpec) like RAML, Swagger... and a router/framework (Provider) in charge of routing the request like [Silex](http://silex.sensiolabs.org/), [Symfony](https://symfony.com/), [Laravel](https://laravel.com/)... to your business logic.
