@@ -198,8 +198,8 @@ class RREST extends atoum
             )
             ->isInstanceOf('RREST\Exception\InvalidPayloadBodyException')
         ;
-        // //TODO test error array?
-        // //json payload body hinted
+        //TODO test error array?
+        //json payload body hinted
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
         $app =  $this->getSilexApplication();
         $provider = $this->getSilexProvider($app);
@@ -209,6 +209,58 @@ class RREST extends atoum
             ->and(
                 $this->testedInstance->addRoute(),
                 $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'{"title":"title","artist":"artist"}'),
+                $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
+                $song = $provider->getPayloadBodyValue()
+            )
+            ->object($song)
+            ->isInstanceOf('\stdClass');
+        ;
+
+        //bad XML payload body
+        $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/xml';
+        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
+        $app =  $this->getSilexApplication();
+        $provider = $this->getSilexProvider($app);
+        $this
+            ->exception(
+                function() use ($app, $apiSpec, $provider) {
+                    $provider->setPayloadBodyValue('bad xml'); //because we are in a CLI context and can't set php://input
+                    $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
+                    $this->testedInstance->addRoute();
+                    $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'bad xml');
+                    $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidXMLException')
+        ;
+
+        //bad XML schema payload body
+        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
+        $app =  $this->getSilexApplication();
+        $provider = $this->getSilexProvider($app);
+        $this
+            ->exception(
+                function() use ($app, $apiSpec, $provider) {
+                    $provider->setPayloadBodyValue('<song></song>'); //because we are in a CLI context and can't set php://input
+                    $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
+                    $this->testedInstance->addRoute();
+                    $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'<song></song>');
+                    $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidPayloadBodyException')
+        ;
+
+        // xml payload body hinted
+        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
+        $app =  $this->getSilexApplication();
+        $provider = $this->getSilexProvider($app);
+        $provider->setPayloadBodyValue('<song><title>qsd</title><artist>qsd</artist></song>'); //because we are in a CLI context and can't set php://input
+        $this
+            ->given($this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units'))
+            ->and(
+                $this->testedInstance->addRoute(),
+                $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'<song><title>qsd</title><artist>qsd</artist></song>'),
                 $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
                 $song = $provider->getPayloadBodyValue()
             )
