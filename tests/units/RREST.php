@@ -149,8 +149,13 @@ class RREST extends atoum
                 }
             )
             ->isInstanceOf('RREST\Exception\InvalidParameterException')
+            ->array($this->exception->getErrors())
+            ->hasSize(1)
+            ->object($this->exception->getErrors()[0])
+            ->isInstanceOf('RREST\Error')
+            ->string($this->exception->getErrors()[0]->message)
+            ->isEqualTo('id maximum size is 10')
         ;
-        //TODO test error array?
 
         //parameters hinted
         $this
@@ -180,8 +185,13 @@ class RREST extends atoum
                 }
             )
             ->isInstanceOf('RREST\Exception\InvalidJSONException')
+            ->array($this->exception->getErrors())
+            ->hasSize(1)
+            ->object($this->exception->getErrors()[0])
+            ->isInstanceOf('RREST\Error')
+            ->string($this->exception->getErrors()[0]->message)
         ;
-        //TODO test error array?
+
         //bad json schema payload body
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
         $app =  $this->getSilexApplication();
@@ -189,16 +199,22 @@ class RREST extends atoum
         $this
             ->exception(
                 function() use ($app, $apiSpec, $provider) {
-                    $provider->setPayloadBodyValue('{"title":"title"}'); //because we are in a CLI context and can't set php://input
+                    $provider->setPayloadBodyValue('{}'); //because we are in a CLI context and can't set php://input
                     $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
-                    $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'{"title":"title"}');
+                    $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'{}');
                     $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
                 }
             )
             ->isInstanceOf('RREST\Exception\InvalidPayloadBodyException')
+            ->array($this->exception->getErrors())
+            ->hasSize(2)
+            ->object($this->exception->getErrors()[0])
+            ->isInstanceOf('RREST\Error')
+            ->string($this->exception->getErrors()[0]->message)
+            ->isEqualTo('Title property: the property title is required')
         ;
-        //TODO test error array?
+
         //json payload body hinted
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
         $app =  $this->getSilexApplication();
@@ -232,6 +248,11 @@ class RREST extends atoum
                 }
             )
             ->isInstanceOf('RREST\Exception\InvalidXMLException')
+            ->array($this->exception->getErrors())
+            ->hasSize(1)
+            ->object($this->exception->getErrors()[0])
+            ->isInstanceOf('RREST\Error')
+            ->string($this->exception->getErrors()[0]->message)
         ;
 
         //bad XML schema payload body
@@ -249,6 +270,12 @@ class RREST extends atoum
                 }
             )
             ->isInstanceOf('RREST\Exception\InvalidPayloadBodyException')
+            ->array($this->exception->getErrors())
+            ->hasSize(1)
+            ->object($this->exception->getErrors()[0])
+            ->isInstanceOf('RREST\Error')
+            ->string($this->exception->getErrors()[0]->message)
+            ->isNotEmpty()
         ;
 
         // xml payload body hinted
