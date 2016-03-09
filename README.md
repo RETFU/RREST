@@ -3,6 +3,7 @@
 **RREST** build good REST API in PHP.
 
 [![Build Status](https://api.travis-ci.org/RETFU/RREST.svg?branch=master)](https://travis-ci.org/RETFU/RREST)
+[![Coverage Status](https://coveralls.io/repos/github/RETFU/RREST/badge.svg?branch=master)](https://coveralls.io/github/RETFU/RREST?branch=master)
 ![WIP](https://img.shields.io/badge/unstable-master-red.svg)
 
 > Important: **RREST** is in active development. The API is not frozen and BC break can happen at any time.
