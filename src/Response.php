@@ -206,7 +206,7 @@ class Response
     public function serialize($data, $format)
     {
         if( $format === 'json' ) {
-            return json_encode($data);
+            return json_encode($data, JSON_UNESCAPED_SLASHES);
         }
         elseif( $format === 'xml' ) {
             $serializer = new Serializer([
@@ -215,8 +215,8 @@ class Response
                     'xml' => new XmlEncoder(),
                 ]
             );
-            //fix stdClass not serialize vy default
-            $data = json_decode(json_encode($data), true);
+            //fix stdClass not serialize by default
+            $data = json_decode(json_encode($data, JSON_UNESCAPED_SLASHES), true);
             return $serializer->serialize($data, $format);
         }
         else {
