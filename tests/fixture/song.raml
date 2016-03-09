@@ -50,14 +50,16 @@ schemas:
     put:
       body:
         application/json:
-          schema: !include song.json
+            schema: !include song.json
         application/xml:
-            schema:
+            schema: !include song.xml
       responses:
         200:
           body:
             application/json:
-              schema: !include song.json
+                schema: !include song.json
+            application/xml:
+                schema: !include song.xml
     get:
       securedBy: [JWT]
       queryParameters:

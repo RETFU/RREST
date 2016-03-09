@@ -120,7 +120,7 @@ class RAML extends atoum
         $this
             ->given( $this->testedInstance )
             ->string($this->testedInstance->getRequestPayloadBodySchema('application/xml'))
-            ->isEmpty()
+            ->contains('<xs:element name="song">')
         ;
         $this
             ->given( $this->testedInstance )
