@@ -4,6 +4,8 @@ namespace RREST\tests\units;
 require_once __DIR__ . '/boostrap.php';
 
 use atoum;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 use RREST\Provider\Silex;
 use RREST\APISpec\RAML;
@@ -25,11 +27,18 @@ class RREST extends atoum
     /**
      * @return Silex
      */
-    private function getSilexProvider()
+    private function getSilexApplication()
     {
-        $app = new Application();
-        $provider = new Silex($app);
-        return $provider;
+        return new Application();
+    }
+
+    /**
+     * @param  Application $app
+     * @return Silex
+     */
+    private function getSilexProvider(Application $app)
+    {
+        return new Silex($app);
     }
 
     /**
@@ -46,7 +55,7 @@ class RREST extends atoum
     public function testAddRoute()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $provider = $this->getSilexProvider();
+        $provider = $this->getSilexProvider( $this->getSilexApplication() );
 
         //good
         $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
@@ -122,12 +131,43 @@ class RREST extends atoum
             )
             ->isInstanceOf('Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException')
         ;
+        unset($_SERVER['HTTPS']);
+
+        //bad parameters
+        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
+        $app =  $this->getSilexApplication();
+        $provider = $this->getSilexProvider($app);
+        $this
+            ->exception(
+                function() use ($app, $apiSpec, $provider) {
+                    $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
+                    $this->testedInstance->addRoute();
+                    $request = Request::create('/v1/songs/98','GET',['id'=>'25'],[],[],[]);
+                    $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidParameterException')
+        ;
+        //TODO test error array?
+
+        //parameters hinted
+        $this
+            ->given($this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units'))
+            ->and(
+                $this->testedInstance->addRoute(),
+                $request = Request::create('/v1/songs/98','GET',['id'=>'10'],[],[],[]),
+                $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
+                $id = $provider->getParameterValue('id')
+            )
+            ->integer($id)
+            ->isEqualTo(10)
+        ;
     }
 
     public function testGetActionMethodName()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $provider = $this->getSilexProvider();
+        $provider = $this->getSilexProvider( $this->getSilexApplication() );
 
         $this
             ->given($this->newTestedInstance($apiSpec, $provider))
@@ -139,7 +179,7 @@ class RREST extends atoum
     public function testGetControllerNamespaceClass()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $provider = $this->getSilexProvider();
+        $provider = $this->getSilexProvider( $this->getSilexApplication() );
 
         $this
             ->given($this->newTestedInstance($apiSpec, $provider))
@@ -157,7 +197,7 @@ class RREST extends atoum
     public function testGetProtocol()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $provider = $this->getSilexProvider();
+        $provider = $this->getSilexProvider( $this->getSilexApplication() );
 
         $this
             ->given($this->newTestedInstance($apiSpec, $provider))
@@ -192,12 +232,12 @@ class RREST extends atoum
 
 class Songs
 {
-    public function getAction(Application $app, Request $request, Response $response, $slotId=null)
+    public function getAction(Application $app, Request $request, \RREST\Response $response, $slotId=null)
     {
         return $response->getProviderResponse();
     }
 
-    public function putAction(Application $app, Request $request, Response $response, $slotId)
+    public function putAction(Application $app, Request $request, \RREST\Response $response, $slotId)
     {
         return $response->getProviderResponse();
     }

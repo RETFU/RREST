@@ -74,14 +74,14 @@ class Parameter
     /**
      * The minimum for a string length, integer or number (optional)
      *
-     * @var integer
+     * @var integer|null
      */
     private $minimum;
 
     /**
      * The maximum for a string length, a integer or number (optional)
      *
-     * @var integer
+     * @var integer|null
      */
     private $maximum;
 
@@ -192,7 +192,7 @@ class Parameter
      */
     public function setMinimum($minimum)
     {
-        $this->minimum = (int) $minimum;
+        $this->minimum = \CastToType::cast($minimum, 'integer', false, true);
     }
 
     /**
@@ -208,7 +208,7 @@ class Parameter
      */
     public function setMaximum($maximum)
     {
-        $this->maximum = (int) $maximum;
+        $this->maximum = \CastToType::cast($maximum, 'integer', false, true);
     }
 
     /**
@@ -255,6 +255,8 @@ class Parameter
             if($this->getRequired()) {
                 $this->throwInvalidParameter($this->getName().' is required');
             }
+            //no need to continue, the value is empty & not required
+            return;
         }
 
         // good type?
