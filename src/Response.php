@@ -46,6 +46,12 @@ class Response
      */
     protected $headerContentType;
 
+    /**
+     * JSON encoding options
+     * @var int
+     */
+    const JSON_ENCODE_OPTIONS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+
     public function __construct(ProviderInterface $provider, $format, $statusCode)
     {
         $this->setFormat($format);
@@ -206,7 +212,7 @@ class Response
     public function serialize($data, $format)
     {
         if( $format === 'json' ) {
-            return json_encode($data, JSON_UNESCAPED_SLASHES);
+            return json_encode($data, self::JSON_ENCODE_OPTIONS);
         }
         elseif( $format === 'xml' ) {
             $serializer = new Serializer([
@@ -216,7 +222,7 @@ class Response
                 ]
             );
             //fix stdClass not serialize by default
-            $data = json_decode(json_encode($data, JSON_UNESCAPED_SLASHES), true);
+            $data = json_decode(json_encode($data, self::JSON_ENCODE_OPTIONS), true);
             return $serializer->serialize($data, $format);
         }
         else {
