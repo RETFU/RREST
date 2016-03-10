@@ -162,6 +162,36 @@ class RREST extends atoum
             ->integer($id)
             ->isEqualTo(10)
         ;
+
+        //bad json payload body
+        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
+        $app =  $this->getSilexApplication();
+        $provider = $this->getSilexProvider($app);
+        $this
+            ->exception(
+                function() use ($app, $apiSpec, $provider) {
+                    $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
+                    $this->testedInstance->addRoute();
+                    $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'bad json');
+                    $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidPayloadBodyException')
+        ;
+        //TODO test error array?
+        //bad json schema payload body
+        $this
+            ->exception(
+                function() use ($app, $apiSpec, $provider) {
+                    $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
+                    $this->testedInstance->addRoute();
+                    $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'{"title":"title"}');
+                    $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidPayloadBodyException')
+        ;
+        //TODO test error array?
     }
 
     public function testGetActionMethodName()
