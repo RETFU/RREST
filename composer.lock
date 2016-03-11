@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3a492f55c5b93dae4c43a567693dfe78",
-    "content-hash": "71b747a88a81dbb965a8a63a30efeb28",
+    "hash": "d28f6d379e868bbe48c60058c2557e3d",
+    "content-hash": "a31b229ceb37bb8fae095c74856b0786",
     "packages": [
         {
             "name": "ircmaxell/password-compat",
@@ -489,7 +489,7 @@
         },
         {
             "name": "symfony/polyfill-php55",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php55.git",
@@ -765,16 +765,16 @@
         },
         {
             "name": "atoum/atoum",
-            "version": "2.5.2",
+            "version": "2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/atoum/atoum.git",
-                "reference": "391fb29e4c0b922a081727317da9d724402abc5a"
+                "reference": "80a985ae02bb0028c6e9c658b1d862d01ad8e522"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/atoum/atoum/zipball/391fb29e4c0b922a081727317da9d724402abc5a",
-                "reference": "391fb29e4c0b922a081727317da9d724402abc5a",
+                "url": "https://api.github.com/repos/atoum/atoum/zipball/80a985ae02bb0028c6e9c658b1d862d01ad8e522",
+                "reference": "80a985ae02bb0028c6e9c658b1d862d01ad8e522",
                 "shasum": ""
             },
             "require": {
@@ -841,7 +841,7 @@
                 "test",
                 "unit testing"
             ],
-            "time": "2016-01-28 15:46:28"
+            "time": "2016-03-09 16:06:05"
         },
         {
             "name": "atoum/stubs",
@@ -992,12 +992,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/silexphp/Silex.git",
-                "reference": "800912d3b2ca4a273b1e5657e07b7fbed91daaa5"
+                "reference": "a8cc0ae4ed1035c08b22c8d9f21d4b44b5287276"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silexphp/Silex/zipball/800912d3b2ca4a273b1e5657e07b7fbed91daaa5",
-                "reference": "800912d3b2ca4a273b1e5657e07b7fbed91daaa5",
+                "url": "https://api.github.com/repos/silexphp/Silex/zipball/a8cc0ae4ed1035c08b22c8d9f21d4b44b5287276",
+                "reference": "a8cc0ae4ed1035c08b22c8d9f21d4b44b5287276",
                 "shasum": ""
             },
             "require": {
@@ -1067,7 +1067,7 @@
             "keywords": [
                 "microframework"
             ],
-            "time": "2016-02-08 07:46:50"
+            "time": "2016-03-10 11:48:44"
         },
         {
             "name": "symfony/routing",

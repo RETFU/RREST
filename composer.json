@@ -31,7 +31,7 @@
         "alecsammon/php-raml-parser": "To use the RAML APISpec"
     },
     "require-dev": {
-        "atoum/atoum": "^2.5",
+        "atoum/atoum": "^2.6",
         "atoum/stubs": "*",
         "silex/silex": "~2.0@dev",
         "alecsammon/php-raml-parser": "^2.0"
