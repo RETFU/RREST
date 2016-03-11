@@ -5,7 +5,7 @@ namespace RREST\Exception;
 interface ErrorExceptionInterface
 {
     /**
-     * @return RREST\Error[]
+     * @return \RREST\Error[]
      */
     public function getErrors();
 }

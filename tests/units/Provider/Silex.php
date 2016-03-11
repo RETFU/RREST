@@ -4,11 +4,10 @@ namespace RREST\tests\units\Provider;
 require_once __DIR__ . '/../boostrap.php';
 
 use atoum;
+use RREST\Response;
 use Silex\Application;
-use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use RREST\Response;
 
 class Silex extends atoum
 {

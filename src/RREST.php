@@ -13,9 +13,6 @@ use RREST\Provider\ProviderInterface;
 use RREST\Exception\InvalidParameterException;
 use RREST\Exception\InvalidPayloadBodyException;
 use RREST\Exception\InvalidJSONException;
-use RREST\Exception\InvalidXMLException;
-use RREST\Route;
-use RREST\Response;
 
 /**
  * ApiSpec + Provider = RREST.
@@ -51,7 +48,7 @@ class RREST
     protected $hintedHTTPParameters;
 
     /**
-     * @var array|stdClass
+     * @var array|\stdClass
      */
     protected $hintedPayloadBody;
 
@@ -187,8 +184,6 @@ class RREST
         else {
             throw new \RuntimeException('You can\'t define multiple 20x for one resource path!');
         }
-        //default
-        return 200;
     }
 
     /**
@@ -320,8 +315,8 @@ class RREST
      * @param  string $value
      * @param  string $schema
      *
-     * @throws RREST\Exception\InvalidXMLException
-     * @throws RREST\Exception\InvalidPayloadBodyException
+     * @throws \RREST\Exception\InvalidXMLException
+     * @throws \RREST\Exception\InvalidPayloadBodyException
      *
      */
     protected function assertHTTPPayloadBodyXML($value, $schema)
@@ -367,8 +362,8 @@ class RREST
      * @param  string $value
      * @param  string $schema
      *
-     * @throws RREST\Exception\InvalidJSONException
-     * @throws RREST\Exception\InvalidPayloadBodyException
+     * @throws \RREST\Exception\InvalidJSONException
+     * @throws \RREST\Exception\InvalidPayloadBodyException
      *
      */
     protected function assertHTTPPayloadBodyJSON($value, $schema)
@@ -432,9 +427,10 @@ class RREST
 
     /**
      * @param string $controllerClassName
+     * @param $action
+     * @return string
      * @throw RuntimeException
      *
-     * @return string
      */
     protected function assertActionMethodName($controllerClassName, $action)
     {
