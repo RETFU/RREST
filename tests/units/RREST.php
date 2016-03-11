@@ -54,6 +54,7 @@ class RREST extends atoum
 
     public function testAddRoute()
     {
+        date_default_timezone_set('UTC');
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
         $provider = $this->getSilexProvider( $this->getSilexApplication() );
 
@@ -134,6 +135,7 @@ class RREST extends atoum
         unset($_SERVER['HTTPS']);
 
         //bad parameters
+        date_default_timezone_set('UTC'); // for datetime validation
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
         $app =  $this->getSilexApplication();
         $provider = $this->getSilexProvider($app);
