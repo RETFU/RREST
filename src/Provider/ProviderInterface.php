@@ -45,17 +45,16 @@ interface ProviderInterface
     /**
      * Set the payload body content.
      *
-     * @param string $key
+     * @param $payloadBodyJSON
      */
     public function setPayloadBodyValue($payloadBodyJSON);
 
     /**
      * The provider response
      *
+     * @param string $content
      * @param  int $statusCode
-     * @param  string $contentType
      * @param  string[] $headers
-     *
      * @return mixed
      */
     public function getResponse($content = '', $statusCode = 200, $headers = array());

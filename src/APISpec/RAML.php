@@ -8,10 +8,7 @@ use Raml\ApiDefinition;
 use Raml\Resource;
 use Raml\Method;
 use Raml\Exception\BadParameter\ResourceNotFoundException;
-use Raml\Exception\ValidationException;
-use Raml\Exception\InvalidSchemaException;
 use Raml\NamedParameter;
-use RREST\Error;
 use RREST\Parameter;
 
 /**

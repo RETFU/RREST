@@ -246,7 +246,7 @@ class Parameter
     /**
      * @param mixed $value The value of the paramater to validate
      *
-     * @throws RREST\Exception\InvalidParameterException
+     * @throws \RREST\Exception\InvalidParameterException
      */
     public function assertValue($value)
     {
@@ -339,9 +339,7 @@ class Parameter
 
     /**
      * @param  string $message
-     * @param  string $code
-     *
-     * @throws RREST\Exception\InvalidParameterException
+     * @throws InvalidParameterException
      */
     protected function throwInvalidParameter($message)
     {
