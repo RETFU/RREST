@@ -170,19 +170,24 @@ class RREST extends atoum
         $this
             ->exception(
                 function() use ($app, $apiSpec, $provider) {
+                    $provider->setPayloadBodyValue('bad json'); //because we are in a CLI context and can't set php://input
                     $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
                     $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'bad json');
                     $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
                 }
             )
-            ->isInstanceOf('RREST\Exception\InvalidPayloadBodyException')
+            ->isInstanceOf('RREST\Exception\InvalidJSONException')
         ;
         //TODO test error array?
         //bad json schema payload body
+        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
+        $app =  $this->getSilexApplication();
+        $provider = $this->getSilexProvider($app);
         $this
             ->exception(
                 function() use ($app, $apiSpec, $provider) {
+                    $provider->setPayloadBodyValue('{"title":"title"}'); //because we are in a CLI context and can't set php://input
                     $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
                     $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'{"title":"title"}');
@@ -191,7 +196,23 @@ class RREST extends atoum
             )
             ->isInstanceOf('RREST\Exception\InvalidPayloadBodyException')
         ;
-        //TODO test error array?
+        // //TODO test error array?
+        // //json payload body hinted
+        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
+        $app =  $this->getSilexApplication();
+        $provider = $this->getSilexProvider($app);
+        $provider->setPayloadBodyValue('{"title":"title","artist":"artist"}'); //because we are in a CLI context and can't set php://input
+        $this
+            ->given($this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units'))
+            ->and(
+                $this->testedInstance->addRoute(),
+                $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'{"title":"title","artist":"artist"}'),
+                $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
+                $song = $provider->getPayloadBodyValue()
+            )
+            ->object($song)
+            ->isInstanceOf('\stdClass');
+        ;
     }
 
     public function testGetActionMethodName()
@@ -267,7 +288,7 @@ class Songs
         return $response->getProviderResponse();
     }
 
-    public function putAction(Application $app, Request $request, \RREST\Response $response, $slotId)
+    public function putAction(Application $app, Request $request, \RREST\Response $response, $slotId=null)
     {
         return $response->getProviderResponse();
     }
