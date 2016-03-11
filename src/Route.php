@@ -22,7 +22,7 @@ class Route
     private $authTypes;
 
     /**
-     * @param string path
+     * @param string $path
      * @param string $method
      * @param string $authTypes
      */

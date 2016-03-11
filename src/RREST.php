@@ -13,9 +13,6 @@ use RREST\Provider\ProviderInterface;
 use RREST\Exception\InvalidParameterException;
 use RREST\Exception\InvalidPayloadBodyException;
 use RREST\Exception\InvalidJSONException;
-use RREST\Exception\InvalidXMLException;
-use RREST\Route;
-use RREST\Response;
 
 /**
  * ApiSpec + Provider = RREST.
@@ -51,7 +48,7 @@ class RREST
     protected $hintedHTTPParameters;
 
     /**
-     * @var array|stdClass
+     * @var array|\stdClass
      */
     protected $hintedPayloadBody;
 
@@ -87,22 +84,22 @@ class RREST
         $this->assertActionMethodName($controllerClassName, $method);
 
         $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
-        $accept = $this->getBestHeaderAccept( $this->getHeader('Accept'), $availableAcceptContentTypes );
-        $this->assertHTTPHeaderAccept($availableAcceptContentTypes,$accept);
+        $accept = $this->getBestHeaderAccept($this->getHeader('Accept'), $availableAcceptContentTypes);
+        $this->assertHTTPHeaderAccept($availableAcceptContentTypes, $accept);
 
         $contentType = $this->getHeader('Content-Type');
         $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
-        $this->assertHTTPHeaderContentType($availableContentTypes,$contentType);
+        $this->assertHTTPHeaderContentType($availableContentTypes, $contentType);
 
         $protocol = $this->getProtocol();
         $availableProtocols = $this->apiSpec->getProtocols();
-        $this->assertHTTPProtocol($availableProtocols,$protocol);
+        $this->assertHTTPProtocol($availableProtocols, $protocol);
 
         $contentTypeSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
         $payloadBodyValue = $this->provider->getPayloadBodyValue();
         $statusCodeSucess = $this->getStatusCodeSuccess();
-        $format = $this->getFormat($accept,self::$supportedMimeTypes);
-        $mimeType = $this->getMimeType($format,self::$supportedMimeTypes);
+        $format = $this->getFormat($accept, self::$supportedMimeTypes);
+        $mimeType = $this->getMimeType($format, self::$supportedMimeTypes);
         $routPaths = $this->getRoutePaths($this->apiSpec->getRoutePath());
 
         foreach ($routPaths as $routPath) {
@@ -111,10 +108,10 @@ class RREST
                 $method,
                 $this->getControllerNamespaceClass($controllerClassName),
                 $this->getActionMethodName($method),
-                $this->getResponse($this->provider,$statusCodeSucess,$format,$mimeType),
-                function () use ($contentType,$contentTypeSchema,$payloadBodyValue) {
+                $this->getResponse($this->provider, $statusCodeSucess, $format, $mimeType),
+                function () use ($contentType, $contentTypeSchema, $payloadBodyValue) {
                     $this->assertHTTPParameters();
-                    $this->assertHTTPPayloadBody($contentType,$contentTypeSchema,$payloadBodyValue);
+                    $this->assertHTTPPayloadBody($contentType, $contentTypeSchema, $payloadBodyValue);
                     $this->hintHTTPParameterValue($this->hintedHTTPParameters);
                     $this->hintHTTPPayloadBody($this->hintedPayloadBody);
                 }
@@ -139,7 +136,7 @@ class RREST
     {
         $routePaths = [];
         $routePaths[] = $apiSpecRoutePath;
-        if( substr($apiSpecRoutePath, -1) === '/' ) {
+        if (substr($apiSpecRoutePath, -1) === '/') {
             $routePaths[] = substr($apiSpecRoutePath, 0, -1);
         } else {
             $routePaths[] = $apiSpecRoutePath.'/';
@@ -158,13 +155,13 @@ class RREST
      */
     protected function getResponse(ProviderInterface $provider, $statusCodeSucess, $format, $mimeType)
     {
-        if($format === false) {
+        if ($format === false) {
             throw new \RuntimeException(
                 'Can\'t find a supported format for this Accept header.
                 RRest only support json & xml.'
             );
         }
-        $response = new Response($provider,$format,$statusCodeSucess);
+        $response = new Response($provider, $format, $statusCodeSucess);
         $response->setContentType($mimeType);
         return $response;
     }
@@ -178,17 +175,14 @@ class RREST
     {
         $statusCodes = $this->apiSpec->getStatusCodes();
         //find a 20x code
-        $statusCodes20x = array_filter($statusCodes, function($value) {
+        $statusCodes20x = array_filter($statusCodes, function ($value) {
             return preg_match('/20\d?/', $value);
         });
-        if(count($statusCodes20x) === 1) {
+        if (count($statusCodes20x) === 1) {
             return (int) array_pop($statusCodes20x);
-        }
-        else {
+        } else {
             throw new \RuntimeException('You can\'t define multiple 20x for one resource path!');
         }
-        //default
-        return 200;
     }
 
     /**
@@ -201,7 +195,7 @@ class RREST
     {
         $availableHTTPProtocols = array_map('strtoupper', $availableHTTPProtocols);
         $currentHTTPProtocol = strtoupper($currentHTTPProtocol);
-        if(in_array($currentHTTPProtocol, $availableHTTPProtocols) === false) {
+        if (in_array($currentHTTPProtocol, $availableHTTPProtocols) === false) {
             throw new AccessDeniedHttpException();
         }
     }
@@ -216,9 +210,9 @@ class RREST
     {
         $availableContentTypes = array_map('strtolower', $availableContentTypes);
         $contentType = strtolower($contentType);
-        if(
+        if (
             empty($availableContentTypes) === false &&
-            in_array($contentType,$availableContentTypes) === false
+            in_array($contentType, $availableContentTypes) === false
         ) {
             throw new UnsupportedMediaTypeHttpException();
         }
@@ -232,15 +226,15 @@ class RREST
      */
     protected function assertHTTPHeaderAccept(array $availableContentTypes, $acceptContentType)
     {
-        if(empty($acceptContentType)) {
+        if (empty($acceptContentType)) {
             throw new NotAcceptableHttpException();
         }
-        if(empty($availableContentTypes)) {
+        if (empty($availableContentTypes)) {
             throw new \RuntimeException('No content type defined for this response');
         }
         $availableContentTypes = array_map('strtolower', $availableContentTypes);
         $acceptContentType = strtolower($acceptContentType);
-        if( in_array($acceptContentType,$availableContentTypes) === false ) {
+        if (in_array($acceptContentType, $availableContentTypes) === false) {
             throw new NotAcceptableHttpException();
         }
     }
@@ -299,7 +293,7 @@ class RREST
     protected function assertHTTPPayloadBody($contentType, $schema, $value)
     {
         //No payload body here, no need to assert
-        if($schema === false) {
+        if ($schema === false) {
             return;
         }
 
@@ -320,13 +314,13 @@ class RREST
      * @param  string $value
      * @param  string $schema
      *
-     * @throws RREST\Exception\InvalidXMLException
-     * @throws RREST\Exception\InvalidPayloadBodyException
+     * @throws \RREST\Exception\InvalidXMLException
+     * @throws \RREST\Exception\InvalidPayloadBodyException
      *
      */
     protected function assertHTTPPayloadBodyXML($value, $schema)
     {
-        $thowInvalidXMLException = function($exceptionClassName) {
+        $thowInvalidXMLException = function ($exceptionClassName) {
             $invalidBodyError = [];
             $libXMLErrors = libxml_get_errors();
             libxml_clear_errors();
@@ -367,13 +361,13 @@ class RREST
      * @param  string $value
      * @param  string $schema
      *
-     * @throws RREST\Exception\InvalidJSONException
-     * @throws RREST\Exception\InvalidPayloadBodyException
+     * @throws \RREST\Exception\InvalidJSONException
+     * @throws \RREST\Exception\InvalidPayloadBodyException
      *
      */
     protected function assertHTTPPayloadBodyJSON($value, $schema)
     {
-        $assertInvalidJSONException = function() {
+        $assertInvalidJSONException = function () {
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new InvalidJSONException([new Error(
                     ucfirst(json_last_error_msg()),
@@ -411,7 +405,7 @@ class RREST
 
     protected function hintHTTPPayloadBody($hintedPayloadBody)
     {
-        $this->provider->setPayloadBodyValue( $hintedPayloadBody );
+        $this->provider->setPayloadBodyValue($hintedPayloadBody);
     }
 
     /**
@@ -432,9 +426,10 @@ class RREST
 
     /**
      * @param string $controllerClassName
+     * @param $action
+     * @return string
      * @throw RuntimeException
      *
-     * @return string
      */
     protected function assertActionMethodName($controllerClassName, $action)
     {
@@ -468,8 +463,8 @@ class RREST
         $chunks = explode('/', $controllerClassName);
         $controllerClassName = ucwords($controllerClassName);
 
-        if(count($chunks) > 1) {
-            $chunks = array_map('ucwords',$chunks);
+        if (count($chunks) > 1) {
+            $chunks = array_map('ucwords', $chunks);
             $controllerClassName = implode('\\', $chunks);
         }
 
@@ -506,8 +501,7 @@ class RREST
         $isSecure = false;
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             $isSecure = true;
-        }
-        elseif(
+        } elseif (
             !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
             $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ||
             !empty($_SERVER['HTTP_X_FORWARDED_SSL']) &&
@@ -546,7 +540,7 @@ class RREST
     private function getMimeType($format, $availableMimeTypes)
     {
         $mimeType = false;
-        if( array_key_exists($format, $availableMimeTypes) ) {
+        if (array_key_exists($format, $availableMimeTypes)) {
             $mimeType = $availableMimeTypes[$format][0];
         }
         return $mimeType;
@@ -590,7 +584,9 @@ class RREST
      */
     private function getBestHeaderAccept($acceptRaw, array $priorities)
     {
-        if(empty($acceptRaw)) return null;
+        if (empty($acceptRaw)) {
+            return null;
+        }
 
         try {
             $negotiaor = new Negotiator();
@@ -599,7 +595,7 @@ class RREST
             $accept = null;
         }
 
-        if(is_null($accept)) {
+        if (is_null($accept)) {
             return null;
         }
         return $accept->getValue();
@@ -613,13 +609,13 @@ class RREST
     private function getHeader($name)
     {
         $name = strtolower($name);
-        if( empty($this->headers) ) {
-            $this->headers = array_change_key_case( getallheaders(), CASE_LOWER );
-            if( empty($this->headers) ) {
-                $this->headers = array_change_key_case( $_SERVER, CASE_LOWER );
+        if (empty($this->headers)) {
+            $this->headers = array_change_key_case(getallheaders(), CASE_LOWER);
+            if (empty($this->headers)) {
+                $this->headers = array_change_key_case($_SERVER, CASE_LOWER);
             }
         }
-        if( isset($this->headers[$name]) ) {
+        if (isset($this->headers[$name])) {
             return $this->headers[$name];
         }
         return null;

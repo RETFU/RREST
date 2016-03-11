@@ -8,10 +8,7 @@ use Raml\ApiDefinition;
 use Raml\Resource;
 use Raml\Method;
 use Raml\Exception\BadParameter\ResourceNotFoundException;
-use Raml\Exception\ValidationException;
-use Raml\Exception\InvalidSchemaException;
 use Raml\NamedParameter;
-use RREST\Error;
 use RREST\Parameter;
 
 /**
@@ -93,7 +90,7 @@ class RAML implements APISpecInterface
     public function getStatusCodes()
     {
         $statusCodes = [];
-        foreach( $this->method->getResponses() as $response ) {
+        foreach ($this->method->getResponses() as $response) {
             $statusCodes[] = $response->getStatusCode();
         }
         return $statusCodes;
@@ -126,17 +123,17 @@ class RAML implements APISpecInterface
                 $nameParameter->isRequired()
             );
             $parameter->setDateFormat('D, d M Y H:i:s T'); //RFC2616 from RAML spec
-            $parameter->setEnum( (array) $nameParameter->getEnum() );
-            $parameter->setValidationPattern( $nameParameter->getValidationPattern() );
+            $parameter->setEnum((array) $nameParameter->getEnum());
+            $parameter->setValidationPattern($nameParameter->getValidationPattern());
             switch ($nameParameter->getType()) {
                 case NamedParameter::TYPE_STRING:
-                    $parameter->setMinimum( $nameParameter->getMinLength() );
-                    $parameter->setMaximum( $nameParameter->getMaxLength() );
+                    $parameter->setMinimum($nameParameter->getMinLength());
+                    $parameter->setMaximum($nameParameter->getMaxLength());
                     break;
                 case NamedParameter::TYPE_INTEGER:
                 case NamedParameter::TYPE_NUMBER:
-                    $parameter->setMinimum( $nameParameter->getMinimum() );
-                    $parameter->setMaximum( $nameParameter->getMaximum() );
+                    $parameter->setMinimum($nameParameter->getMinimum());
+                    $parameter->setMaximum($nameParameter->getMaximum());
                     break;
                 default:
                     break;
@@ -180,11 +177,10 @@ class RAML implements APISpecInterface
     public function getRequestPayloadBodySchema($contentType)
     {
         $bodies = $this->method->getBodies();
-        if( empty( $bodies ) === false ) {
+        if (empty($bodies) === false) {
             try {
                 return (string) $this->method->getBodyByType($contentType)->getSchema();
             } catch (\Exception $e) {
-
             }
         }
         return false;
@@ -228,7 +224,7 @@ class RAML implements APISpecInterface
         try {
             $resource = $this->apiDefinition->getResourceByUri($path);
         } catch (ResourceNotFoundException $e) {
-                //Try with a trailing slash to accept /resource/ and /ressource
+            //Try with a trailing slash to accept /resource/ and /ressource
             try {
                 $resource = $this->apiDefinition->getResourceByUri($path.'/');
             } catch (ResourceNotFoundException $e) {
@@ -251,7 +247,7 @@ class RAML implements APISpecInterface
     {
         $resourcePath = '';
         $parts = explode($split, $url);
-        if(count($parts) === 2) {
+        if (count($parts) === 2) {
             $resourcePath = explode($split, $url)[1];
         }
 

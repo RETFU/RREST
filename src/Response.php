@@ -3,7 +3,6 @@ namespace RREST;
 
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use RREST\Provider\ProviderInterface;
 
@@ -46,6 +45,12 @@ class Response
      */
     protected $headerContentType;
 
+    /**
+     * JSON encoding options
+     * @var int
+     */
+    const JSON_ENCODE_OPTIONS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+
     public function __construct(ProviderInterface $provider, $format, $statusCode)
     {
         $this->setFormat($format);
@@ -66,7 +71,7 @@ class Response
      */
     public function setFormat($format)
     {
-        if(in_array($format, $this->supportedFormat) === false) {
+        if (in_array($format, $this->supportedFormat) === false) {
             throw new \RuntimeException(
                 'format not supported, only are '.implode(', ', $this->supportedFormat).' availables'
             );
@@ -104,7 +109,6 @@ class Response
     public function setLocation($headerLocation)
     {
         $this->headerLocation = $headerLocation;
-
     }
 
     /**
@@ -132,11 +136,11 @@ class Response
     {
         $headers = [];
         $contentType = $this->getContentType();
-        if(empty($contentType)===false) {
+        if (empty($contentType)===false) {
             $headers['Content-Type'] = $contentType;
         }
         $location = $this->getLocation();
-        if(empty($location)===false) {
+        if (empty($location)===false) {
             $headers['Location'] = $location;
         }
         return $headers;
@@ -190,7 +194,7 @@ class Response
     public function getProviderResponse($autoSerializeContent=true)
     {
         $content = $this->getContent();
-        if($autoSerializeContent) {
+        if ($autoSerializeContent) {
             $content = $this->serialize($content, $this->getFormat());
         }
         return $this->provider->getResponse(
@@ -205,21 +209,19 @@ class Response
      */
     public function serialize($data, $format)
     {
-        if( $format === 'json' ) {
-            return json_encode($data, JSON_UNESCAPED_SLASHES);
-        }
-        elseif( $format === 'xml' ) {
+        if ($format === 'json') {
+            return json_encode($data, self::JSON_ENCODE_OPTIONS);
+        } elseif ($format === 'xml') {
             $serializer = new Serializer([
                     new ObjectNormalizer()
-                ],[
+                ], [
                     'xml' => new XmlEncoder(),
                 ]
             );
             //fix stdClass not serialize by default
-            $data = json_decode(json_encode($data, JSON_UNESCAPED_SLASHES), true);
+            $data = json_decode(json_encode($data, self::JSON_ENCODE_OPTIONS), true);
             return $serializer->serialize($data, $format);
-        }
-        else {
+        } else {
             throw new \RuntimeException(
                 'format not supported, only are '.implode(', ', $this->supportedFormat).' availables'
             );

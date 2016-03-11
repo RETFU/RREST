@@ -246,13 +246,13 @@ class Parameter
     /**
      * @param mixed $value The value of the paramater to validate
      *
-     * @throws RREST\Exception\InvalidParameterException
+     * @throws \RREST\Exception\InvalidParameterException
      */
     public function assertValue($value)
     {
         // required?
         if (empty($value)) {
-            if($this->getRequired()) {
+            if ($this->getRequired()) {
                 $this->throwInvalidParameter($this->getName().' is required');
             }
             //no need to continue, the value is empty & not required
@@ -267,7 +267,7 @@ class Parameter
                 }
                 break;
             case static::TYPE_DATE:
-                if($value instanceof \DateTime === false) {
+                if ($value instanceof \DateTime === false) {
                     $this->throwInvalidParameter($this->getName().' is not a valid date');
                 }
                 break;
@@ -292,26 +292,26 @@ class Parameter
         }
 
         //min & max can only be apply to $this->minmaxTypes because make sense :)
-        if(in_array($this->getType(), $this->minmaxTypes)) {
+        if (in_array($this->getType(), $this->minmaxTypes)) {
             $isNumeric = (
                 $this->getType() === self::TYPE_NUMBER ||
                 $this->getType() === self::TYPE_INTEGER
             );
             $isString = $this->getType() === self::TYPE_STRING;
             $min = $this->getMinimum();
-            if(empty($min) === false) {
-                if(
-                    ( $isNumeric && $min > $value ) ||
-                    ( $isString && $min > strlen($value) )
+            if (empty($min) === false) {
+                if (
+                    ($isNumeric && $min > $value) ||
+                    ($isString && $min > strlen($value))
                 ) {
                     $this->throwInvalidParameter($this->getName().' minimum size is '.$min);
                 }
             }
             $max = $this->getMaximum();
-            if(empty($max) === false) {
-                if(
-                    ( $isNumeric && $max < $value ) ||
-                    ( $isString && $max < strlen($value) )
+            if (empty($max) === false) {
+                if (
+                    ($isNumeric && $max < $value) ||
+                    ($isString && $max < strlen($value))
                 ) {
                     $this->throwInvalidParameter($this->getName().' maximum size is '.$max);
                 }
@@ -339,9 +339,7 @@ class Parameter
 
     /**
      * @param  string $message
-     * @param  string $code
-     *
-     * @throws RREST\Exception\InvalidParameterException
+     * @throws InvalidParameterException
      */
     protected function throwInvalidParameter($message)
     {

@@ -5,10 +5,6 @@ require_once __DIR__ . '/../boostrap.php';
 
 use atoum;
 use Silex\Application;
-use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use RREST\Response;
 
 class RAML extends atoum
 {
@@ -19,7 +15,7 @@ class RAML extends atoum
 
     public function beforeTestMethod($method)
     {
-        if(is_null($this->apiDefinition)) {
+        if (is_null($this->apiDefinition)) {
             $this->apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../../fixture/song.raml');
         }
     }
@@ -28,7 +24,7 @@ class RAML extends atoum
     {
         $this
             ->exception(
-                function() {
+                function () {
                     $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songsX');
                 }
             )
@@ -40,7 +36,7 @@ class RAML extends atoum
     {
         $this
             ->exception(
-                function() {
+                function () {
                     $this->newTestedInstance($this->apiDefinition, 'DELETE', '/v1/songs');
                 }
             )
@@ -52,7 +48,7 @@ class RAML extends atoum
     {
         $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs/98');
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->array($this->testedInstance->getParameters())
             ->hasSize(9)
         ;
@@ -62,7 +58,7 @@ class RAML extends atoum
     {
         $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs/98');
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->array($this->testedInstance->getAuthTypes())
             ->hasSize(1)
             ->contains('x-jwt')
@@ -73,7 +69,7 @@ class RAML extends atoum
     {
         $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs');
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->array($this->testedInstance->getStatusCodes())
             ->hasSize(1)
             ->strictlyContainsValues(array(200))
@@ -84,10 +80,10 @@ class RAML extends atoum
     {
         $this->newTestedInstance($this->apiDefinition, 'PUT', '/v1/songs/90');
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->array($this->testedInstance->getRequestPayloadBodyContentTypes())
             ->hasSize(2)
-            ->strictlyContainsValues(array('application/json','application/xml'))
+            ->strictlyContainsValues(array('application/json', 'application/xml'))
         ;
     }
 
@@ -95,7 +91,7 @@ class RAML extends atoum
     {
         $this->newTestedInstance($this->apiDefinition, 'GET', '/v1/songs');
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->array($this->testedInstance->getResponsePayloadBodyContentTypes())
             ->hasSize(1)
             ->strictlyContainsValues(array('application/json'))
@@ -103,7 +99,7 @@ class RAML extends atoum
 
         $this->newTestedInstance($this->apiDefinition, 'DELETE', '/v1/songs/89');
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->array($this->testedInstance->getResponsePayloadBodyContentTypes())
             ->hasSize(0)
         ;
@@ -113,17 +109,17 @@ class RAML extends atoum
     {
         $this->newTestedInstance($this->apiDefinition, 'PUT', '/v1/songs/90');
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->string($this->testedInstance->getRequestPayloadBodySchema('application/json'))
             ->contains('$schema')
         ;
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->string($this->testedInstance->getRequestPayloadBodySchema('application/xml'))
             ->contains('<xs:element name="song">')
         ;
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->boolean($this->testedInstance->getRequestPayloadBodySchema('text/xml'))
             ->isFalse()
         ;
