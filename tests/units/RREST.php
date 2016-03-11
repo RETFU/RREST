@@ -19,7 +19,7 @@ class RREST extends atoum
 
     public function beforeTestMethod($method)
     {
-        if(is_null($this->apiDefinition)) {
+        if (is_null($this->apiDefinition)) {
             $this->apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../fixture/song.raml');
         }
     }
@@ -55,7 +55,7 @@ class RREST extends atoum
     public function testAddRoute()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $provider = $this->getSilexProvider( $this->getSilexApplication() );
+        $provider = $this->getSilexProvider($this->getSilexApplication());
 
         //good
         $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
@@ -68,7 +68,7 @@ class RREST extends atoum
         //missing controller
         $this
             ->exception(
-                function() use ($provider) {
+                function () use ($provider) {
                     $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
                     $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
                     $this->newTestedInstance($apiSpec, $provider, 'RREST\tests');
@@ -82,7 +82,7 @@ class RREST extends atoum
         //missing controller method
         $this
             ->exception(
-                function() use ($provider) {
+                function () use ($provider) {
                     $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
                     $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'DELETE', '/v1/songs/98');
                     $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
@@ -96,7 +96,7 @@ class RREST extends atoum
         //bad accept
         $this
             ->exception(
-                function() use ($apiSpec, $provider) {
+                function () use ($apiSpec, $provider) {
                     $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/jxson';
                     $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
@@ -108,7 +108,7 @@ class RREST extends atoum
         //bad content-type
         $this
             ->exception(
-                function() use ($provider) {
+                function () use ($provider) {
                     $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/98');
                     $_SERVER['Accept'] = 'application/json';
                     $_SERVER['Content-Type'] = 'application/jsonx';
@@ -124,7 +124,7 @@ class RREST extends atoum
         $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
         $this
             ->exception(
-                function() use ($apiSpec, $provider) {
+                function () use ($apiSpec, $provider) {
                     $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
                 }
@@ -139,10 +139,10 @@ class RREST extends atoum
         $provider = $this->getSilexProvider($app);
         $this
             ->exception(
-                function() use ($app, $apiSpec, $provider) {
+                function () use ($app, $apiSpec, $provider) {
                     $this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
-                    $request = Request::create('/v1/songs/98','GET',['id'=>'25'],[],[],[]);
+                    $request = Request::create('/v1/songs/98', 'GET', ['id'=>'25'], [], [], []);
                     $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
                 }
             )
@@ -155,7 +155,7 @@ class RREST extends atoum
             ->given($this->newTestedInstance($apiSpec, $provider, 'RREST\tests\units'))
             ->and(
                 $this->testedInstance->addRoute(),
-                $request = Request::create('/v1/songs/98','GET',['id'=>'10'],[],[],[]),
+                $request = Request::create('/v1/songs/98', 'GET', ['id'=>'10'], [], [], []),
                 $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
                 $id = $provider->getParameterValue('id')
             )
@@ -167,7 +167,7 @@ class RREST extends atoum
     public function testGetActionMethodName()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $provider = $this->getSilexProvider( $this->getSilexApplication() );
+        $provider = $this->getSilexProvider($this->getSilexApplication());
 
         $this
             ->given($this->newTestedInstance($apiSpec, $provider))
@@ -179,7 +179,7 @@ class RREST extends atoum
     public function testGetControllerNamespaceClass()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $provider = $this->getSilexProvider( $this->getSilexApplication() );
+        $provider = $this->getSilexProvider($this->getSilexApplication());
 
         $this
             ->given($this->newTestedInstance($apiSpec, $provider))
@@ -197,7 +197,7 @@ class RREST extends atoum
     public function testGetProtocol()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $provider = $this->getSilexProvider( $this->getSilexApplication() );
+        $provider = $this->getSilexProvider($this->getSilexApplication());
 
         $this
             ->given($this->newTestedInstance($apiSpec, $provider))
