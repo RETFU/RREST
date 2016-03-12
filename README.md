@@ -8,7 +8,7 @@
 ![PHP7 supported](http://php7ready.timesplinter.ch/RETFU/RREST/badge.svg)
 > Important: **RREST** is in active development. The API is not frozen and BC break can happen at any time.
 
-**RREST** do the glue between an [API specification language](https://en.wikipedia.org/wiki/Overview_of_RESTful_API_Description_Languages) (APISpec) like RAML, Swagger... and a router/framework (Provider) in charge of routing the request like [Silex](http://silex.sensiolabs.org/), [Symfony](https://symfony.com/), [Laravel](https://laravel.com/)... to your business logic.
+**RREST** do the glue between an [API specification language](https://en.wikipedia.org/wiki/Overview_of_RESTful_API_Description_Languages) (APISpec) like RAML, Swagger... and a router/framework (Router) in charge of routing the request like [Silex](http://silex.sensiolabs.org/), [Symfony](https://symfony.com/), [Laravel](https://laravel.com/)... to your business logic.
 
 
 **RREST** take care of boring stuff to make a good REST API:
@@ -84,10 +84,10 @@ $app = new Silex\Application();
 $apiDefinition = (new Raml\Parser())->parse($ramlFile, true);
 //load a RAML APISPec by injecting the RAML Parser instance
 $apiSpec = new APISpec\RAML($apiDefinition);
-//load a Silex Provider by injecting the Silex app instance
-$provider = new Provider\Silex($app);
-//bind APISpec + Provider
-$rrest = new RREST\RREST($apiSpec, $provider, 'Controllers');
+//load a Silex Router by injecting the Silex app instance
+$router = new Router\Silex($app);
+//bind APISpec + Router
+$rrest = new RREST\RREST($apiSpec, $router, 'Controllers');
 //add only the current route if match the APISpec
 //validate `Accept`, `Content-Type`, protocol
 $rrest->addRoute();
@@ -109,7 +109,7 @@ $app->run();
 * RAML
 * More coming soon
 
-##### Provider
+##### Router
 * Silex
 * More coming soon
 

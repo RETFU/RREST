@@ -1,20 +1,20 @@
 <?php
 
-namespace RREST\Provider;
+namespace RREST\Router;
 
 use RREST\Response;
 
-interface ProviderInterface
+interface RouterInterface
 {
     /**
-     * Adding a new provider route.
+     * Adding a new router route.
      *
      * @param string    $routePath
      * @param string    $method
      * @param string    $controllerClassName
      * @param string    $actionMethodName
      * @param Response  $response
-     * @param \Closure  $init  A callback to call when the provider is initialized
+     * @param \Closure  $init  A callback to call when the router is initialized
      */
     public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $init);
 
@@ -50,7 +50,7 @@ interface ProviderInterface
     public function setPayloadBodyValue($payloadBodyJSON);
 
     /**
-     * The provider response
+     * The router response
      *
      * @param string $content
      * @param  int $statusCode

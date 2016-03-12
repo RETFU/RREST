@@ -1,6 +1,6 @@
 <?php
 
-namespace RREST\Provider;
+namespace RREST\Router;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
@@ -8,9 +8,9 @@ use RREST\Response;
 use Silex\Application;
 
 /**
- * Silex provider.
+ * Silex router.
  */
-class Silex implements ProviderInterface
+class Silex implements RouterInterface
 {
     /**
      * @var Request

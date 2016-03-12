@@ -9,13 +9,13 @@ use JsonSchema\Validator;
 use Negotiation\Negotiator;
 use Negotiation\Exception\InvalidArgument;
 use RREST\APISpec\APISpecInterface;
-use RREST\Provider\ProviderInterface;
+use RREST\Router\RouterInterface;
 use RREST\Exception\InvalidParameterException;
 use RREST\Exception\InvalidPayloadBodyException;
 use RREST\Exception\InvalidJSONException;
 
 /**
- * ApiSpec + Provider = RREST.
+ * ApiSpec + Router = RREST.
  */
 class RREST
 {
@@ -33,9 +33,9 @@ class RREST
     protected $apiSpec;
 
     /**
-     * @var ProviderInterface
+     * @var RouterInterface
      */
-    protected $provider;
+    protected $router;
 
     /**
      * @var string
@@ -59,13 +59,13 @@ class RREST
 
     /**
      * @param APISpecInterface  $apiSpec
-     * @param ProviderInterface $provider
+     * @param RouterInterface $router
      * @param string            $controllerNamespace
      */
-    public function __construct(APISpecInterface $apiSpec, ProviderInterface $provider, $controllerNamespace = 'Controllers')
+    public function __construct(APISpecInterface $apiSpec, RouterInterface $router, $controllerNamespace = 'Controllers')
     {
         $this->apiSpec = $apiSpec;
-        $this->provider = $provider;
+        $this->router = $router;
         $this->controllerNamespace = $controllerNamespace;
         $this->hintedHTTPParameters = [];
     }
@@ -96,19 +96,19 @@ class RREST
         $this->assertHTTPProtocol($availableProtocols,$protocol);
 
         $contentTypeSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
-        $payloadBodyValue = $this->provider->getPayloadBodyValue();
+        $payloadBodyValue = $this->router->getPayloadBodyValue();
         $statusCodeSucess = $this->getStatusCodeSuccess();
         $format = $this->getFormat($accept,self::$supportedMimeTypes);
         $mimeType = $this->getMimeType($format,self::$supportedMimeTypes);
         $routPaths = $this->getRoutePaths($this->apiSpec->getRoutePath());
 
         foreach ($routPaths as $routPath) {
-            $this->provider->addRoute(
+            $this->router->addRoute(
                 $routPath,
                 $method,
                 $this->getControllerNamespaceClass($controllerClassName),
                 $this->getActionMethodName($method),
-                $this->getResponse($this->provider,$statusCodeSucess,$format,$mimeType),
+                $this->getResponse($this->router,$statusCodeSucess,$format,$mimeType),
                 function () use ($contentType,$contentTypeSchema,$payloadBodyValue) {
                     $this->assertHTTPParameters();
                     $this->assertHTTPPayloadBody($contentType,$contentTypeSchema,$payloadBodyValue);
@@ -146,14 +146,14 @@ class RREST
     }
 
     /**
-     * @param  ProviderInterface $provider
+     * @param  RouterInterface $router
      * @param  string            $statusCodeSucess
      * @param  string            $format
      * @param  string            $mimeType
      *
      * @return Response
      */
-    protected function getResponse(ProviderInterface $provider, $statusCodeSucess, $format, $mimeType)
+    protected function getResponse(RouterInterface $router, $statusCodeSucess, $format, $mimeType)
     {
         if($format === false) {
             throw new \RuntimeException(
@@ -161,7 +161,7 @@ class RREST
                 RRest only support json & xml.'
             );
         }
-        $response = new Response($provider,$format,$statusCodeSucess);
+        $response = new Response($router,$format,$statusCodeSucess);
         $response->setContentType($mimeType);
         return $response;
     }
@@ -248,7 +248,7 @@ class RREST
         $invalidParametersError = [];
         $parameters = $this->apiSpec->getParameters();
         foreach ($parameters as $parameter) {
-            $value = $this->provider->getParameterValue($parameter->getName());
+            $value = $this->router->getParameterValue($parameter->getName());
             try {
                 $castValue = $this->cast($value, $parameter->getType());
             } catch (\Exception $e) {
@@ -278,7 +278,7 @@ class RREST
     protected function hintHTTPParameterValue($hintedHTTPParameters)
     {
         foreach ($hintedHTTPParameters as $key => $value) {
-            $this->provider->setParameterValue($key, $value);
+            $this->router->setParameterValue($key, $value);
         }
     }
 
@@ -406,7 +406,7 @@ class RREST
 
     protected function hintHTTPPayloadBody($hintedPayloadBody)
     {
-        $this->provider->setPayloadBodyValue( $hintedPayloadBody );
+        $this->router->setPayloadBodyValue( $hintedPayloadBody );
     }
 
     /**

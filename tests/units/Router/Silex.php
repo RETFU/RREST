@@ -1,5 +1,5 @@
 <?php
-namespace RREST\tests\units\Provider;
+namespace RREST\tests\units\Router;
 
 require_once __DIR__ . '/../boostrap.php';
 
@@ -25,14 +25,14 @@ class Silex extends atoum
 
     public function testAddRoute()
     {
-        //just check if adding a route with the Silex Provider
+        //just check if adding a route with the Silex Router
         //work when a request happen on the route GET /
         $this->newTestedInstance($this->app);
         $this
             ->given( $this->testedInstance )
             ->and(
                 $this->testedInstance->addRoute(
-                    '/','GET','RREST\tests\units\Provider\Controller','getAction',
+                    '/','GET','RREST\tests\units\Router\Controller','getAction',
                     new Response($this->testedInstance,'json',201),
                     function(){}
                 ),
@@ -71,7 +71,7 @@ class Silex extends atoum
             ->given( $this->testedInstance )
             ->and(
                 $this->testedInstance->addRoute(
-                    '/','GET','RREST\tests\units\Provider\Controller','getAction',
+                    '/','GET','RREST\tests\units\Router\Controller','getAction',
                     new Response($this->testedInstance,'json',201),
                     function(){}
                 ),
@@ -91,7 +91,7 @@ class Silex extends atoum
             ->given( $this->testedInstance )
             ->and(
                 $this->testedInstance->addRoute(
-                    '/','GET','RREST\tests\units\Provider\Controller','getAction',
+                    '/','GET','RREST\tests\units\Router\Controller','getAction',
                     new Response($this->testedInstance,'json',201),
                     function(){}
                 ),
@@ -113,7 +113,7 @@ class Silex extends atoum
             ->given( $this->testedInstance )
             ->and(
                 $this->testedInstance->addRoute(
-                    '/','GET','RREST\tests\units\Provider\Controller','getAction',
+                    '/','GET','RREST\tests\units\Router\Controller','getAction',
                     new Response($this->testedInstance,'json',201),
                     function(){}
                 ),
@@ -133,6 +133,6 @@ class Controller
 {
     public function getAction(Application $app, Request $request, Response $response)
     {
-        return $response->getProviderResponse();
+        return $response->getRouterResponse();
     }
 }

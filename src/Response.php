@@ -4,7 +4,7 @@ namespace RREST;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use RREST\Provider\ProviderInterface;
+use RREST\Router\RouterInterface;
 
 class Response
 {
@@ -29,9 +29,9 @@ class Response
     protected $supportedFormat = ['json','xml'];
 
     /**
-     * @var ProviderInterface
+     * @var RouterInterface
      */
-    protected $provider;
+    protected $router;
 
     /**
      * The URL of a resource, useful when POST a new one
@@ -45,10 +45,10 @@ class Response
      */
     protected $headerContentType;
 
-    public function __construct(ProviderInterface $provider, $format, $statusCode)
+    public function __construct(RouterInterface $router, $format, $statusCode)
     {
         $this->setFormat($format);
-        $this->setProvider($provider);
+        $this->setRouter($router);
         $this->setStatusCode($statusCode);
     }
 
@@ -160,23 +160,23 @@ class Response
     }
 
     /**
-     * @param ProviderInterface $provider
+     * @param RouterInterface $router
      */
-    public function setProvider(ProviderInterface $provider)
+    public function setRouter(RouterInterface $router)
     {
-        $this->provider = $provider;
+        $this->router = $router;
     }
 
     /**
-     * @return ProviderInterface
+     * @return RouterInterface
      */
-    public function getProvider()
+    public function getRouter()
     {
-        return $this->provider;
+        return $this->router;
     }
 
     /**
-     * Get a provider configured response with:
+     * Get a router configured response with:
      * - content serialize
      * - success status code
      * - header Content-Type
@@ -186,13 +186,13 @@ class Response
      *
      * @return mixed
      */
-    public function getProviderResponse($autoSerializeContent=true)
+    public function getRouterResponse($autoSerializeContent=true)
     {
         $content = $this->getContent();
         if($autoSerializeContent) {
             $content = $this->serialize($content, $this->getFormat());
         }
-        return $this->provider->getResponse(
+        return $this->router->getResponse(
             $content, $this->getConfiguredHeaderstatusCode(), $this->getConfiguredHeaders()
         );
     }
