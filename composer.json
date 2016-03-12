@@ -27,7 +27,7 @@
         "ralouphie/getallheaders": "^2.0"
     },
     "suggest": {
-        "silex/silex": "To use the Silex Provider",
+        "silex/silex": "To use the Silex Router",
         "alecsammon/php-raml-parser": "To use the RAML APISpec"
     },
     "require-dev": {
