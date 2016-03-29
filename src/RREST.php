@@ -306,7 +306,6 @@ class RREST
                 $this->assertHTTPPayloadBodyXML($value, $schema);
                 break;
             default:
-                throw new UnsupportedMediaTypeHttpException();
                 break;
         }
     }
