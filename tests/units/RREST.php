@@ -210,7 +210,7 @@ class RREST extends atoum
                     $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
                 }
             )
-            ->isInstanceOf('RREST\Exception\InvalidPayloadBodyException')
+            ->isInstanceOf('RREST\Exception\InvalidRequestPayloadBodyException')
             ->array($this->exception->getErrors())
             ->hasSize(2)
             ->object($this->exception->getErrors()[0])
@@ -272,7 +272,7 @@ class RREST extends atoum
                     $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
                 }
             )
-            ->isInstanceOf('RREST\Exception\InvalidPayloadBodyException')
+            ->isInstanceOf('RREST\Exception\InvalidRequestPayloadBodyException')
             ->array($this->exception->getErrors())
             ->hasSize(1)
             ->object($this->exception->getErrors()[0])

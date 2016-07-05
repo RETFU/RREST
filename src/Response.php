@@ -340,7 +340,7 @@ class Response
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new InvalidJSONException([new Error(
                     ucfirst(json_last_error_msg()),
-                    'invalid-payloadbody-json'
+                    'invalid-response-payloadbody-json'
                 )]);
             }
         };
@@ -359,7 +359,7 @@ class Response
                     ucfirst(trim(strtolower(
                         $jsonError['property'].' property: '.$jsonError['message']
                     ))),
-                    'invalid-payloadbody-json'
+                    'invalid-response-payloadbody-jsonschema'
                 );
             }
             if (empty($invalidBodyError) == false) {

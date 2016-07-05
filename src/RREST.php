@@ -11,7 +11,7 @@ use Negotiation\Exception\InvalidArgument;
 use RREST\APISpec\APISpecInterface;
 use RREST\Router\RouterInterface;
 use RREST\Exception\InvalidParameterException;
-use RREST\Exception\InvalidPayloadBodyException;
+use RREST\Exception\InvalidRequestPayloadBodyException;
 use RREST\Exception\InvalidJSONException;
 
 /**
@@ -316,7 +316,7 @@ class RREST
      * @param string $schema
      * @param string $value
      *
-     * @throw RREST\Exception\InvalidPayloadBodyException
+     * @throw RREST\Exception\InvalidRequestPayloadBodyException
      * @throw RREST\Exception\InvalidJSONException
      * @throw RREST\Exception\InvalidXMLException
      */
@@ -344,7 +344,7 @@ class RREST
      * @param string $schema
      *
      * @throws \RREST\Exception\InvalidXMLException
-     * @throws \RREST\Exception\InvalidPayloadBodyException
+     * @throws \RREST\Exception\InvalidRequestPayloadBodyException
      */
     protected function assertHTTPPayloadBodyXML($value, $schema)
     {
@@ -375,7 +375,7 @@ class RREST
         //validate XMLSchema
         $invalidBodyError = [];
         $valueDOM->schemaValidateSource($schema);
-        $thowInvalidXMLException('RREST\Exception\InvalidPayloadBodyException');
+        $thowInvalidXMLException('RREST\Exception\InvalidRequestPayloadBodyException');
 
         libxml_use_internal_errors($originalErrorLevel);
 
@@ -390,7 +390,7 @@ class RREST
      * @param string $schema
      *
      * @throws \RREST\Exception\InvalidJSONException
-     * @throws \RREST\Exception\InvalidPayloadBodyException
+     * @throws \RREST\Exception\InvalidRequestPayloadBodyException
      */
     protected function assertHTTPPayloadBodyJSON($value, $schema)
     {
@@ -398,7 +398,7 @@ class RREST
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new InvalidJSONException([new Error(
                     ucfirst(json_last_error_msg()),
-                    'invalid-payloadbody-json'
+                    'invalid-request-payloadbody-json'
                 )]);
             }
         };
@@ -419,11 +419,11 @@ class RREST
                     ucfirst(trim(strtolower(
                         $jsonError['property'].' property: '.$jsonError['message']
                     ))),
-                    'invalid-payloadbody-json'
+                    'invalid-request-payloadbody-jsonschema'
                 );
             }
             if (empty($invalidBodyError) == false) {
-                throw new InvalidPayloadBodyException($invalidBodyError);
+                throw new InvalidRequestPayloadBodyException($invalidBodyError);
             }
         }
 

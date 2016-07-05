@@ -4,7 +4,7 @@ namespace RREST\Exception;
 
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
-class InvalidPayloadBodyException extends UnprocessableEntityHttpException implements ErrorExceptionInterface
+class InvalidRequestPayloadBodyException extends UnprocessableEntityHttpException implements ErrorExceptionInterface
 {
     /**
      * @var \RREST\Error[]
