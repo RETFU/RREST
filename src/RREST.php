@@ -53,6 +53,11 @@ class RREST
     protected $hintedPayloadBody;
 
     /**
+     * @var boolean
+     */
+    protected $assertResponse = true;
+
+    /**
      * @var string[]
      */
     private $headers;
@@ -68,6 +73,24 @@ class RREST
         $this->router = $router;
         $this->controllerNamespace = $controllerNamespace;
         $this->hintedHTTPParameters = [];
+    }
+
+    /**
+     * Define if the response will be validate against the APISpec
+     * schema or not. You can make it to false in production to have better
+     * performance on large response, like list of object.
+     *
+     * @param bool $assert
+     */
+    public function setAsserResponse($assert) {
+        $this->assertResponse = $assert;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAsserResponse() {
+        return $this->assertResponse;
     }
 
     /**
@@ -104,7 +127,9 @@ class RREST
 
         $responseSchema = $this->apiSpec->getResponsePayloadBodySchema($statusCodeSucess, $accept);
         $response = $this->getResponse($this->router, $statusCodeSucess, $format, $mimeType);
-        $response->setSchema($responseSchema);
+        if( $this->getAsserResponse() ) {
+            $response->setSchema($responseSchema);
+        }
 
         foreach ($routPaths as $routPath) {
             $this->router->addRoute(
