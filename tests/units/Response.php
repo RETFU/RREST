@@ -92,6 +92,60 @@ class Response extends atoum
         ;
     }
 
+    public function testAssertReponseSchema()
+    {
+        $this->newTestedInstance($this->router,'json',200);
+        $this
+            ->exception(
+                function() {
+                    $this->testedInstance->assertReponseSchema('xxx','ddd','ddd');
+                }
+            )
+            ->isInstanceOf('\RuntimeException')
+            ->message->contains('format not supported')
+        ;
+
+        $this
+            ->exception(
+                function() {
+                    $this->testedInstance->assertReponseSchema('json','ddd','ddd');
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidJSONException')
+        ;
+
+        $this
+            ->exception(
+                function() {
+                    $schema = file_get_contents(__DIR__.'/../fixture/song.json');
+                    $value = '{"title":"title","artist":4}';
+                    $this->testedInstance->assertReponseSchema('json',$schema,$value);
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidResponsePayloadBodyException')
+        ;
+
+        $this
+            ->exception(
+                function() {
+                    $this->testedInstance->assertReponseSchema('xml','ddd','ddd');
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidXMLException')
+        ;
+
+        $this
+            ->exception(
+                function() {
+                    $schema = file_get_contents(__DIR__.'/../fixture/song.xml');
+                    $value = '<song><title>qsd</title></song>';
+                    $this->testedInstance->assertReponseSchema('xml',$schema,$value);
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidResponsePayloadBodyException')
+        ;
+    }
+
     public function testGetRouterResponse()
     {
         $this->newTestedInstance($this->router,'json',201);
