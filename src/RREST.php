@@ -82,14 +82,14 @@ class RREST
      *
      * @param bool $assert
      */
-    public function setAsserResponse($assert) {
+    public function setAssertResponse($assert) {
         $this->assertResponse = $assert;
     }
 
     /**
      * @return bool
      */
-    public function getAsserResponse() {
+    public function getAssertResponse() {
         return $this->assertResponse;
     }
 
@@ -127,7 +127,7 @@ class RREST
 
         $responseSchema = $this->apiSpec->getResponsePayloadBodySchema($statusCodeSucess, $accept);
         $response = $this->getResponse($this->router, $statusCodeSucess, $format, $mimeType);
-        if( $this->getAsserResponse() ) {
+        if( $this->getAssertResponse() ) {
             $response->setSchema($responseSchema);
         }
 
