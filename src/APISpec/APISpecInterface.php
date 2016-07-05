@@ -67,6 +67,10 @@ interface APISpecInterface
      */
     public function getResponsePayloadBodyContentTypes();
 
-    //TODO: add response validation against schema
-    //public function getResponsePayloadBodySchema($contentType);
+    /**
+     * @param  string $statusCode
+     * @param  string $contentType
+     * @return string|null
+     */
+    public function getResponsePayloadBodySchema($statusCode, $contentType);
 }

@@ -95,12 +95,16 @@ class RREST
         $availableProtocols = $this->apiSpec->getProtocols();
         $this->assertHTTPProtocol($availableProtocols,$protocol);
 
-        $contentTypeSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
+        $requestSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
         $payloadBodyValue = $this->router->getPayloadBodyValue();
         $statusCodeSucess = $this->getStatusCodeSuccess();
         $format = $this->getFormat($accept,self::$supportedMimeTypes);
         $mimeType = $this->getMimeType($format,self::$supportedMimeTypes);
         $routPaths = $this->getRoutePaths($this->apiSpec->getRoutePath());
+
+        $responseSchema = $this->apiSpec->getResponsePayloadBodySchema($statusCodeSucess, $accept);
+        $response = $this->getResponse($this->router,$statusCodeSucess,$format,$mimeType);
+        $response->setSchema($responseSchema);
 
         foreach ($routPaths as $routPath) {
             $this->router->addRoute(
@@ -108,10 +112,10 @@ class RREST
                 $method,
                 $this->getControllerNamespaceClass($controllerClassName),
                 $this->getActionMethodName($method),
-                $this->getResponse($this->router,$statusCodeSucess,$format,$mimeType),
-                function () use ($contentType,$contentTypeSchema,$payloadBodyValue) {
+                $response,
+                function () use ($contentType,$requestSchema,$payloadBodyValue) {
                     $this->assertHTTPParameters();
-                    $this->assertHTTPPayloadBody($contentType,$contentTypeSchema,$payloadBodyValue);
+                    $this->assertHTTPPayloadBody($contentType,$requestSchema,$payloadBodyValue);
                     $this->hintHTTPParameterValue($this->hintedHTTPParameters);
                     $this->hintHTTPPayloadBody($this->hintedPayloadBody);
                 }

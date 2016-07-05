@@ -1,10 +1,13 @@
 <?php
 namespace RREST;
 
+use JsonSchema\Validator;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use RREST\Router\RouterInterface;
+use RREST\Exception\InvalidResponsePayloadBodyException;
+use RREST\Exception\InvalidJSONException;
 
 class Response
 {
@@ -22,6 +25,11 @@ class Response
      * @var string
      */
     protected $statusCode;
+
+    /**
+     * @var string
+     */
+    protected $schema;
 
     /**
      * @var string[]
@@ -123,6 +131,22 @@ class Response
     }
 
     /**
+     * @param string
+     */
+    public function setSchema($schema)
+    {
+        $this->schema = $schema;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSchema()
+    {
+        return $this->schema;
+    }
+
+    /**
      * All headers configured, index by header name
      *
      * @return string[]
@@ -149,6 +173,12 @@ class Response
     public function setContent($content)
     {
         $this->content = $content;
+
+        $this->assertReponseSchema(
+            $this->getFormat(),
+            $this->getSchema(),
+            $content
+        );
     }
 
     /**
@@ -222,6 +252,119 @@ class Response
             throw new \RuntimeException(
                 'format not supported, only are '.implode(', ', $this->supportedFormat).' availables'
             );
+        }
+    }
+
+    /**
+     * @param  string $format
+     * @param  string $schema
+     * @param  string $value
+     *
+     * @throws InvalidResponsePayloadBodyException
+     * @throws InvalidJSONException
+     * @throws InvalidXMLException
+     */
+    public function assertReponseSchema($format, $schema, $value)
+    {
+        if(empty($schema)) {
+            return;
+        }
+
+        switch (true) {
+            case strpos($format, 'json') !== false:
+                $this->assertResponseJSON($value, $schema);
+                break;
+            case strpos($format, 'xml') !== false:
+                $this->assertResponseXML($value, $schema);
+                break;
+            default:
+                throw new \RuntimeException(
+                    'format not supported, only are '.implode(', ', $this->supportedFormat).' availables'
+                );
+                break;
+        }
+    }
+
+    /**
+     * @param  string $value
+     * @param  string $schema
+     *
+     * @throws \RREST\Exception\InvalidXMLException
+     * @throws \RREST\Exception\InvalidResponsePayloadBodyException
+     *
+     */
+    public function assertResponseXML($value, $schema)
+    {
+        $thowInvalidXMLException = function($exceptionClassName) {
+            $invalidBodyError = [];
+            $libXMLErrors = libxml_get_errors();
+            libxml_clear_errors();
+            if (empty($libXMLErrors) === false) {
+                foreach ($libXMLErrors as $libXMLError) {
+                    $message = $libXMLError->message.' (line: '.$libXMLError->line.')';
+                    $invalidBodyError[] = new Error(
+                        $message,
+                        'invalid-response-xml'
+                    );
+                }
+                if (empty($invalidBodyError) == false) {
+                    throw new $exceptionClassName($invalidBodyError);
+                }
+            }
+        };
+
+        //validate XML
+        $originalErrorLevel = libxml_use_internal_errors(true);
+        $valueDOM = new \DOMDocument;
+        $valueDOM->loadXML($value);
+        $thowInvalidXMLException('RREST\Exception\InvalidXMLException');
+
+        //validate XMLSchema
+        $valueDOM->schemaValidateSource($schema);
+        $thowInvalidXMLException('RREST\Exception\InvalidResponsePayloadBodyException');
+
+        libxml_use_internal_errors($originalErrorLevel);
+    }
+
+    /**
+     * @param  string $value
+     * @param  string $schema
+     *
+     * @throws \RREST\Exception\InvalidJSONException
+     * @throws \RREST\Exception\InvalidResponsePayloadBodyException
+     *
+     */
+    public function assertResponseJSON($value, $schema)
+    {
+        $assertInvalidJSONException = function() {
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new InvalidJSONException([new Error(
+                    ucfirst(json_last_error_msg()),
+                    'invalid-payloadbody-json'
+                )]);
+            }
+        };
+
+        //validate JSON format
+        $schemaJSON = json_decode($schema);
+        $assertInvalidJSONException();
+
+        //validate JsonSchema
+        $jsonValidator = new Validator();
+        $jsonValidator->check($value, $schemaJSON);
+        if ($jsonValidator->isValid() === false) {
+            $invalidBodyError = [];
+            foreach ($jsonValidator->getErrors() as $jsonError) {
+                $invalidBodyError[] = new Error(
+                    ucfirst(trim(strtolower(
+                        $jsonError['property'].' property: '.$jsonError['message']
+                    ))),
+                    'invalid-payloadbody-json'
+                );
+            }
+            if (empty($invalidBodyError) == false) {
+                throw new InvalidResponsePayloadBodyException($invalidBodyError);
+            }
         }
     }
 }

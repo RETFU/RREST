@@ -160,6 +160,22 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
+    public function getRequestPayloadBodySchema($contentType)
+    {
+        $bodies = $this->method->getBodies();
+        if( empty( $bodies ) === false ) {
+            try {
+                return (string) $this->method->getBodyByType($contentType)->getSchema();
+            } catch (\Exception $e) {
+
+            }
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResponsePayloadBodyContentTypes()
     {
         $contentTypes = [];
@@ -174,17 +190,18 @@ class RAML implements APISpecInterface
     /**
      * {@inheritdoc}
      */
-    public function getRequestPayloadBodySchema($contentType)
+    public function getResponsePayloadBodySchema($statusCode, $contentType)
     {
-        $bodies = $this->method->getBodies();
-        if( empty( $bodies ) === false ) {
+        $response = $this->method->getResponse($statusCode);
+        if( empty( $response ) === false ) {
             try {
-                return (string) $this->method->getBodyByType($contentType)->getSchema();
+                $body = $response->getBodyByType($contentType);
+                return (string) $body->getSchema();
             } catch (\Exception $e) {
 
             }
         }
-        return false;
+        return null;
     }
 
     /**
