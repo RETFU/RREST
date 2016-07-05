@@ -1,4 +1,5 @@
 <?php
+
 namespace RREST;
 
 use JsonSchema\Validator;
@@ -34,7 +35,7 @@ class Response
     /**
      * @var string[]
      */
-    protected $supportedFormat = ['json','xml'];
+    protected $supportedFormat = ['json', 'xml'];
 
     /**
      * @var RouterInterface
@@ -42,7 +43,7 @@ class Response
     protected $router;
 
     /**
-     * The URL of a resource, useful when POST a new one
+     * The URL of a resource, useful when POST a new one.
      *
      * @var string
      */
@@ -73,7 +74,7 @@ class Response
      */
     public function setFormat($format)
     {
-        if(in_array($format, $this->supportedFormat) === false) {
+        if (in_array($format, $this->supportedFormat) === false) {
             throw new \RuntimeException(
                 'format not supported, only are '.implode(', ', $this->supportedFormat).' availables'
             );
@@ -111,7 +112,6 @@ class Response
     public function setLocation($headerLocation)
     {
         $this->headerLocation = $headerLocation;
-
     }
 
     /**
@@ -147,7 +147,7 @@ class Response
     }
 
     /**
-     * All headers configured, index by header name
+     * All headers configured, index by header name.
      *
      * @return string[]
      */
@@ -155,20 +155,21 @@ class Response
     {
         $headers = [];
         $contentType = $this->getContentType();
-        if(empty($contentType)===false) {
+        if (empty($contentType) === false) {
             $headers['Content-Type'] = $contentType;
         }
         $location = $this->getLocation();
-        if(empty($location)===false) {
+        if (empty($location) === false) {
             $headers['Location'] = $location;
         }
+
         return $headers;
     }
 
     /**
      * @param mixed $content
      *
-     * @return boolean
+     * @return bool
      */
     public function setContent($content)
     {
@@ -210,45 +211,46 @@ class Response
      * - content serialize
      * - success status code
      * - header Content-Type
-     * - header Location
+     * - header Location.
      *
-     * @param  boolean $autoSerializeContent
+     * @param bool $autoSerializeContent
      *
      * @return mixed
      */
-    public function getRouterResponse($autoSerializeContent=true)
+    public function getRouterResponse($autoSerializeContent = true)
     {
         $content = $this->getContent();
-        if($autoSerializeContent) {
+        if ($autoSerializeContent) {
             $content = $this->serialize($content, $this->getFormat());
         }
+
         return $this->router->getResponse(
             $content, $this->getConfiguredHeaderstatusCode(), $this->getConfiguredHeaders()
         );
     }
 
     /**
-     * @param  mixed $data
-     * @param  string $format
+     * @param mixed  $data
+     * @param string $format
+     *
      * @return string
      */
     public function serialize($data, $format)
     {
-        if( $format === 'json' ) {
+        if ($format === 'json') {
             return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        }
-        elseif( $format === 'xml' ) {
+        } elseif ($format === 'xml') {
             $serializer = new Serializer([
-                    new ObjectNormalizer()
-                ],[
+                    new ObjectNormalizer(),
+                ], [
                     'xml' => new XmlEncoder(),
                 ]
             );
             //fix stdClass not serialize by default
             $data = json_decode(json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true);
+
             return $serializer->serialize($data, $format);
-        }
-        else {
+        } else {
             throw new \RuntimeException(
                 'format not supported, only are '.implode(', ', $this->supportedFormat).' availables'
             );
@@ -256,9 +258,9 @@ class Response
     }
 
     /**
-     * @param  string $format
-     * @param  string $schema
-     * @param  string $value
+     * @param string $format
+     * @param string $schema
+     * @param string $value
      *
      * @throws InvalidResponsePayloadBodyException
      * @throws InvalidJSONException
@@ -266,7 +268,7 @@ class Response
      */
     public function assertReponseSchema($format, $schema, $value)
     {
-        if(empty($schema)) {
+        if (empty($schema)) {
             return;
         }
 
@@ -286,16 +288,15 @@ class Response
     }
 
     /**
-     * @param  string $value
-     * @param  string $schema
+     * @param string $value
+     * @param string $schema
      *
      * @throws \RREST\Exception\InvalidXMLException
      * @throws \RREST\Exception\InvalidResponsePayloadBodyException
-     *
      */
     public function assertResponseXML($value, $schema)
     {
-        $thowInvalidXMLException = function($exceptionClassName) {
+        $thowInvalidXMLException = function ($exceptionClassName) {
             $invalidBodyError = [];
             $libXMLErrors = libxml_get_errors();
             libxml_clear_errors();
@@ -315,7 +316,7 @@ class Response
 
         //validate XML
         $originalErrorLevel = libxml_use_internal_errors(true);
-        $valueDOM = new \DOMDocument;
+        $valueDOM = new \DOMDocument();
         $valueDOM->loadXML($value);
         $thowInvalidXMLException('RREST\Exception\InvalidXMLException');
 
@@ -327,16 +328,15 @@ class Response
     }
 
     /**
-     * @param  string $value
-     * @param  string $schema
+     * @param string $value
+     * @param string $schema
      *
      * @throws \RREST\Exception\InvalidJSONException
      * @throws \RREST\Exception\InvalidResponsePayloadBodyException
-     *
      */
     public function assertResponseJSON($value, $schema)
     {
-        $assertInvalidJSONException = function() {
+        $assertInvalidJSONException = function () {
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new InvalidJSONException([new Error(
                     ucfirst(json_last_error_msg()),

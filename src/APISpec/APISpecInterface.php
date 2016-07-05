@@ -21,7 +21,7 @@ interface APISpecInterface
     public function getRouteMethod();
 
     /**
-     * Return all auths type supported by the current route
+     * Return all auths type supported by the current route.
      *
      * @return string[]
      */
@@ -37,7 +37,7 @@ interface APISpecInterface
     public function getRessourcePath();
 
     /**
-     * @return integer[]
+     * @return int[]
      */
     public function getStatusCodes();
 
@@ -52,24 +52,26 @@ interface APISpecInterface
     public function getParameters();
 
     /**
-     * @return string[]|boolean
+     * @return string[]|bool
      */
     public function getRequestPayloadBodyContentTypes();
 
     /**
-     * @param  string $contentType
-     * @return string|boolean
+     * @param string $contentType
+     *
+     * @return string|bool
      */
     public function getRequestPayloadBodySchema($contentType);
 
     /**
-     * @return string[]|boolean
+     * @return string[]|bool
      */
     public function getResponsePayloadBodyContentTypes();
 
     /**
-     * @param  string $statusCode
-     * @param  string $contentType
+     * @param string $statusCode
+     * @param string $contentType
+     *
      * @return string|null
      */
     public function getResponsePayloadBodySchema($statusCode, $contentType);

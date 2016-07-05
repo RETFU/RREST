@@ -1,17 +1,17 @@
 <?php
+
 namespace RREST;
 
 use RREST\Exception\InvalidParameterException;
-use RREST\Error;
 
 class Parameter
 {
-    const TYPE_STRING   = 'string';
-    const TYPE_NUMBER   = 'number';
-    const TYPE_INTEGER  = 'integer';
-    const TYPE_DATE     = 'date';
-    const TYPE_BOOLEAN  = 'boolean';
-    const TYPE_FILE     = 'file';
+    const TYPE_STRING = 'string';
+    const TYPE_NUMBER = 'number';
+    const TYPE_INTEGER = 'integer';
+    const TYPE_DATE = 'date';
+    const TYPE_BOOLEAN = 'boolean';
+    const TYPE_FILE = 'file';
 
     /**
      * @var string[]
@@ -22,72 +22,72 @@ class Parameter
         self::TYPE_INTEGER,
         self::TYPE_DATE,
         self::TYPE_BOOLEAN,
-        self::TYPE_FILE
+        self::TYPE_FILE,
     ];
 
     /**
-     * Define types that can have a maximum or a minimum
+     * Define types that can have a maximum or a minimum.
      *
      * @var string[]
      */
     protected $minmaxTypes = [
         self::TYPE_STRING,
         self::TYPE_NUMBER,
-        self::TYPE_INTEGER
+        self::TYPE_INTEGER,
     ];
 
     /**
-     * The name of the parameter
+     * The name of the parameter.
      *
      * @var string
      */
     private $name;
 
     /**
-     * The primitive type of the parameter
+     * The primitive type of the parameter.
      *
      * @var string
      */
     private $type;
 
     /**
-     * If the parameter is required
+     * If the parameter is required.
      *
-     * @var boolean
+     * @var bool
      */
     protected $required;
 
     /**
-     * List of valid values for the parameter (optional)
+     * List of valid values for the parameter (optional).
      *
      * @var string[]
      */
     private $enum;
 
     /**
-     * A regular expression pattern for the string to match against (optional)
+     * A regular expression pattern for the string to match against (optional).
      *
      * @var string
      */
     private $validationPattern;
 
     /**
-     * The minimum for a string length, integer or number (optional)
+     * The minimum for a string length, integer or number (optional).
      *
-     * @var integer|null
+     * @var int|null
      */
     private $minimum;
 
     /**
-     * The maximum for a string length, a integer or number (optional)
+     * The maximum for a string length, a integer or number (optional).
      *
-     * @var integer|null
+     * @var int|null
      */
     private $maximum;
 
     /**
      * A valid DateTime format
-     * Default RFC2616
+     * Default RFC2616.
      *
      * @var string
      */
@@ -96,7 +96,7 @@ class Parameter
     /**
      * @param string $name
      * @param string $type
-     * @param boolean $required
+     * @param bool   $required
      */
     public function __construct($name, $type, $required)
     {
@@ -178,7 +178,7 @@ class Parameter
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getMinimum()
     {
@@ -186,7 +186,7 @@ class Parameter
     }
 
     /**
-     * @param integer $minimum
+     * @param int $minimum
      *
      * @throws \Exception
      */
@@ -196,7 +196,7 @@ class Parameter
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getMaximum()
     {
@@ -204,7 +204,7 @@ class Parameter
     }
 
     /**
-     * Set maximum
+     * Set maximum.
      */
     public function setMaximum($maximum)
     {
@@ -212,7 +212,7 @@ class Parameter
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getRequired()
     {
@@ -220,7 +220,7 @@ class Parameter
     }
 
     /**
-     * @param boolean $required
+     * @param bool $required
      */
     public function setRequired($required)
     {
@@ -252,7 +252,7 @@ class Parameter
     {
         // required?
         if (empty($value)) {
-            if($this->getRequired()) {
+            if ($this->getRequired()) {
                 $this->throwInvalidParameter($this->getName().' is required');
             }
             //no need to continue, the value is empty & not required
@@ -267,7 +267,7 @@ class Parameter
                 }
                 break;
             case static::TYPE_DATE:
-                if($value instanceof \DateTime === false) {
+                if ($value instanceof \DateTime === false) {
                     $this->throwInvalidParameter($this->getName().' is not a valid date');
                 }
                 break;
@@ -292,26 +292,26 @@ class Parameter
         }
 
         //min & max can only be apply to $this->minmaxTypes because make sense :)
-        if(in_array($this->getType(), $this->minmaxTypes)) {
+        if (in_array($this->getType(), $this->minmaxTypes)) {
             $isNumeric = (
                 $this->getType() === self::TYPE_NUMBER ||
                 $this->getType() === self::TYPE_INTEGER
             );
             $isString = $this->getType() === self::TYPE_STRING;
             $min = $this->getMinimum();
-            if(empty($min) === false) {
-                if(
-                    ( $isNumeric && $min > $value ) ||
-                    ( $isString && $min > strlen($value) )
+            if (empty($min) === false) {
+                if (
+                    ($isNumeric && $min > $value) ||
+                    ($isString && $min > strlen($value))
                 ) {
                     $this->throwInvalidParameter($this->getName().' minimum size is '.$min);
                 }
             }
             $max = $this->getMaximum();
-            if(empty($max) === false) {
-                if(
-                    ( $isNumeric && $max < $value ) ||
-                    ( $isString && $max < strlen($value) )
+            if (empty($max) === false) {
+                if (
+                    ($isNumeric && $max < $value) ||
+                    ($isString && $max < strlen($value))
                 ) {
                     $this->throwInvalidParameter($this->getName().' maximum size is '.$max);
                 }
@@ -338,13 +338,14 @@ class Parameter
     }
 
     /**
-     * @param  string $message
+     * @param string $message
+     *
      * @throws InvalidParameterException
      */
     protected function throwInvalidParameter($message)
     {
         throw new InvalidParameterException([
-            new Error($message, 'parameter-invalid')
+            new Error($message, 'parameter-invalid'),
         ]);
     }
 }

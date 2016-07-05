@@ -1,4 +1,5 @@
 <?php
+
 namespace RREST;
 
 class Route
@@ -10,7 +11,7 @@ class Route
 
     /**
      * The verb of the Route
-     * [GET, POST, PUT, PATCH, DELETE]
+     * [GET, POST, PUT, PATCH, DELETE].
      *
      * @var string
      */
@@ -50,7 +51,7 @@ class Route
     }
 
     /**
-     * Return all auths type supported by the current route
+     * Return all auths type supported by the current route.
      *
      * @return string[]
      */

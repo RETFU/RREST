@@ -13,7 +13,7 @@ class InvalidXMLException extends BadRequestHttpException implements ErrorExcept
     public $errors;
 
     /**
-     * @param Error[]  $errors   List of errors
+     * @param Error[]         $errors   List of errors
      * @param \Exception|null $previous
      */
     public function __construct(array $errors, $message = 'Invalid', \Exception $previous = null, $code = 0)
@@ -23,7 +23,7 @@ class InvalidXMLException extends BadRequestHttpException implements ErrorExcept
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getErrors()
     {

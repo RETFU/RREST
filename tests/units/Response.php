@@ -1,7 +1,8 @@
 <?php
+
 namespace RREST\tests\units;
 
-require_once __DIR__ . '/boostrap.php';
+require_once __DIR__.'/boostrap.php';
 
 use atoum;
 use RREST\Router\Silex;
@@ -21,15 +22,15 @@ class Response extends atoum
 
     public function beforeTestMethod($method)
     {
-        if(is_null($this->router)) {
+        if (is_null($this->router)) {
             $app = new Application();
             $this->router = new Silex($app);
 
-            $this->data = new \stdClass;
+            $this->data = new \stdClass();
             $this->data->name = 'diego';
             $this->data->age = 3;
-            $this->data->moods = new \stdClass;
-            $this->data->moods = ['angry','cool','happy'];
+            $this->data->moods = new \stdClass();
+            $this->data->moods = ['angry', 'cool', 'happy'];
         }
     }
 
@@ -37,8 +38,8 @@ class Response extends atoum
     {
         $this
             ->exception(
-                function() {
-                    $this->newTestedInstance($this->router,'json',200);
+                function () {
+                    $this->newTestedInstance($this->router, 'json', 200);
                     $this->testedInstance->setFormat('xxx');
                 }
             )
@@ -49,42 +50,42 @@ class Response extends atoum
 
     public function testGetConfiguredHeaders()
     {
-        $this->newTestedInstance($this->router,'json',200);
+        $this->newTestedInstance($this->router, 'json', 200);
         $this->testedInstance->setContentType('application/xml');
         $this->testedInstance->setLocation('https://api.domain.com/items/uuid');
 
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->array($this->testedInstance->getConfiguredHeaders())
             ->hasKey('Content-Type')
             ->hasKey('Location')
             ->hasSize(2)
             ->strictlyContainsValues(array(
                 'application/xml',
-                'https://api.domain.com/items/uuid'
+                'https://api.domain.com/items/uuid',
             ))
         ;
     }
 
     public function testSerialize()
     {
-        $this->newTestedInstance($this->router,'json',200);
+        $this->newTestedInstance($this->router, 'json', 200);
         $this
-            ->given( $this->testedInstance )
-            ->string($this->testedInstance->serialize($this->data,'json'))
+            ->given($this->testedInstance)
+            ->string($this->testedInstance->serialize($this->data, 'json'))
             ->isEqualTo('{"name":"diego","age":3,"moods":["angry","cool","happy"]}')
         ;
 
         $this
-            ->given( $this->testedInstance )
-            ->string($this->testedInstance->serialize($this->data,'xml'))
+            ->given($this->testedInstance)
+            ->string($this->testedInstance->serialize($this->data, 'xml'))
             ->isEqualTo("<?xml version=\"1.0\"?>\n<response><name>diego</name><age>3</age><moods>angry</moods><moods>cool</moods><moods>happy</moods></response>\n")
         ;
 
         $this
             ->exception(
-                function() {
-                    $this->testedInstance->serialize($this->data,'xxx');
+                function () {
+                    $this->testedInstance->serialize($this->data, 'xxx');
                 }
             )
             ->isInstanceOf('\RuntimeException')
@@ -94,11 +95,11 @@ class Response extends atoum
 
     public function testAssertReponseSchema()
     {
-        $this->newTestedInstance($this->router,'json',200);
+        $this->newTestedInstance($this->router, 'json', 200);
         $this
             ->exception(
-                function() {
-                    $this->testedInstance->assertReponseSchema('xxx','ddd','ddd');
+                function () {
+                    $this->testedInstance->assertReponseSchema('xxx', 'ddd', 'ddd');
                 }
             )
             ->isInstanceOf('\RuntimeException')
@@ -107,8 +108,8 @@ class Response extends atoum
 
         $this
             ->exception(
-                function() {
-                    $this->testedInstance->assertReponseSchema('json','ddd','ddd');
+                function () {
+                    $this->testedInstance->assertReponseSchema('json', 'ddd', 'ddd');
                 }
             )
             ->isInstanceOf('RREST\Exception\InvalidJSONException')
@@ -116,10 +117,10 @@ class Response extends atoum
 
         $this
             ->exception(
-                function() {
+                function () {
                     $schema = file_get_contents(__DIR__.'/../fixture/song.json');
                     $value = '{"title":"title","artist":4}';
-                    $this->testedInstance->assertReponseSchema('json',$schema,$value);
+                    $this->testedInstance->assertReponseSchema('json', $schema, $value);
                 }
             )
             ->isInstanceOf('RREST\Exception\InvalidResponsePayloadBodyException')
@@ -127,8 +128,8 @@ class Response extends atoum
 
         $this
             ->exception(
-                function() {
-                    $this->testedInstance->assertReponseSchema('xml','ddd','ddd');
+                function () {
+                    $this->testedInstance->assertReponseSchema('xml', 'ddd', 'ddd');
                 }
             )
             ->isInstanceOf('RREST\Exception\InvalidXMLException')
@@ -136,10 +137,10 @@ class Response extends atoum
 
         $this
             ->exception(
-                function() {
+                function () {
                     $schema = file_get_contents(__DIR__.'/../fixture/song.xml');
                     $value = '<song><title>qsd</title></song>';
-                    $this->testedInstance->assertReponseSchema('xml',$schema,$value);
+                    $this->testedInstance->assertReponseSchema('xml', $schema, $value);
                 }
             )
             ->isInstanceOf('RREST\Exception\InvalidResponsePayloadBodyException')
@@ -148,30 +149,29 @@ class Response extends atoum
 
     public function testGetRouterResponse()
     {
-        $this->newTestedInstance($this->router,'json',201);
+        $this->newTestedInstance($this->router, 'json', 201);
 
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->object($this->testedInstance->getRouterResponse())
             ->isInstanceOf('Symfony\Component\HttpFoundation\Response');
-        ;
 
         $this->testedInstance->setContent($this->data);
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->string($this->testedInstance->getRouterResponse()->getContent())
             ->isEqualTo('{"name":"diego","age":3,"moods":["angry","cool","happy"]}')
         ;
 
         $this->testedInstance->setContent('ABC');
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->string($this->testedInstance->getRouterResponse(false)->getContent())
             ->isEqualTo('ABC')
         ;
 
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->integer($this->testedInstance->getRouterResponse()->getStatusCode())
             ->isEqualTo(201)
         ;
@@ -180,7 +180,7 @@ class Response extends atoum
         $this->testedInstance->setLocation('https://api.domain.com/items/uuid');
 
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->string($this->testedInstance->getRouterResponse()->headers->get('Content-Type'))
             ->isEqualTo('application/xml')
             ->string($this->testedInstance->getRouterResponse()->headers->get('Location'))

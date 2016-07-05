@@ -43,7 +43,7 @@ class Silex implements RouterInterface
         ->method(strtoupper($method))
         //define a response configured
         ->value('response', $response)
-        ->before(function(Request $request) use ($init) {
+        ->before(function (Request $request) use ($init) {
             $this->request = $request;
             $init();
         });
@@ -63,7 +63,7 @@ class Silex implements RouterInterface
             }
         }
 
-        return null;
+        return;
     }
 
     /**

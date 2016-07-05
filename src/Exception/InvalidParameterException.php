@@ -22,7 +22,7 @@ class InvalidParameterException extends UnprocessableEntityHttpException impleme
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getErrors()
     {

@@ -12,10 +12,10 @@ class InvalidResponsePayloadBodyException extends HttpException implements Error
     public $errors;
 
     /**
-     * @param \RREST\Error[]  $errors   List of errors
-     * @param string $message
-     * @param \Exception $previous
-     * @param integer $code
+     * @param \RREST\Error[] $errors   List of errors
+     * @param string         $message
+     * @param \Exception     $previous
+     * @param int            $code
      */
     public function __construct(array $errors, $message = 'Invalid', \Exception $previous = null, $code = 0)
     {
@@ -24,7 +24,7 @@ class InvalidResponsePayloadBodyException extends HttpException implements Error
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getErrors()
     {

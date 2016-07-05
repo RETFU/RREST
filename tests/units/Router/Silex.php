@@ -1,7 +1,8 @@
 <?php
+
 namespace RREST\tests\units\Router;
 
-require_once __DIR__ . '/../boostrap.php';
+require_once __DIR__.'/../boostrap.php';
 
 use atoum;
 use RREST\Response;
@@ -18,7 +19,7 @@ class Silex extends atoum
 
     public function beforeTestMethod($method)
     {
-        if(is_null($this->app)) {
+        if (is_null($this->app)) {
             $this->app = new Application();
         }
     }
@@ -29,14 +30,14 @@ class Silex extends atoum
         //work when a request happen on the route GET /
         $this->newTestedInstance($this->app);
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->and(
                 $this->testedInstance->addRoute(
-                    '/','GET','RREST\tests\units\Router\Controller','getAction',
-                    new Response($this->testedInstance,'json',201),
-                    function(){}
+                    '/', 'GET', 'RREST\tests\units\Router\Controller', 'getAction',
+                    new Response($this->testedInstance, 'json', 201),
+                    function () {}
                 ),
-                $request = Request::create('/','GET',[],[],[],[],'YYY'),
+                $request = Request::create('/', 'GET', [], [], [], [], 'YYY'),
                 $response = $this->app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
             )
             ->object($response)
@@ -48,60 +49,56 @@ class Silex extends atoum
     {
         $this->newTestedInstance($this->app);
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->object($this->testedInstance->getResponse('XXX'))
             ->isInstanceOf('Symfony\Component\HttpFoundation\Response');
-        ;
     }
 
     public function testGetPayloadBodyValue()
     {
         $this->newTestedInstance($this->app);
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->and(
                 $this->testedInstance->setPayloadBodyValue('XXX')
             )
             ->string($this->testedInstance->getPayloadBodyValue())
             ->isEqualTo('XXX');
-        ;
 
         $this->newTestedInstance($this->app);
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->and(
                 $this->testedInstance->addRoute(
-                    '/','GET','RREST\tests\units\Router\Controller','getAction',
-                    new Response($this->testedInstance,'json',201),
-                    function(){}
+                    '/', 'GET', 'RREST\tests\units\Router\Controller', 'getAction',
+                    new Response($this->testedInstance, 'json', 201),
+                    function () {}
                 ),
-                $request = Request::create('/','GET',[],[],[],[],'YYY'),
+                $request = Request::create('/', 'GET', [], [], [], [], 'YYY'),
                 $response = $this->app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
             )
             ->string($this->testedInstance->getPayloadBodyValue())
             ->isEqualTo('YYY');
-        ;
-
     }
 
     public function testGetParameterValue()
     {
         $this->newTestedInstance($this->app);
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->and(
                 $this->testedInstance->addRoute(
-                    '/','GET','RREST\tests\units\Router\Controller','getAction',
-                    new Response($this->testedInstance,'json',201),
-                    function(){}
+                    '/', 'GET', 'RREST\tests\units\Router\Controller', 'getAction',
+                    new Response($this->testedInstance, 'json', 201),
+                    function () {}
                 ),
-                $parameters = ['parameter'=>'5'],
-                $request = Request::create('/','GET',$parameters,[],[],[],'YYY'),
+                $parameters = ['parameter' => '5'],
+                $request = Request::create('/', 'GET', $parameters, [], [], [], 'YYY'),
                 $response = $this->app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
             )
-            ->string($this->testedInstance->getParameterValue('parameter','string'))
+            ->string($this->testedInstance->getParameterValue('parameter', 'string'))
             ->isEqualTo('5')
-            ->variable($this->testedInstance->getParameterValue('notexisting','string'))
+            ->variable($this->testedInstance->getParameterValue('notexisting', 'string'))
             ->isNull('5')
         ;
     }
@@ -110,19 +107,19 @@ class Silex extends atoum
     {
         $this->newTestedInstance($this->app);
         $this
-            ->given( $this->testedInstance )
+            ->given($this->testedInstance)
             ->and(
                 $this->testedInstance->addRoute(
-                    '/','GET','RREST\tests\units\Router\Controller','getAction',
-                    new Response($this->testedInstance,'json',201),
-                    function(){}
+                    '/', 'GET', 'RREST\tests\units\Router\Controller', 'getAction',
+                    new Response($this->testedInstance, 'json', 201),
+                    function () {}
                 ),
-                $parameters = ['parameter'=>'5'],
-                $request = Request::create('/','GET',$parameters,[],[],[],'YYY'),
+                $parameters = ['parameter' => '5'],
+                $request = Request::create('/', 'GET', $parameters, [], [], [], 'YYY'),
                 $response = $this->app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
-                $this->testedInstance->setParameterValue('parameter',5)
+                $this->testedInstance->setParameterValue('parameter', 5)
             )
-            ->integer($this->testedInstance->getParameterValue('parameter','string'))
+            ->integer($this->testedInstance->getParameterValue('parameter', 'string'))
             ->isEqualTo(5)
         ;
     }

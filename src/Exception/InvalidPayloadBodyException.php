@@ -22,7 +22,7 @@ class InvalidPayloadBodyException extends UnprocessableEntityHttpException imple
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getErrors()
     {

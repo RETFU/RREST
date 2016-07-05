@@ -12,7 +12,7 @@ class InvalidJSONException extends BadRequestHttpException implements ErrorExcep
     public $errors;
 
     /**
-     * @param \RREST\Error[]  $errors   List of errors
+     * @param \RREST\Error[] $errors   List of errors
      * @param Exception|null $previous
      */
     public function __construct(array $errors, $message = 'Invalid', \Exception $previous = null, $code = 0)
@@ -22,7 +22,7 @@ class InvalidJSONException extends BadRequestHttpException implements ErrorExcep
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getErrors()
     {

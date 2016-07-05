@@ -1,7 +1,8 @@
 <?php
+
 namespace RREST\tests\units;
 
-require_once __DIR__ . '/boostrap.php';
+require_once __DIR__.'/boostrap.php';
 
 use atoum;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -19,7 +20,7 @@ class RREST extends atoum
 
     public function beforeTestMethod($method)
     {
-        if(is_null($this->apiDefinition)) {
+        if (is_null($this->apiDefinition)) {
             $this->apiDefinition = (new \Raml\Parser())->parse(__DIR__.'/../fixture/song.raml');
         }
     }
@@ -33,7 +34,8 @@ class RREST extends atoum
     }
 
     /**
-     * @param  Application $app
+     * @param Application $app
+     *
      * @return Silex
      */
     private function getSilexRouter(Application $app)
@@ -42,13 +44,15 @@ class RREST extends atoum
     }
 
     /**
-     * @param  string $method
-     * @param  string $routePath
+     * @param string $method
+     * @param string $routePath
+     *
      * @return RAML
      */
     public function getRAMLAPISpec($apiDefinition, $method, $routePath)
     {
         $apiSpec = new RAML($apiDefinition, $method, $routePath);
+
         return $apiSpec;
     }
 
@@ -56,7 +60,7 @@ class RREST extends atoum
     {
         date_default_timezone_set('UTC');
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $router = $this->getSilexRouter( $this->getSilexApplication() );
+        $router = $this->getSilexRouter($this->getSilexApplication());
 
         //good
         $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
@@ -69,7 +73,7 @@ class RREST extends atoum
         //missing controller
         $this
             ->exception(
-                function() use ($router) {
+                function () use ($router) {
                     $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
                     $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
                     $this->newTestedInstance($apiSpec, $router, 'RREST\tests');
@@ -83,7 +87,7 @@ class RREST extends atoum
         //missing controller method
         $this
             ->exception(
-                function() use ($router) {
+                function () use ($router) {
                     $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
                     $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'DELETE', '/v1/songs/98');
                     $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
@@ -97,7 +101,7 @@ class RREST extends atoum
         //bad accept
         $this
             ->exception(
-                function() use ($apiSpec, $router) {
+                function () use ($apiSpec, $router) {
                     $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/jxson';
                     $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
@@ -109,7 +113,7 @@ class RREST extends atoum
         //bad content-type
         $this
             ->exception(
-                function() use ($router) {
+                function () use ($router) {
                     $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/98');
                     $_SERVER['Accept'] = 'application/json';
                     $_SERVER['Content-Type'] = 'application/jsonx';
@@ -125,7 +129,7 @@ class RREST extends atoum
         $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
         $this
             ->exception(
-                function() use ($apiSpec, $router) {
+                function () use ($apiSpec, $router) {
                     $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
                 }
@@ -137,14 +141,14 @@ class RREST extends atoum
         //bad parameters
         date_default_timezone_set('UTC'); // for datetime validation
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $app =  $this->getSilexApplication();
+        $app = $this->getSilexApplication();
         $router = $this->getSilexRouter($app);
         $this
             ->exception(
-                function() use ($app, $apiSpec, $router) {
+                function () use ($app, $apiSpec, $router) {
                     $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
-                    $request = Request::create('/v1/songs/98','GET',['id'=>'25'],[],[],[]);
+                    $request = Request::create('/v1/songs/98', 'GET', ['id' => '25'], [], [], []);
                     $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
                 }
             )
@@ -162,7 +166,7 @@ class RREST extends atoum
             ->given($this->newTestedInstance($apiSpec, $router, 'RREST\tests\units'))
             ->and(
                 $this->testedInstance->addRoute(),
-                $request = Request::create('/v1/songs/98','GET',['id'=>'10'],[],[],[]),
+                $request = Request::create('/v1/songs/98', 'GET', ['id' => '10'], [], [], []),
                 $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
                 $id = $router->getParameterValue('id')
             )
@@ -172,15 +176,15 @@ class RREST extends atoum
 
         //bad json payload body
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
-        $app =  $this->getSilexApplication();
+        $app = $this->getSilexApplication();
         $router = $this->getSilexRouter($app);
         $this
             ->exception(
-                function() use ($app, $apiSpec, $router) {
+                function () use ($app, $apiSpec, $router) {
                     $router->setPayloadBodyValue('bad json'); //because we are in a CLI context and can't set php://input
                     $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
-                    $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'bad json');
+                    $request = Request::create('/v1/songs/90', 'PUT', [], [], [], [], 'bad json');
                     $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
                 }
             )
@@ -194,15 +198,15 @@ class RREST extends atoum
 
         //bad json schema payload body
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
-        $app =  $this->getSilexApplication();
+        $app = $this->getSilexApplication();
         $router = $this->getSilexRouter($app);
         $this
             ->exception(
-                function() use ($app, $apiSpec, $router) {
+                function () use ($app, $apiSpec, $router) {
                     $router->setPayloadBodyValue('{}'); //because we are in a CLI context and can't set php://input
                     $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
-                    $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'{}');
+                    $request = Request::create('/v1/songs/90', 'PUT', [], [], [], [], '{}');
                     $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
                 }
             )
@@ -217,33 +221,32 @@ class RREST extends atoum
 
         //json payload body hinted
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
-        $app =  $this->getSilexApplication();
+        $app = $this->getSilexApplication();
         $router = $this->getSilexRouter($app);
         $router->setPayloadBodyValue('{"title":"title","artist":"artist"}'); //because we are in a CLI context and can't set php://input
         $this
             ->given($this->newTestedInstance($apiSpec, $router, 'RREST\tests\units'))
             ->and(
                 $this->testedInstance->addRoute(),
-                $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'{"title":"title","artist":"artist"}'),
+                $request = Request::create('/v1/songs/90', 'PUT', [], [], [], [], '{"title":"title","artist":"artist"}'),
                 $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
                 $song = $router->getPayloadBodyValue()
             )
             ->object($song)
             ->isInstanceOf('\stdClass');
-        ;
 
         //bad XML payload body
         $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/xml';
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
-        $app =  $this->getSilexApplication();
+        $app = $this->getSilexApplication();
         $router = $this->getSilexRouter($app);
         $this
             ->exception(
-                function() use ($app, $apiSpec, $router) {
+                function () use ($app, $apiSpec, $router) {
                     $router->setPayloadBodyValue('bad xml'); //because we are in a CLI context and can't set php://input
                     $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
-                    $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'bad xml');
+                    $request = Request::create('/v1/songs/90', 'PUT', [], [], [], [], 'bad xml');
                     $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
                 }
             )
@@ -257,15 +260,15 @@ class RREST extends atoum
 
         //bad XML schema payload body
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
-        $app =  $this->getSilexApplication();
+        $app = $this->getSilexApplication();
         $router = $this->getSilexRouter($app);
         $this
             ->exception(
-                function() use ($app, $apiSpec, $router) {
+                function () use ($app, $apiSpec, $router) {
                     $router->setPayloadBodyValue('<song></song>'); //because we are in a CLI context and can't set php://input
                     $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
                     $this->testedInstance->addRoute();
-                    $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'<song></song>');
+                    $request = Request::create('/v1/songs/90', 'PUT', [], [], [], [], '<song></song>');
                     $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
                 }
             )
@@ -280,26 +283,25 @@ class RREST extends atoum
 
         // xml payload body hinted
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
-        $app =  $this->getSilexApplication();
+        $app = $this->getSilexApplication();
         $router = $this->getSilexRouter($app);
         $router->setPayloadBodyValue('<song><title>qsd</title><artist>qsd</artist></song>'); //because we are in a CLI context and can't set php://input
         $this
             ->given($this->newTestedInstance($apiSpec, $router, 'RREST\tests\units'))
             ->and(
                 $this->testedInstance->addRoute(),
-                $request = Request::create('/v1/songs/90','PUT',[],[],[],[],'<song><title>qsd</title><artist>qsd</artist></song>'),
+                $request = Request::create('/v1/songs/90', 'PUT', [], [], [], [], '<song><title>qsd</title><artist>qsd</artist></song>'),
                 $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false),
                 $song = $router->getPayloadBodyValue()
             )
             ->object($song)
             ->isInstanceOf('\stdClass');
-        ;
     }
 
     public function testGetActionMethodName()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $router = $this->getSilexRouter( $this->getSilexApplication() );
+        $router = $this->getSilexRouter($this->getSilexApplication());
 
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
@@ -311,7 +313,7 @@ class RREST extends atoum
     public function testGetControllerNamespaceClass()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $router = $this->getSilexRouter( $this->getSilexApplication() );
+        $router = $this->getSilexRouter($this->getSilexApplication());
 
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
@@ -329,7 +331,7 @@ class RREST extends atoum
     public function testGetProtocol()
     {
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $router = $this->getSilexRouter( $this->getSilexApplication() );
+        $router = $this->getSilexRouter($this->getSilexApplication());
 
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
@@ -364,12 +366,12 @@ class RREST extends atoum
 
 class Songs
 {
-    public function getAction(Application $app, Request $request, \RREST\Response $response, $slotId=null)
+    public function getAction(Application $app, Request $request, \RREST\Response $response, $slotId = null)
     {
         return $response->getRouterResponse();
     }
 
-    public function putAction(Application $app, Request $request, \RREST\Response $response, $slotId=null)
+    public function putAction(Application $app, Request $request, \RREST\Response $response, $slotId = null)
     {
         return $response->getRouterResponse();
     }
