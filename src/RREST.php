@@ -53,7 +53,7 @@ class RREST
     protected $hintedPayloadBody;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $assertResponse = true;
 
@@ -82,14 +82,16 @@ class RREST
      *
      * @param bool $assert
      */
-    public function setAssertResponse($assert) {
+    public function setAssertResponse($assert)
+    {
         $this->assertResponse = $assert;
     }
 
     /**
      * @return bool
      */
-    public function getAssertResponse() {
+    public function getAssertResponse()
+    {
         return $this->assertResponse;
     }
 
@@ -127,7 +129,7 @@ class RREST
 
         $responseSchema = $this->apiSpec->getResponsePayloadBodySchema($statusCodeSucess, $accept);
         $response = $this->getResponse($this->router, $statusCodeSucess, $format, $mimeType);
-        if( $this->getAssertResponse() ) {
+        if ($this->getAssertResponse()) {
             $response->setSchema($responseSchema);
         }
 
@@ -240,10 +242,17 @@ class RREST
     {
         $availableContentTypes = array_map('strtolower', $availableContentTypes);
         $contentType = strtolower($contentType);
-        if (
-            empty($availableContentTypes) === false &&
-            in_array($contentType, $availableContentTypes) === false
-        ) {
+
+        if ( empty($availableContentTypes) === false ) {
+            foreach ($availableContentTypes as $availableContentType) {
+                //not comparing with strict equality because some Content-Types
+                //have "metadata" like multi-part:
+                //multipart/form-data; boundary=--------------------------699519696930389418481751
+                if (strpos($contentType, $availableContentType) !== false) {
+                    //find one valid content type
+                    return;
+                }
+            }
             throw new UnsupportedMediaTypeHttpException();
         }
     }
