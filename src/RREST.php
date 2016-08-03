@@ -247,12 +247,12 @@ class RREST
             foreach ($availableContentTypes as $availableContentType) {
                 if (
                     (
-                        strpos('multipart/form-data', $contentType) === false &&
+                        strpos($contentType, 'multipart/form-data') === false &&
                         $availableContentType === $contentType
                     ) || (
                         //not comparing with strict equality for multi-part because
                         //multipart/form-data; boundary=--------------------------699519696930389418481751
-                        strpos('multipart/form-data', $contentType) !== false &&
+                        strpos($contentType, 'multipart/form-data') !== false &&
                         strpos($contentType, $availableContentType) !== false
                     )
                 ) {
