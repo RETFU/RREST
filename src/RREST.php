@@ -243,12 +243,19 @@ class RREST
         $availableContentTypes = array_map('strtolower', $availableContentTypes);
         $contentType = strtolower($contentType);
 
-        if ( empty($availableContentTypes) === false ) {
+        if (empty($availableContentTypes) === false) {
             foreach ($availableContentTypes as $availableContentType) {
-                //not comparing with strict equality because some Content-Types
-                //have "metadata" like multi-part:
-                //multipart/form-data; boundary=--------------------------699519696930389418481751
-                if (strpos($contentType, $availableContentType) !== false) {
+                if (
+                    (
+                        strpos('multipart/form-data', $contentType) === false &&
+                        $availableContentType === $contentType
+                    ) || (
+                        //not comparing with strict equality for multi-part because
+                        //multipart/form-data; boundary=--------------------------699519696930389418481751
+                        strpos('multipart/form-data', $contentType) !== false &&
+                        strpos($contentType, $availableContentType) !== false
+                    )
+                ) {
                     //find one valid content type
                     return;
                 }
