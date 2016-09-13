@@ -1,17 +1,13 @@
 language: php
 
 php:
-  - 5.4
-  - 5.5
   - 5.6
   - 7.0
   - hhvm
   - nightly
 
 before_script:
-  #use --ignore-platform-reqs because waiting to move on 5.6 by default
-  #some dependencies are working fine with 5.4 but are configured in composer for ^5.5
-  - composer install --ignore-platform-reqs --dev
+  - composer install --dev
 
 script:
   - ./vendor/bin/atoum -d tests/units
