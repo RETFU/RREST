@@ -5,7 +5,8 @@ namespace RREST;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-use JsonSchema\Validator;
+use League\JsonGuard;
+use Rs\Json\Pointer;
 use Negotiation\Negotiator;
 use Negotiation\Exception\InvalidArgument;
 use RREST\APISpec\APISpecInterface;
@@ -426,14 +427,46 @@ class RREST
         $assertInvalidJSONException();
 
         //validate JsonSchema
-        $jsonValidator = new Validator();
-        $jsonValidator->check($valueJSON, $schemaJSON);
-        if ($jsonValidator->isValid() === false) {
+        $deref = new JsonGuard\Dereferencer();
+        $schema = $deref->dereference($schemaJSON);
+        $validator = new JsonGuard\Validator($valueJSON, $schema);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $jsonPointer = new Pointer($value);
             $invalidBodyError = [];
-            foreach ($jsonValidator->getErrors() as $jsonError) {
+            foreach ($validator->errors() as $jsonError) {
+                $error = $jsonError->toArray();
+                $propertyValue = null;
+                $pointer = empty($error['pointer']) ? null : $error['pointer'];
+                if (empty($pointer) === false) {
+                    try {
+                        $propertyValue = $jsonPointer->get($pointer);
+                    } catch (NonexistentValueReferencedException $e) {
+                        //don't care if we can't have the value here, it's just
+                        //for the context
+                    }
+                }
+                $context = new \stdClass();
+                $context->jsonPointer = $pointer;
+                $context->value = $propertyValue;
+                $context->constraints = $error['constraints'];
+                //$context->jsonSource = $valueJSON;
+                $message = strtolower($error['message']);
+                if (empty($pointer) === false) {
+                    $message = strtolower($pointer.': '.$error['message']);
+                }
+                //TODO: having RREST message error
+                //special case for required to have a better message
+                if ($error['code'] === JsonGuard\ErrorCode::MISSING_REQUIRED) {
+                    $message = strtolower(
+                        $error['message'].' ('.implode(', ', $context->constraints['required']).')'
+                    );
+                }
+
                 $invalidBodyError[] = new Error(
-                    strtolower($jsonError['property'].': '.$jsonError['message']),
-                    strtolower($jsonError['property'].'-'.$jsonError['constraint'])
+                    strtolower($message),
+                    strtolower($error['code']),
+                    $context
                 );
             }
             if (empty($invalidBodyError) == false) {

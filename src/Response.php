@@ -2,7 +2,8 @@
 
 namespace RREST;
 
-use JsonSchema\Validator;
+use League\JsonGuard;
+use Rs\Json\Pointer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -347,17 +348,36 @@ class Response
 
         //validate JSON format
         $schemaJSON = json_decode($schema);
+        $valueJSON = json_decode($value);
         $assertInvalidJSONException();
 
         //validate JsonSchema
-        $jsonValidator = new Validator();
-        $jsonValidator->check($value, $schemaJSON);
-        if ($jsonValidator->isValid() === false) {
+        $deref = new JsonGuard\Dereferencer();
+        $schema = $deref->dereference($schemaJSON);
+        $validator = new JsonGuard\Validator($valueJSON, $schema);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $jsonPointer = new Pointer($value);
             $invalidBodyError = [];
-            foreach ($jsonValidator->getErrors() as $jsonError) {
+            foreach ($validator->errors() as $jsonError) {
+                $error = $jsonError->toArray();
+                $propertyValue = null;
+                try {
+                    $propertyValue = $jsonPointer->get($error['pointer']);
+                } catch (NonexistentValueReferencedException $e) {
+                    //don't care if we can't have the value here, it's just
+                    //for the context
+                }
+                $context = new \stdClass();
+                $context->jsonPointer = $error['pointer'];
+                $context->value = $propertyValue;
+                $context->constraints = $error['constraints'];
+                //$context->jsonSource = $valueJSON;
+
                 $invalidBodyError[] = new Error(
-                    strtolower($jsonError['property'].': '.$jsonError['message']),
-                    strtolower($jsonError['property'].'-'.$jsonError['constraint'])
+                    strtolower($error['pointer'].': '.$error['message']),
+                    strtolower($error['code']),
+                    $context
                 );
             }
             if (empty($invalidBodyError) == false) {

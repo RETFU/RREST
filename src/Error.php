@@ -15,12 +15,21 @@ class Error
     public $code;
 
     /**
-     * @param string $message
-     * @param string $code
+     * Add useful data to help debugging or to give more informations
+     *
+     * @var \stdClass
      */
-    public function __construct($message = null, $code = null)
+    public $context;
+
+    /**
+     * @param string    $message
+     * @param string    $code
+     * @param \stdClass $context
+     */
+    public function __construct($message = null, $code = null, $context = null)
     {
         $this->message = $message;
         $this->code = $code;
+        $this->context = $context;
     }
 }

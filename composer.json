@@ -21,10 +21,11 @@
         "symfony/http-kernel": "^2.8",
         "symfony/serializer": "^3.0",
 	"symfony/property-access": "^3.0",
-        "justinrainbow/json-schema": "^1.6",
         "jrfnl/PHP-cast-to-type": "^2.0",
         "willdurand/negotiation": "^2.0",
-        "ralouphie/getallheaders": "^2.0"
+        "ralouphie/getallheaders": "^2.0",
+        "league/json-guard": "^0.3.3",
+        "php-jsonpointer/php-jsonpointer": "^3.0"
     },
     "suggest": {
         "silex/silex": "To use the Silex Router",

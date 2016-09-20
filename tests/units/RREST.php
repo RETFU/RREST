@@ -212,11 +212,11 @@ class RREST extends atoum
             )
             ->isInstanceOf('RREST\Exception\InvalidRequestPayloadBodyException')
             ->array($this->exception->getErrors())
-            ->hasSize(2)
+            ->hasSize(1)
             ->object($this->exception->getErrors()[0])
             ->isInstanceOf('RREST\Error')
-            ->string($this->exception->getErrors()[0]->message)
-            ->isEqualTo('title: the property title is required')
+            ->string($this->exception->getErrors()[0]->code)
+            ->isEqualTo('43')
         ;
 
         //json payload body hinted
