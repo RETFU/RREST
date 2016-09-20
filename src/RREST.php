@@ -432,10 +432,8 @@ class RREST
             $invalidBodyError = [];
             foreach ($jsonValidator->getErrors() as $jsonError) {
                 $invalidBodyError[] = new Error(
-                    ucfirst(trim(strtolower(
-                        $jsonError['property'].' property: '.$jsonError['message']
-                    ))),
-                    'invalid-request-payloadbody-jsonschema'
+                    strtolower($jsonError['property'].': '.$jsonError['message']),
+                    strtolower($jsonError['property'].'-'.$jsonError['constraint'])
                 );
             }
             if (empty($invalidBodyError) == false) {

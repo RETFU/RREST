@@ -216,7 +216,7 @@ class RREST extends atoum
             ->object($this->exception->getErrors()[0])
             ->isInstanceOf('RREST\Error')
             ->string($this->exception->getErrors()[0]->message)
-            ->isEqualTo('Title property: the property title is required')
+            ->isEqualTo('title: the property title is required')
         ;
 
         //json payload body hinted

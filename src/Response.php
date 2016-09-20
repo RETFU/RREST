@@ -356,10 +356,8 @@ class Response
             $invalidBodyError = [];
             foreach ($jsonValidator->getErrors() as $jsonError) {
                 $invalidBodyError[] = new Error(
-                    ucfirst(trim(strtolower(
-                        $jsonError['property'].' property: '.$jsonError['message']
-                    ))),
-                    'invalid-response-payloadbody-jsonschema'
+                    strtolower($jsonError['property'].': '.$jsonError['message']),
+                    strtolower($jsonError['property'].'-'.$jsonError['constraint'])
                 );
             }
             if (empty($invalidBodyError) == false) {
