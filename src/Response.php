@@ -348,16 +348,15 @@ class Response
 
         //validate JSON format
         $schemaJSON = json_decode($schema);
-        $valueJSON = json_decode($value);
         $assertInvalidJSONException();
 
         //validate JsonSchema
         $deref = new JsonGuard\Dereferencer();
         $schema = $deref->dereference($schemaJSON);
-        $validator = new JsonGuard\Validator($valueJSON, $schema);
+        $validator = new JsonGuard\Validator($value, $schema);
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $jsonPointer = new Pointer($value);
+            $jsonPointer = new Pointer(json_encode($value));
             $invalidBodyError = [];
             foreach ($validator->errors() as $jsonError) {
                 $error = $jsonError->toArray();
@@ -372,7 +371,6 @@ class Response
                 $context->jsonPointer = $error['pointer'];
                 $context->value = $propertyValue;
                 $context->constraints = $error['constraints'];
-                //$context->jsonSource = $valueJSON;
 
                 $invalidBodyError[] = new Error(
                     strtolower($error['pointer'].': '.$error['message']),
