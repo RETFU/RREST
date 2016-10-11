@@ -356,7 +356,7 @@ class Response
         $validator = new JsonGuard\Validator($value, $schema);
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $jsonPointer = new Pointer(json_encode($value));
+            $jsonPointer = new Pointer($value);
             $invalidBodyError = [];
             foreach ($validator->errors() as $jsonError) {
                 $error = $jsonError->toArray();
