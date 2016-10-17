@@ -6,7 +6,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use League\JsonGuard;
-use Rs\Json\Pointer;
 use Negotiation\Negotiator;
 use Negotiation\Exception\InvalidArgument;
 use RREST\APISpec\APISpecInterface;
@@ -432,7 +431,7 @@ class RREST
         $validator = new JsonGuard\Validator($valueJSON, $schema);
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $jsonPointer = new Pointer($value);
+            $jsonPointer = new JsonGuard\Pointer($value);
             $invalidBodyError = [];
             foreach ($validator->errors() as $jsonError) {
                 $error = $jsonError->toArray();

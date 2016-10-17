@@ -3,7 +3,6 @@
 namespace RREST;
 
 use League\JsonGuard;
-use Rs\Json\Pointer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -356,7 +355,7 @@ class Response
         $validator = new JsonGuard\Validator($value, $schema);
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $jsonPointer = new Pointer($value);
+            $jsonPointer = new JsonGuard\Pointer($value);
             $invalidBodyError = [];
             foreach ($validator->errors() as $jsonError) {
                 $error = $jsonError->toArray();
