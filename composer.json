@@ -2,25 +2,23 @@
     "name": "retfu/rrest",
     "type": "library",
     "description": "RREST helps to build good REST API in PHP.",
-    "keywords": ["api","REST","RAML","Swagger","API Blueprint","Open API Initiative"],
+    "keywords": ["api", "REST", "RAML", "Swagger", "API Blueprint", "Open API Initiative"],
     "homepage": "https://github.com/RETFU/RREST",
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Fabien Furet",
-            "homepage": "http://fabienfuret.net"
-        }
-    ],
+    "authors": [{
+        "name": "Fabien Furet",
+        "homepage": "http://fabienfuret.net"
+    }],
     "autoload": {
-      "psr-4": {
-        "RREST\\": "src/"
-      }
+        "psr-4": {
+            "RREST\\": "src/"
+        }
     },
     "require": {
         "php": ">=5.6",
         "symfony/http-kernel": "^3.0",
         "symfony/serializer": "^3.0",
-	"symfony/property-access": "^3.0",
+        "symfony/property-access": "^3.0",
         "jrfnl/PHP-cast-to-type": "^2.0",
         "willdurand/negotiation": "^2.0",
         "ralouphie/getallheaders": "^2.0",
@@ -36,12 +34,12 @@
         "silex/silex": "^2.0",
         "alecsammon/php-raml-parser": "^2.2",
         "friendsofphp/php-cs-fixer": "^2.0",
-		"squizlabs/php_codesniffer": "^2.0"
+        "squizlabs/php_codesniffer": "^2.0"
     },
-	"scripts": {
+    "scripts": {
         "post-install-cmd": [
             "test -d .git && cp contrib/pre-commit .git/hooks/pre-commit",
-			"test -d .git && chmod +x .git/hooks/pre-commit"
+            "test -d .git && chmod +x .git/hooks/pre-commit"
         ]
     }
 }
