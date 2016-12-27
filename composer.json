@@ -22,7 +22,7 @@
         "jrfnl/PHP-cast-to-type": "^2.0",
         "willdurand/negotiation": "^2.0",
         "ralouphie/getallheaders": "^2.0",
-        "league/json-guard": "^0.3.3"
+        "league/json-guard": "^0.4"
     },
     "suggest": {
         "silex/silex": "To use the Silex Router",
