@@ -369,11 +369,11 @@ class Response
                 $context = new \stdClass();
                 $context->jsonPointer = $error['pointer'];
                 $context->value = $propertyValue;
-                $context->constraints = $error['constraints'];
+                $context->constraints = $error['context'];
 
                 $invalidBodyError[] = new Error(
                     strtolower($error['pointer'].': '.$error['message']),
-                    strtolower($error['code']),
+                    strtolower($error['keyword']),
                     $context
                 );
             }

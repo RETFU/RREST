@@ -216,7 +216,7 @@ class RREST extends atoum
             ->object($this->exception->getErrors()[0])
             ->isInstanceOf('RREST\Error')
             ->string($this->exception->getErrors()[0]->code)
-            ->isEqualTo('43')
+            ->isEqualTo('required')
         ;
 
         //json payload body hinted

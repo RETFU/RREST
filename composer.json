@@ -22,14 +22,14 @@
         "jrfnl/PHP-cast-to-type": "^2.0",
         "willdurand/negotiation": "^2.0",
         "ralouphie/getallheaders": "^2.0",
-        "league/json-guard": "^0.4"
+        "league/json-guard": "^0.5"
     },
     "suggest": {
         "silex/silex": "To use the Silex Router",
         "alecsammon/php-raml-parser": "To use the RAML APISpec"
     },
     "require-dev": {
-        "atoum/atoum": "^2.0",
+        "atoum/atoum": "^3.0",
         "atoum/stubs": "*",
         "silex/silex": "^2.0",
         "alecsammon/php-raml-parser": "^2.2",

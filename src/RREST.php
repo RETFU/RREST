@@ -448,23 +448,16 @@ class RREST
                 $context = new \stdClass();
                 $context->jsonPointer = $pointer;
                 $context->value = $propertyValue;
-                $context->constraints = $error['constraints'];
+                $context->constraints = $error['context'];
                 //$context->jsonSource = $valueJSON;
                 $message = strtolower($error['message']);
                 if (empty($pointer) === false) {
                     $message = strtolower($pointer.': '.$error['message']);
                 }
-                //TODO: having RREST message error
-                //special case for required to have a better message
-                if ($error['code'] === JsonGuard\ErrorCode::MISSING_REQUIRED) {
-                    $message = strtolower(
-                        $error['message'].' ('.implode(', ', $context->constraints['required']).')'
-                    );
-                }
 
                 $invalidBodyError[] = new Error(
                     strtolower($message),
-                    strtolower($error['code']),
+                    strtolower($error['keyword']),
                     $context
                 );
             }
