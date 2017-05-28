@@ -112,13 +112,7 @@ class RAML implements APISpecInterface
     public function getParameters()
     {
         $parameters = [];
-        $namedParameters = array_merge(
-            $this->method->getQueryParameters(),
-            $this->resource->getUriParameters(),
-            $this->resource->getBaseUriParameters(),
-            $this->method->getBaseUriParameters()
-        );
-        foreach ($namedParameters as $nameParameter) {
+        foreach ($this->method->getQueryParameters() as $nameParameter) {
             $parameter = new Parameter(
                 $nameParameter->getKey(),
                 $nameParameter->getType(),

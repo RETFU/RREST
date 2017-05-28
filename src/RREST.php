@@ -108,6 +108,11 @@ class RREST
         $this->assertControllerClassName($controllerClassName);
         $this->assertActionMethodName($controllerClassName, $method);
 
+        $requestValidator = new RequestValidator($this->apiSpec);
+        $requestValidator->assert(
+            $this->router->getRequest()
+        );
+
         $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
         $accept = $this->getBestHeaderAccept($this->getHeader('Accept'), $availableAcceptContentTypes);
         $this->assertHTTPHeaderAccept($availableAcceptContentTypes, $accept);

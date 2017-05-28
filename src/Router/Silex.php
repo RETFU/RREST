@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
 use RREST\Response;
 use Silex\Application;
+use Psr\Http\Message\RequestInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 
 /**
  * Silex router.
@@ -47,6 +49,14 @@ class Silex implements RouterInterface
             $this->request = $request;
             $init();
         });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequest(): RequestInterface
+    {
+        return (new DiactorosFactory())->createRequest($this->request);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace RREST\Router;
 
 use RREST\Response;
+use Psr\Http\Message\RequestInterface;
 
 interface RouterInterface
 {
@@ -17,6 +18,11 @@ interface RouterInterface
      * @param \Closure $init                A callback to call when the router is initialized
      */
     public function addRoute($routePath, $method, $controllerClassName, $actionMethodName, Response $response, \Closure $init);
+
+    /**
+     * @return RequestInterface
+     */
+    public function getRequest(): RequestInterface;
 
     /**
      * Return the parameter typed or raw value if can't be hinted.
