@@ -273,7 +273,8 @@ class RREST
     protected function assertHTTPHeaderAccept(array $availableContentTypes, $acceptContentType)
     {
         if (empty($acceptContentType)) {
-            throw new NotAcceptableHttpException();
+            //see https://github.com/RETFU/RREST/issues/14
+            return;
         }
         if (empty($availableContentTypes)) {
             throw new \RuntimeException('No content type defined for this response');

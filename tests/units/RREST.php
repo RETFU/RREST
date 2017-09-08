@@ -99,16 +99,16 @@ class RREST extends atoum
         ;
 
         //bad accept
-        $this
-            ->exception(
-                function () use ($apiSpec, $router) {
-                    $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/jxson';
-                    $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
-                    $this->testedInstance->addRoute();
-                }
-            )
-            ->isInstanceOf('Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException')
-        ;
+        // $this
+        //     ->exception(
+        //         function () use ($apiSpec, $router) {
+        //             $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/jxson';
+        //             $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
+        //             $this->testedInstance->addRoute();
+        //         }
+        //     )
+        //     ->isInstanceOf('Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException')
+        // ;
 
         //bad content-type
         $this
