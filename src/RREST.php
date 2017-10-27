@@ -427,7 +427,8 @@ class RREST
         $assertInvalidJSONException();
 
         //validate JsonSchema
-        $deref = new JsonGuard\Dereferencer();
+        //$deref = new JsonGuard\Dereferencer();
+        $deref = \League\JsonReference\Dereferencer::draft4();
         $schema = $deref->dereference($schemaJSON);
         $validator = new JsonGuard\Validator($valueJSON, $schema);
         if ($validator->fails()) {
