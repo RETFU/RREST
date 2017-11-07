@@ -3,6 +3,7 @@
 namespace RREST;
 
 use League\JsonGuard;
+use RREST\Validator\JsonValidator;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -336,50 +337,11 @@ class Response
      */
     public function assertResponseJSON($value, $schema)
     {
-        $assertInvalidJSONException = function () {
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new InvalidJSONException([new Error(
-                    ucfirst(json_last_error_msg()),
-                    'invalid-response-payloadbody-json'
-                )]);
-            }
-        };
-
-        //validate JSON format
-        $schemaJSON = json_decode($schema);
-        $assertInvalidJSONException();
-
-        //validate JsonSchema
-        $deref = new JsonGuard\Dereferencer();
-        $schema = $deref->dereference($schemaJSON);
-        $validator = new JsonGuard\Validator($value, $schema);
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $jsonPointer = new JsonGuard\Pointer($value);
-            $invalidBodyError = [];
-            foreach ($validator->errors() as $jsonError) {
-                $error = $jsonError->toArray();
-                $propertyValue = null;
-                try {
-                    $propertyValue = $jsonPointer->get($error['pointer']);
-                } catch (NonexistentValueReferencedException $e) {
-                    //don't care if we can't have the value here, it's just
-                    //for the context
-                }
-                $context = new \stdClass();
-                $context->jsonPointer = $error['pointer'];
-                $context->value = $propertyValue;
-                $context->constraints = $error['context'];
-
-                $invalidBodyError[] = new Error(
-                    strtolower($error['pointer'].': '.$error['message']),
-                    strtolower($error['keyword']),
-                    $context
-                );
-            }
-            if (empty($invalidBodyError) == false) {
-                throw new InvalidResponsePayloadBodyException($invalidBodyError);
-            }
+        $validator = new JsonValidator($value, $schema);
+        if($validator->fails()) {
+            throw new InvalidResponsePayloadBodyException(
+                $validator->getErrors()
+            );
         }
     }
 }
