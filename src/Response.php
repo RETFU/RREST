@@ -179,7 +179,7 @@ class Response
         $this->assertReponseSchema(
             $this->getFormat(),
             $this->getSchema(),
-            $content
+            \json_encode($content)
         );
     }
 

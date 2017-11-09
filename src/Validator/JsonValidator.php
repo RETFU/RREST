@@ -6,7 +6,7 @@ use League\JsonGuard\Validator;
 use League\JsonReference\Dereferencer;
 use RREST\Error;
 use RREST\Exception\InvalidJSONException;
-use RREST\Validator\JsonGuardValidationErrorConverter;
+use RREST\Validator\Util\JsonGuardValidationError\Converter;
 
 class JsonValidator
 {
@@ -72,7 +72,7 @@ class JsonValidator
             foreach ($validator->errors() as $jsonGuardError) {
                 $this->errors = \array_merge(
                     $this->errors,
-                    (new JsonGuardValidationErrorConverter($jsonGuardError))->getErrors()
+                    (new Converter($jsonGuardError))->getErrors()
                 );
             }
         }
