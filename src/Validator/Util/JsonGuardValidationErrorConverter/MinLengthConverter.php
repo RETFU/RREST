@@ -1,10 +1,10 @@
 <?php
 
-namespace RREST\Validator\Util\JsonGuardValidationError;
+namespace RREST\Validator\Util\JsonGuardValidationErrorConverter;
 
 use RREST\Error;
 
-class MaxLengthConverter extends ConverterAbstract
+class MinLengthConverter extends ConverterAbstract
 {
     /**
      * @inheritdoc
@@ -16,7 +16,7 @@ class MaxLengthConverter extends ConverterAbstract
         $context->minLength = $this->validationError->getParameter();
         $context->currentValue = $this->validationError->getData();
         return [new Error(
-            \sprintf('The field %s must be less than %s characters long', $context->field, $context->maxLength),
+            \sprintf('The field %s must be at least %s characters long', $context->field, $context->minLength),
             Error::DATA_VALIDATION_MINLENGTH,
             $context
         )];

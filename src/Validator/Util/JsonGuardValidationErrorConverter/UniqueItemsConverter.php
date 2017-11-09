@@ -1,6 +1,6 @@
 <?php
 
-namespace RREST\Validator\Util\JsonGuardValidationError;
+namespace RREST\Validator\Util\JsonGuardValidationErrorConverter;
 
 use RREST\Error;
 

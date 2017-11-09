@@ -6,7 +6,7 @@ use League\JsonGuard\Validator;
 use League\JsonReference\Dereferencer;
 use RREST\Error;
 use RREST\Exception\InvalidJSONException;
-use RREST\Validator\Util\JsonGuardValidationError\Converter;
+use RREST\Validator\Util\JsonGuardValidationErrorConverter\Converter;
 
 class JsonValidator
 {
@@ -87,10 +87,8 @@ class JsonValidator
     {
         $json = json_decode($value);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new InvalidJSONException([new Error(
-                ucfirst(json_last_error_msg()),
-                Error::INVALID_JSON
-            )]);
+            $error = new Error(ucfirst(json_last_error_msg()), Error::INVALID_JSON);
+            throw new InvalidJSONException([$error]);
         }
 
         return $json;

@@ -1,6 +1,6 @@
 <?php
 
-namespace RREST\Validator\Util\JsonGuardValidationError;
+namespace RREST\Validator\Util\JsonGuardValidationErrorConverter;
 
 use RREST\Error;
 
@@ -35,11 +35,8 @@ class FormatConverter extends ConverterAbstract
                 break;
             default:
                 $message = 'Invalid format';
+                break;
         }
-        return [new Error(
-            $message,
-            Error::DATA_VALIDATION_FORMAT,
-            $context
-        )];
+        return [new Error($message, Error::DATA_VALIDATION_FORMAT, $context)];
     }
 }

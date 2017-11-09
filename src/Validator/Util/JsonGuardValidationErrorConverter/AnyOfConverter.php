@@ -1,6 +1,6 @@
 <?php
 
-namespace RREST\Validator\Util\JsonGuardValidationError;
+namespace RREST\Validator\Util\JsonGuardValidationErrorConverter;
 
 use League\JsonGuard\Constraint\DraftFour\Required;
 use RREST\Error;

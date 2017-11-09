@@ -1,10 +1,10 @@
 <?php
 
-namespace RREST\Validator\Util\JsonGuardValidationError;
+namespace RREST\Validator\Util\JsonGuardValidationErrorConverter;
 
 use RREST\Error;
 
-class MinItemsConverter extends ConverterAbstract
+class PatternConverter extends ConverterAbstract
 {
     /**
      * @inheritdoc
@@ -13,11 +13,11 @@ class MinItemsConverter extends ConverterAbstract
     {
         $context = new \stdClass;
         $context->field = $this->getFieldPath($this->validationError, '');
-        $context->minItems = $this->validationError->getParameter();
+        $context->pattern = $this->validationError->getParameter();
         $context->currentValues = $this->validationError->getData();
         return [new Error(
-            \sprintf('The field %s must contain at least %s item(s)', $context->field, $context->minItems),
-            Error::DATA_VALIDATION_MINITEMS,
+            \sprintf('The field %s must match the pattern %s', $context->field, $context->pattern),
+            Error::DATA_VALIDATION_PATTERN,
             $context
         )];
     }
