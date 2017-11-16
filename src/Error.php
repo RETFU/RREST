@@ -4,6 +4,22 @@ namespace RREST;
 
 class Error
 {
+    const INVALID_JSON = 'INVALID_JSON';
+    const DATA_VALIDATION_REQUIRED = 'DATA_VALIDATION_REQUIRED';
+    const DATA_VALIDATION_REQUIRED_ANYOF = 'DATA_VALIDATION_REQUIRED_ANYOF';
+    const DATA_VALIDATION_UNKNOW = 'DATA_VALIDATION_UNKNOW';
+    const DATA_VALIDATION_MINLENGTH = 'DATA_VALIDATION_MINLENGTH';
+    const DATA_VALIDATION_MAXLENGTH = 'DATA_VALIDATION_MAXLENGTH';
+    const DATA_VALIDATION_FORMAT = 'DATA_VALIDATION_FORMAT';
+    const DATA_VALIDATION_TYPE = 'DATA_VALIDATION_TYPE';
+    const DATA_VALIDATION_ENUM = 'DATA_VALIDATION_ENUM';
+    const DATA_VALIDATION_MINITEMS = 'DATA_VALIDATION_MINITEMS';
+    const DATA_VALIDATION_MAXITEMS = 'DATA_VALIDATION_MAXITEMS';
+    const DATA_VALIDATION_UNIQUEITEMS = 'DATA_VALIDATION_UNIQUEITEMS';
+    const DATA_VALIDATION_ONEOF = 'DATA_VALIDATION_ONEOF';
+    const DATA_VALIDATION_PATTERN = 'DATA_VALIDATION_PATTERN';
+
+
     /**
      * @var string
      */
@@ -24,9 +40,9 @@ class Error
     /**
      * @param string    $message
      * @param string    $code
-     * @param \stdClass $context
+     * @param \stdClass|null $context
      */
-    public function __construct($message = null, $code = null, $context = null)
+    public function __construct($message, $code, $context = null)
     {
         $this->message = $message;
         $this->code = $code;

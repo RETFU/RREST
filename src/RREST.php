@@ -2,6 +2,7 @@
 
 namespace RREST;
 
+use RREST\Validator\JsonValidator;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
@@ -411,63 +412,14 @@ class RREST
      */
     protected function assertHTTPPayloadBodyJSON($value, $schema)
     {
-        $assertInvalidJSONException = function () {
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new InvalidJSONException([new Error(
-                    ucfirst(json_last_error_msg()),
-                    'invalid-request-payloadbody-json'
-                )]);
-            }
-        };
-
-        //validate JSON format
-        $valueJSON = json_decode($value);
-        $assertInvalidJSONException();
-        $schemaJSON = json_decode($schema);
-        $assertInvalidJSONException();
-
-        //validate JsonSchema
-        $deref = new JsonGuard\Dereferencer();
-        $schema = $deref->dereference($schemaJSON);
-        $validator = new JsonGuard\Validator($valueJSON, $schema);
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $jsonPointer = new JsonGuard\Pointer($value);
-            $invalidBodyError = [];
-            foreach ($validator->errors() as $jsonError) {
-                $error = $jsonError->toArray();
-                $propertyValue = null;
-                $pointer = empty($error['pointer']) ? null : $error['pointer'];
-                if (empty($pointer) === false) {
-                    try {
-                        $propertyValue = $jsonPointer->get($pointer);
-                    } catch (NonexistentValueReferencedException $e) {
-                        //don't care if we can't have the value here, it's just
-                        //for the context
-                    }
-                }
-                $context = new \stdClass();
-                $context->jsonPointer = $pointer;
-                $context->value = $propertyValue;
-                $context->constraints = $error['context'];
-                //$context->jsonSource = $valueJSON;
-                $message = strtolower($error['message']);
-                if (empty($pointer) === false) {
-                    $message = strtolower($pointer.': '.$error['message']);
-                }
-
-                $invalidBodyError[] = new Error(
-                    strtolower($message),
-                    strtolower($error['keyword']),
-                    $context
-                );
-            }
-            if (empty($invalidBodyError) == false) {
-                throw new InvalidRequestPayloadBodyException($invalidBodyError);
-            }
+        $validator = new JsonValidator($value, $schema);
+        if($validator->fails()) {
+            throw new InvalidRequestPayloadBodyException(
+                $validator->getErrors()
+            );
         }
 
-        $this->hintedPayloadBody = $valueJSON;
+        $this->hintedPayloadBody = \json_decode($value);
     }
 
     protected function hintHTTPPayloadBody($hintedPayloadBody)

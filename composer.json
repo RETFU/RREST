@@ -22,7 +22,8 @@
         "jrfnl/PHP-cast-to-type": "^2.0",
         "willdurand/negotiation": "^2.0",
         "ralouphie/getallheaders": "^2.0",
-        "league/json-guard": "^0.5"
+        "league/json-guard": "^1.0",
+        "league/json-reference": "^1.0"
     },
     "suggest": {
         "silex/silex": "To use the Silex Router",
@@ -34,7 +35,8 @@
         "silex/silex": "^2.0",
         "alecsammon/php-raml-parser": "^2.2",
         "friendsofphp/php-cs-fixer": "^2.0",
-        "squizlabs/php_codesniffer": "^2.0"
+        "squizlabs/php_codesniffer": "^2.0",
+        "atoum/reports-extension": "^3.0"
     },
     "scripts": {
         "post-install-cmd": [
