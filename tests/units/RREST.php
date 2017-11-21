@@ -84,32 +84,6 @@ class RREST extends atoum
             ->message->contains('RREST\tests\Songs not found')
         ;
 
-        //missing controller method
-        $this
-            ->exception(
-                function () use ($router) {
-                    $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
-                    $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'DELETE', '/v1/songs/98');
-                    $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
-                    $this->testedInstance->addRoute();
-                }
-            )
-            ->isInstanceOf('\RuntimeException')
-            ->message->contains('Songs::deleteAction method not found')
-        ;
-
-        //bad accept
-        // $this
-        //     ->exception(
-        //         function () use ($apiSpec, $router) {
-        //             $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/jxson';
-        //             $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
-        //             $this->testedInstance->addRoute();
-        //         }
-        //     )
-        //     ->isInstanceOf('Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException')
-        // ;
-
         //bad content-type
         $this
             ->exception(
@@ -296,36 +270,6 @@ class RREST extends atoum
             )
             ->object($song)
             ->isInstanceOf('\stdClass');
-    }
-
-    public function testGetActionMethodName()
-    {
-        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $router = $this->getSilexRouter($this->getSilexApplication());
-
-        $this
-            ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getActionMethodName('get'))
-            ->isEqualTo('getAction')
-        ;
-    }
-
-    public function testGetControllerNamespaceClass()
-    {
-        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $router = $this->getSilexRouter($this->getSilexApplication());
-
-        $this
-            ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getControllerNamespaceClass('Songs'))
-            ->isEqualTo('Controllers\\Songs')
-        ;
-
-        $this
-            ->given($this->newTestedInstance($apiSpec, $router, 'Path\\To\\Controllers'))
-            ->string($this->testedInstance->getControllerNamespaceClass('Songs'))
-            ->isEqualTo('Path\\To\\Controllers\\Songs')
-        ;
     }
 
     public function testGetProtocol()

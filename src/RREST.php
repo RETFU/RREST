@@ -102,12 +102,11 @@ class RREST
     public function addRoute()
     {
         $method = $this->apiSpec->getRouteMethod();
-        $controllerClassName = $this->getRouteControllerClassName(
-            $this->apiSpec->getRessourcePath()
+        $controller = new Controller(
+            $this->controllerNamespace,
+            $this->apiSpec->getRessourcePath(),
+            $method
         );
-
-        $this->assertControllerClassName($controllerClassName);
-        $this->assertActionMethodName($controllerClassName, $method);
 
         $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
         $accept = $this->getBestHeaderAccept($this->getHeader('Accept'), $availableAcceptContentTypes);
@@ -138,8 +137,8 @@ class RREST
             $this->router->addRoute(
                 $routPath,
                 $method,
-                $this->getControllerNamespaceClass($controllerClassName),
-                $this->getActionMethodName($method),
+                $controller->getFullyQualifiedName(),
+                $controller->getActionMethodName($method),
                 $response,
                 function () use ($contentType, $requestSchema, $payloadBodyValue) {
                     $this->assertHTTPParameters();
@@ -425,89 +424,6 @@ class RREST
     protected function hintHTTPPayloadBody($hintedPayloadBody)
     {
         $this->router->setPayloadBodyValue($hintedPayloadBody);
-    }
-
-    /**
-     * @param string $controllerClassName
-     * @throw RuntimeException
-     *
-     * @return string
-     */
-    protected function assertControllerClassName($controllerClassName)
-    {
-        $controllerNamespaceClass = $this->getControllerNamespaceClass($controllerClassName);
-        if (class_exists($controllerNamespaceClass) == false) {
-            throw new \RuntimeException(
-                $controllerNamespaceClass.' not found'
-            );
-        }
-    }
-
-    /**
-     * @param string $controllerClassName
-     * @param $action
-     *
-     * @return string
-     * @throw RuntimeException
-     */
-    protected function assertActionMethodName($controllerClassName, $action)
-    {
-        $controllerNamespaceClass = $this->getControllerNamespaceClass($controllerClassName);
-        $controllerActionMethodName = $this->getActionMethodName($action);
-        if (method_exists($controllerNamespaceClass, $controllerActionMethodName) == false) {
-            throw new \RuntimeException(
-                $controllerNamespaceClass.'::'.$controllerActionMethodName.' method not found'
-            );
-        }
-    }
-
-    /**
-     * Return the Controller class name depending of a route path
-     * By convention:
-     *  - /item/{itemId}/ -> Item
-     *  - /item/{itemId}/comment -> Item\Comment.
-     *
-     * @param string $routePath
-     *
-     * @return string
-     */
-    protected function getRouteControllerClassName($routePath)
-    {
-        // remove URI parameters like controller/90/subcontroller/50
-        $controllerClassName = preg_replace('/\{[^}]+\}/', '', $routePath);
-        $controllerClassName = trim(str_replace('//', '/', $controllerClassName));
-        $controllerClassName = trim($controllerClassName, '/');
-        $controllerClassName = preg_replace('/[^a-zA-Z\d\/]/', '', $controllerClassName);
-
-        $chunks = explode('/', $controllerClassName);
-        $controllerClassName = ucwords($controllerClassName);
-
-        if (count($chunks) > 1) {
-            $chunks = array_map('ucwords', $chunks);
-            $controllerClassName = implode('\\', $chunks);
-        }
-
-        return $controllerClassName;
-    }
-
-    /**
-     * @param string $action
-     *
-     * @return string
-     */
-    public function getActionMethodName($action)
-    {
-        return strtolower($action).'Action';
-    }
-
-    /**
-     * @param string $controllerClassName
-     *
-     * @return string
-     */
-    public function getControllerNamespaceClass($controllerClassName)
-    {
-        return $this->controllerNamespace.'\\'.$controllerClassName;
     }
 
     /**
