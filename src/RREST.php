@@ -107,7 +107,7 @@ class RREST
 
         //accept
         $acceptValidator = new AcceptValidator(
-            $this->getHeader('Accept'),
+            HTTP::getHeader('Accept'),
             $this->apiSpec->getResponsePayloadBodyContentTypes()
         );
         if($acceptValidator->fails()) {
@@ -116,7 +116,7 @@ class RREST
         $accept = $acceptValidator->getBestAccept();
 
         //content-type
-        $contentType = $this->getHeader('Content-Type');
+        $contentType = HTTP::getHeader('Content-Type');
         $contentTypeValidator = new ContentTypeValidator(
             $contentType,
             $this->apiSpec->getRequestPayloadBodyContentTypes()
@@ -431,26 +431,5 @@ class RREST
         }
 
         return $castValue;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    private function getHeader($name)
-    {
-        $name = strtolower($name);
-        if (empty($this->headers)) {
-            $this->headers = array_change_key_case(getallheaders(), CASE_LOWER);
-            if (empty($this->headers)) {
-                $this->headers = array_change_key_case($_SERVER, CASE_LOWER);
-            }
-        }
-        if (isset($this->headers[$name])) {
-            return $this->headers[$name];
-        }
-
-        return;
     }
 }

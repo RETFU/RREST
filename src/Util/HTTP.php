@@ -26,4 +26,23 @@ class HTTP
 
         return $isSecure ? 'HTTPS' : 'HTTP';
     }
+
+    /**
+     * @param string $name
+     *
+     * @return string|null
+     */
+    public static function getHeader($name)
+    {
+        $name = strtolower($name);
+        $headers = array_change_key_case(\getallheaders(), CASE_LOWER);
+        if (empty($headers)) {
+            $headers = array_change_key_case($_SERVER, CASE_LOWER);
+        }
+        if (isset($headers[$name])) {
+            return $headers[$name];
+        }
+
+        return null;
+    }
 }
