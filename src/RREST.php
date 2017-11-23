@@ -9,6 +9,7 @@ use RREST\Router\RouterInterface;
 use RREST\Validator\AcceptValidator;
 use RREST\Validator\ContentTypeValidator;
 use RREST\Validator\JsonValidator;
+use RREST\Validator\ProtocolValidator;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -124,9 +125,14 @@ class RREST
             throw $contentTypeValidator->getException();
         }
 
-        $protocol = $this->getProtocol();
-        $availableProtocols = $this->apiSpec->getProtocols();
-        $this->assertHTTPProtocol($availableProtocols, $protocol);
+        //protocol
+        $protocolValidator = new ProtocolValidator(
+            $this->getProtocol(),
+            $this->apiSpec->getProtocols()
+        );
+        if($protocolValidator->fails()) {
+            throw $protocolValidator->getException();
+        }
 
         $requestSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
         $payloadBodyValue = $this->router->getPayloadBodyValue();
@@ -222,21 +228,6 @@ class RREST
             return (int) array_pop($statusCodes20x);
         } else {
             throw new \RuntimeException('You can\'t define multiple 20x for one resource path!');
-        }
-    }
-
-    /**
-     * @param string $availableHTTPProtocols
-     * @param string $currentHTTPProtocol
-     *
-     * @throw AccessDeniedHttpException
-     */
-    protected function assertHTTPProtocol($availableHTTPProtocols, $currentHTTPProtocol)
-    {
-        $availableHTTPProtocols = array_map('strtoupper', $availableHTTPProtocols);
-        $currentHTTPProtocol = strtoupper($currentHTTPProtocol);
-        if (in_array($currentHTTPProtocol, $availableHTTPProtocols) === false) {
-            throw new AccessDeniedHttpException();
         }
     }
 
