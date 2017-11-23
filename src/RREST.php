@@ -2,6 +2,7 @@
 
 namespace RREST;
 
+use RREST\Validator\AcceptValidator;
 use RREST\Validator\JsonValidator;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
@@ -108,9 +109,14 @@ class RREST
             $method
         );
 
-        $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
-        $accept = $this->getBestHeaderAccept($this->getHeader('Accept'), $availableAcceptContentTypes);
-        $this->assertHTTPHeaderAccept($availableAcceptContentTypes, $accept);
+        $acceptValidator = new AcceptValidator(
+            $this->getHeader('Accept'),
+            $this->apiSpec->getResponsePayloadBodyContentTypes()
+        );
+        if($acceptValidator->fails()) {
+            throw $acceptValidator->getException();
+        }
+        $accept = $acceptValidator->getBestAccept();
 
         $contentType = $this->getHeader('Content-Type');
         $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
@@ -138,7 +144,7 @@ class RREST
                 $routPath,
                 $method,
                 $controller->getFullyQualifiedName(),
-                $controller->getActionMethodName($method),
+                $controller->getActionMethodName(),
                 $response,
                 function () use ($contentType, $requestSchema, $payloadBodyValue) {
                     $this->assertHTTPParameters();
@@ -261,28 +267,6 @@ class RREST
                 }
             }
             throw new UnsupportedMediaTypeHttpException();
-        }
-    }
-
-    /**
-     * @param string[]    $availableContentTypes
-     * @param string|bool $acceptContentType
-     *
-     * @throw UnsupportedMediaTypeHttpException
-     */
-    protected function assertHTTPHeaderAccept(array $availableContentTypes, $acceptContentType)
-    {
-        if (empty($acceptContentType)) {
-            //see https://github.com/RETFU/RREST/issues/14
-            return;
-        }
-        if (empty($availableContentTypes)) {
-            throw new \RuntimeException('No content type defined for this response');
-        }
-        $availableContentTypes = array_map('strtolower', $availableContentTypes);
-        $acceptContentType = strtolower($acceptContentType);
-        if (in_array($acceptContentType, $availableContentTypes) === false) {
-            throw new NotAcceptableHttpException();
         }
     }
 
@@ -508,34 +492,6 @@ class RREST
         }
 
         return $castValue;
-    }
-
-    /**
-     * Find the best Accept header depending of priorities.
-     *
-     * @param string $acceptRaw
-     * @param array  $priorities
-     *
-     * @return string|null
-     */
-    private function getBestHeaderAccept($acceptRaw, array $priorities)
-    {
-        if (empty($acceptRaw)) {
-            return;
-        }
-
-        try {
-            $negotiaor = new Negotiator();
-            $accept = $negotiaor->getBest($acceptRaw, $priorities);
-        } catch (InvalidArgument $e) {
-            $accept = null;
-        }
-
-        if (is_null($accept)) {
-            return;
-        }
-
-        return $accept->getValue();
     }
 
     /**
