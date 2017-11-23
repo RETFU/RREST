@@ -10,7 +10,7 @@ use RREST\Validator\AcceptValidator;
 use RREST\Validator\ContentTypeValidator;
 use RREST\Validator\JsonValidator;
 use RREST\Validator\ProtocolValidator;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use RREST\Util\HTTP;
 
 /**
  * ApiSpec + Router = RREST.
@@ -127,7 +127,7 @@ class RREST
 
         //protocol
         $protocolValidator = new ProtocolValidator(
-            $this->getProtocol(),
+            HTTP::getProtocol(),
             $this->apiSpec->getProtocols()
         );
         if($protocolValidator->fails()) {
@@ -369,28 +369,6 @@ class RREST
     protected function hintHTTPPayloadBody($hintedPayloadBody)
     {
         $this->router->setPayloadBodyValue($hintedPayloadBody);
-    }
-
-    /**
-     * Return the protocol (http or https) used.
-     *
-     * @return string
-     */
-    public function getProtocol()
-    {
-        $isSecure = false;
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-            $isSecure = true;
-        } elseif (
-            !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
-            $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ||
-            !empty($_SERVER['HTTP_X_FORWARDED_SSL']) &&
-            $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on'
-        ) {
-            $isSecure = true;
-        }
-
-        return $isSecure ? 'HTTPS' : 'HTTP';
     }
 
     /**

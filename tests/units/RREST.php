@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 use RREST\Router\Silex;
 use RREST\APISpec\RAML;
+use RREST\Util\HTTP;
 
 class RREST extends atoum
 {
@@ -283,21 +284,21 @@ class RREST extends atoum
 
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getProtocol())
+            ->string(hTTP::getProtocol())
             ->isEqualTo('HTTP')
         ;
 
         $_SERVER['HTTPS'] = true;
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getProtocol())
+            ->string(hTTP::getProtocol())
             ->isEqualTo('HTTPS')
         ;
 
         $_SERVER['HTTPS'] = 'on';
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getProtocol())
+            ->string(hTTP::getProtocol())
             ->isEqualTo('HTTPS')
         ;
 
@@ -306,7 +307,7 @@ class RREST extends atoum
         $_SERVER['HTTP_X_FORWARDED_SSL'] = 'on';
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getProtocol())
+            ->string(hTTP::getProtocol())
             ->isEqualTo('HTTPS')
         ;
     }
