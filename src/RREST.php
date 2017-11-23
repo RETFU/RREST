@@ -2,19 +2,14 @@
 
 namespace RREST;
 
-use RREST\Validator\AcceptValidator;
-use RREST\Validator\JsonValidator;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-use League\JsonGuard;
-use Negotiation\Negotiator;
-use Negotiation\Exception\InvalidArgument;
 use RREST\APISpec\APISpecInterface;
-use RREST\Router\RouterInterface;
 use RREST\Exception\InvalidParameterException;
 use RREST\Exception\InvalidRequestPayloadBodyException;
-use RREST\Exception\InvalidJSONException;
+use RREST\Router\RouterInterface;
+use RREST\Validator\AcceptValidator;
+use RREST\Validator\ContentTypeValidator;
+use RREST\Validator\JsonValidator;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * ApiSpec + Router = RREST.
@@ -109,6 +104,7 @@ class RREST
             $method
         );
 
+        //accept
         $acceptValidator = new AcceptValidator(
             $this->getHeader('Accept'),
             $this->apiSpec->getResponsePayloadBodyContentTypes()
@@ -118,9 +114,15 @@ class RREST
         }
         $accept = $acceptValidator->getBestAccept();
 
+        //content-type
         $contentType = $this->getHeader('Content-Type');
-        $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
-        $this->assertHTTPHeaderContentType($availableContentTypes, $contentType);
+        $contentTypeValidator = new ContentTypeValidator(
+            $contentType,
+            $this->apiSpec->getRequestPayloadBodyContentTypes()
+        );
+        if($contentTypeValidator->fails()) {
+            throw $contentTypeValidator->getException();
+        }
 
         $protocol = $this->getProtocol();
         $availableProtocols = $this->apiSpec->getProtocols();
@@ -235,38 +237,6 @@ class RREST
         $currentHTTPProtocol = strtoupper($currentHTTPProtocol);
         if (in_array($currentHTTPProtocol, $availableHTTPProtocols) === false) {
             throw new AccessDeniedHttpException();
-        }
-    }
-
-    /**
-     * @param string $availableContentTypes
-     * @param string $contentType
-     *
-     * @throw UnsupportedMediaTypeHttpException
-     */
-    protected function assertHTTPHeaderContentType($availableContentTypes, $contentType)
-    {
-        $availableContentTypes = array_map('strtolower', $availableContentTypes);
-        $contentType = strtolower($contentType);
-
-        if (empty($availableContentTypes) === false) {
-            foreach ($availableContentTypes as $availableContentType) {
-                if (
-                    (
-                        strpos($contentType, 'multipart/form-data') === false &&
-                        $availableContentType === $contentType
-                    ) || (
-                        //not comparing with strict equality for multi-part because
-                        //multipart/form-data; boundary=--------------------------699519696930389418481751
-                        strpos($contentType, 'multipart/form-data') !== false &&
-                        strpos($contentType, $availableContentType) !== false
-                    )
-                ) {
-                    //find one valid content type
-                    return;
-                }
-            }
-            throw new UnsupportedMediaTypeHttpException();
         }
     }
 

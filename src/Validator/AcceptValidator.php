@@ -3,7 +3,6 @@
 namespace RREST\Validator;
 
 use Negotiation\AcceptHeader;
-use Negotiation\Exception\InvalidArgument;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 

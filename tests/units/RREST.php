@@ -148,28 +148,6 @@ class RREST extends atoum
             ->isEqualTo(10)
         ;
 
-        //bad json payload body
-        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
-        $app = $this->getSilexApplication();
-        $router = $this->getSilexRouter($app);
-        $this
-            ->exception(
-                function () use ($app, $apiSpec, $router) {
-                    $router->setPayloadBodyValue('bad json'); //because we are in a CLI context and can't set php://input
-                    $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
-                    $this->testedInstance->addRoute();
-                    $request = Request::create('/v1/songs/90', 'PUT', [], [], [], [], 'bad json');
-                    $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
-                }
-            )
-            ->isInstanceOf('RREST\Exception\InvalidJSONException')
-            ->array($this->exception->getErrors())
-            ->hasSize(1)
-            ->object($this->exception->getErrors()[0])
-            ->isInstanceOf('RREST\Error')
-            ->string($this->exception->getErrors()[0]->message)
-        ;
-
         //bad json schema payload body
         $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
         $app = $this->getSilexApplication();
@@ -270,6 +248,32 @@ class RREST extends atoum
             )
             ->object($song)
             ->isInstanceOf('\stdClass');
+    }
+
+    public function testAddRouteWithBadJsonContent()
+    {
+        //bad json payload body
+        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
+        $app = $this->getSilexApplication();
+        $router = $this->getSilexRouter($app);
+        $this
+            ->exception(
+                function () use ($app, $apiSpec, $router) {
+                    $_SERVER['Content-Type'] = 'application/json';
+                    $router->setPayloadBodyValue('bad json'); //because we are in a CLI context and can't set php://input
+                    $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
+                    $this->testedInstance->addRoute();
+                    $request = Request::create('/v1/songs/90', 'PUT', [], [], [], ['Content-Type' => 'application/json'], 'bad json');
+                    $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidJSONException')
+            ->array($this->exception->getErrors())
+            ->hasSize(1)
+            ->object($this->exception->getErrors()[0])
+            ->isInstanceOf('RREST\Error')
+            ->string($this->exception->getErrors()[0]->message)
+        ;
     }
 
     public function testGetProtocol()
