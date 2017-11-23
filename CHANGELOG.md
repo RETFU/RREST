@@ -1,5 +1,15 @@
 #  Changelog
 
+## v0.4.0 (2017-11-23)
+
+* refactor: add Util\HTTP::getHeader ([bcfb052](https://github.com/RETFU/RREST/commit/bcfb052))
+* refactor: add Util\HTTP::getProtocol ([775c725](https://github.com/RETFU/RREST/commit/775c725))
+* refactor: extract Protocol validation ([888d5db](https://github.com/RETFU/RREST/commit/888d5db))
+* refactor: extract Content-Type header validation ([cefe94b](https://github.com/RETFU/RREST/commit/cefe94b))
+* refactor: extract Accept header validation ([fc95c46](https://github.com/RETFU/RREST/commit/fc95c46))
+* chore: add PHP 7.2 support for Travis CI ([360d770](https://github.com/RETFU/RREST/commit/360d770))
+* refactor: extract controller/method validation/getter from RREST ([9c1e8c0](https://github.com/RETFU/RREST/commit/9c1e8c0))
+
 ## v0.3.0 (2017-11-16)
 
 * test: add more tests for the JsonGuard error conversion ([9dc2667](https://github.com/RETFU/RREST/commit/9dc2667))
