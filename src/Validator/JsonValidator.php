@@ -8,7 +8,7 @@ use RREST\Error;
 use RREST\Exception\InvalidJSONException;
 use RREST\Validator\Util\JsonGuardValidationErrorConverter\Converter;
 
-class JsonValidator
+class JsonValidator implements ValidatorInterface
 {
     /**
      * @var Error[]
@@ -76,6 +76,8 @@ class JsonValidator
                 );
             }
         }
+
+        $this->isValidated = true;
     }
 
     /**

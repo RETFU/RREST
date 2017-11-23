@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 use RREST\Router\Silex;
 use RREST\APISpec\RAML;
+use RREST\Util\HTTP;
 
 class RREST extends atoum
 {
@@ -84,32 +85,6 @@ class RREST extends atoum
             ->message->contains('RREST\tests\Songs not found')
         ;
 
-        //missing controller method
-        $this
-            ->exception(
-                function () use ($router) {
-                    $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/json';
-                    $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'DELETE', '/v1/songs/98');
-                    $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
-                    $this->testedInstance->addRoute();
-                }
-            )
-            ->isInstanceOf('\RuntimeException')
-            ->message->contains('Songs::deleteAction method not found')
-        ;
-
-        //bad accept
-        // $this
-        //     ->exception(
-        //         function () use ($apiSpec, $router) {
-        //             $_SERVER['Accept'] = $_SERVER['Content-Type'] = 'application/jxson';
-        //             $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
-        //             $this->testedInstance->addRoute();
-        //         }
-        //     )
-        //     ->isInstanceOf('Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException')
-        // ;
-
         //bad content-type
         $this
             ->exception(
@@ -172,28 +147,6 @@ class RREST extends atoum
             )
             ->integer($id)
             ->isEqualTo(10)
-        ;
-
-        //bad json payload body
-        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
-        $app = $this->getSilexApplication();
-        $router = $this->getSilexRouter($app);
-        $this
-            ->exception(
-                function () use ($app, $apiSpec, $router) {
-                    $router->setPayloadBodyValue('bad json'); //because we are in a CLI context and can't set php://input
-                    $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
-                    $this->testedInstance->addRoute();
-                    $request = Request::create('/v1/songs/90', 'PUT', [], [], [], [], 'bad json');
-                    $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
-                }
-            )
-            ->isInstanceOf('RREST\Exception\InvalidJSONException')
-            ->array($this->exception->getErrors())
-            ->hasSize(1)
-            ->object($this->exception->getErrors()[0])
-            ->isInstanceOf('RREST\Error')
-            ->string($this->exception->getErrors()[0]->message)
         ;
 
         //bad json schema payload body
@@ -298,33 +251,29 @@ class RREST extends atoum
             ->isInstanceOf('\stdClass');
     }
 
-    public function testGetActionMethodName()
+    public function testAddRouteWithBadJsonContent()
     {
-        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $router = $this->getSilexRouter($this->getSilexApplication());
-
+        //bad json payload body
+        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'PUT', '/v1/songs/90');
+        $app = $this->getSilexApplication();
+        $router = $this->getSilexRouter($app);
         $this
-            ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getActionMethodName('get'))
-            ->isEqualTo('getAction')
-        ;
-    }
-
-    public function testGetControllerNamespaceClass()
-    {
-        $apiSpec = $this->getRAMLAPISpec($this->apiDefinition, 'GET', '/v1/songs/98');
-        $router = $this->getSilexRouter($this->getSilexApplication());
-
-        $this
-            ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getControllerNamespaceClass('Songs'))
-            ->isEqualTo('Controllers\\Songs')
-        ;
-
-        $this
-            ->given($this->newTestedInstance($apiSpec, $router, 'Path\\To\\Controllers'))
-            ->string($this->testedInstance->getControllerNamespaceClass('Songs'))
-            ->isEqualTo('Path\\To\\Controllers\\Songs')
+            ->exception(
+                function () use ($app, $apiSpec, $router) {
+                    $_SERVER['Content-Type'] = 'application/json';
+                    $router->setPayloadBodyValue('bad json'); //because we are in a CLI context and can't set php://input
+                    $this->newTestedInstance($apiSpec, $router, 'RREST\tests\units');
+                    $this->testedInstance->addRoute();
+                    $request = Request::create('/v1/songs/90', 'PUT', [], [], [], ['Content-Type' => 'application/json'], 'bad json');
+                    $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidJSONException')
+            ->array($this->exception->getErrors())
+            ->hasSize(1)
+            ->object($this->exception->getErrors()[0])
+            ->isInstanceOf('RREST\Error')
+            ->string($this->exception->getErrors()[0]->message)
         ;
     }
 
@@ -335,21 +284,21 @@ class RREST extends atoum
 
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getProtocol())
+            ->string(hTTP::getProtocol())
             ->isEqualTo('HTTP')
         ;
 
         $_SERVER['HTTPS'] = true;
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getProtocol())
+            ->string(hTTP::getProtocol())
             ->isEqualTo('HTTPS')
         ;
 
         $_SERVER['HTTPS'] = 'on';
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getProtocol())
+            ->string(hTTP::getProtocol())
             ->isEqualTo('HTTPS')
         ;
 
@@ -358,7 +307,7 @@ class RREST extends atoum
         $_SERVER['HTTP_X_FORWARDED_SSL'] = 'on';
         $this
             ->given($this->newTestedInstance($apiSpec, $router))
-            ->string($this->testedInstance->getProtocol())
+            ->string(hTTP::getProtocol())
             ->isEqualTo('HTTPS')
         ;
     }

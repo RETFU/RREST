@@ -2,18 +2,15 @@
 
 namespace RREST;
 
-use RREST\Validator\JsonValidator;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-use League\JsonGuard;
-use Negotiation\Negotiator;
-use Negotiation\Exception\InvalidArgument;
 use RREST\APISpec\APISpecInterface;
-use RREST\Router\RouterInterface;
 use RREST\Exception\InvalidParameterException;
 use RREST\Exception\InvalidRequestPayloadBodyException;
-use RREST\Exception\InvalidJSONException;
+use RREST\Router\RouterInterface;
+use RREST\Validator\AcceptValidator;
+use RREST\Validator\ContentTypeValidator;
+use RREST\Validator\JsonValidator;
+use RREST\Validator\ProtocolValidator;
+use RREST\Util\HTTP;
 
 /**
  * ApiSpec + Router = RREST.
@@ -102,24 +99,40 @@ class RREST
     public function addRoute()
     {
         $method = $this->apiSpec->getRouteMethod();
-        $controllerClassName = $this->getRouteControllerClassName(
-            $this->apiSpec->getRessourcePath()
+        $controller = new Controller(
+            $this->controllerNamespace,
+            $this->apiSpec->getRessourcePath(),
+            $method
         );
 
-        $this->assertControllerClassName($controllerClassName);
-        $this->assertActionMethodName($controllerClassName, $method);
+        //accept
+        $acceptValidator = new AcceptValidator(
+            HTTP::getHeader('Accept'),
+            $this->apiSpec->getResponsePayloadBodyContentTypes()
+        );
+        if($acceptValidator->fails()) {
+            throw $acceptValidator->getException();
+        }
+        $accept = $acceptValidator->getBestAccept();
 
-        $availableAcceptContentTypes = $this->apiSpec->getResponsePayloadBodyContentTypes();
-        $accept = $this->getBestHeaderAccept($this->getHeader('Accept'), $availableAcceptContentTypes);
-        $this->assertHTTPHeaderAccept($availableAcceptContentTypes, $accept);
+        //content-type
+        $contentType = HTTP::getHeader('Content-Type');
+        $contentTypeValidator = new ContentTypeValidator(
+            $contentType,
+            $this->apiSpec->getRequestPayloadBodyContentTypes()
+        );
+        if($contentTypeValidator->fails()) {
+            throw $contentTypeValidator->getException();
+        }
 
-        $contentType = $this->getHeader('Content-Type');
-        $availableContentTypes = $this->apiSpec->getRequestPayloadBodyContentTypes();
-        $this->assertHTTPHeaderContentType($availableContentTypes, $contentType);
-
-        $protocol = $this->getProtocol();
-        $availableProtocols = $this->apiSpec->getProtocols();
-        $this->assertHTTPProtocol($availableProtocols, $protocol);
+        //protocol
+        $protocolValidator = new ProtocolValidator(
+            HTTP::getProtocol(),
+            $this->apiSpec->getProtocols()
+        );
+        if($protocolValidator->fails()) {
+            throw $protocolValidator->getException();
+        }
 
         $requestSchema = $this->apiSpec->getRequestPayloadBodySchema($contentType);
         $payloadBodyValue = $this->router->getPayloadBodyValue();
@@ -138,8 +151,8 @@ class RREST
             $this->router->addRoute(
                 $routPath,
                 $method,
-                $this->getControllerNamespaceClass($controllerClassName),
-                $this->getActionMethodName($method),
+                $controller->getFullyQualifiedName(),
+                $controller->getActionMethodName(),
                 $response,
                 function () use ($contentType, $requestSchema, $payloadBodyValue) {
                     $this->assertHTTPParameters();
@@ -215,75 +228,6 @@ class RREST
             return (int) array_pop($statusCodes20x);
         } else {
             throw new \RuntimeException('You can\'t define multiple 20x for one resource path!');
-        }
-    }
-
-    /**
-     * @param string $availableHTTPProtocols
-     * @param string $currentHTTPProtocol
-     *
-     * @throw AccessDeniedHttpException
-     */
-    protected function assertHTTPProtocol($availableHTTPProtocols, $currentHTTPProtocol)
-    {
-        $availableHTTPProtocols = array_map('strtoupper', $availableHTTPProtocols);
-        $currentHTTPProtocol = strtoupper($currentHTTPProtocol);
-        if (in_array($currentHTTPProtocol, $availableHTTPProtocols) === false) {
-            throw new AccessDeniedHttpException();
-        }
-    }
-
-    /**
-     * @param string $availableContentTypes
-     * @param string $contentType
-     *
-     * @throw UnsupportedMediaTypeHttpException
-     */
-    protected function assertHTTPHeaderContentType($availableContentTypes, $contentType)
-    {
-        $availableContentTypes = array_map('strtolower', $availableContentTypes);
-        $contentType = strtolower($contentType);
-
-        if (empty($availableContentTypes) === false) {
-            foreach ($availableContentTypes as $availableContentType) {
-                if (
-                    (
-                        strpos($contentType, 'multipart/form-data') === false &&
-                        $availableContentType === $contentType
-                    ) || (
-                        //not comparing with strict equality for multi-part because
-                        //multipart/form-data; boundary=--------------------------699519696930389418481751
-                        strpos($contentType, 'multipart/form-data') !== false &&
-                        strpos($contentType, $availableContentType) !== false
-                    )
-                ) {
-                    //find one valid content type
-                    return;
-                }
-            }
-            throw new UnsupportedMediaTypeHttpException();
-        }
-    }
-
-    /**
-     * @param string[]    $availableContentTypes
-     * @param string|bool $acceptContentType
-     *
-     * @throw UnsupportedMediaTypeHttpException
-     */
-    protected function assertHTTPHeaderAccept(array $availableContentTypes, $acceptContentType)
-    {
-        if (empty($acceptContentType)) {
-            //see https://github.com/RETFU/RREST/issues/14
-            return;
-        }
-        if (empty($availableContentTypes)) {
-            throw new \RuntimeException('No content type defined for this response');
-        }
-        $availableContentTypes = array_map('strtolower', $availableContentTypes);
-        $acceptContentType = strtolower($acceptContentType);
-        if (in_array($acceptContentType, $availableContentTypes) === false) {
-            throw new NotAcceptableHttpException();
         }
     }
 
@@ -428,111 +372,6 @@ class RREST
     }
 
     /**
-     * @param string $controllerClassName
-     * @throw RuntimeException
-     *
-     * @return string
-     */
-    protected function assertControllerClassName($controllerClassName)
-    {
-        $controllerNamespaceClass = $this->getControllerNamespaceClass($controllerClassName);
-        if (class_exists($controllerNamespaceClass) == false) {
-            throw new \RuntimeException(
-                $controllerNamespaceClass.' not found'
-            );
-        }
-    }
-
-    /**
-     * @param string $controllerClassName
-     * @param $action
-     *
-     * @return string
-     * @throw RuntimeException
-     */
-    protected function assertActionMethodName($controllerClassName, $action)
-    {
-        $controllerNamespaceClass = $this->getControllerNamespaceClass($controllerClassName);
-        $controllerActionMethodName = $this->getActionMethodName($action);
-        if (method_exists($controllerNamespaceClass, $controllerActionMethodName) == false) {
-            throw new \RuntimeException(
-                $controllerNamespaceClass.'::'.$controllerActionMethodName.' method not found'
-            );
-        }
-    }
-
-    /**
-     * Return the Controller class name depending of a route path
-     * By convention:
-     *  - /item/{itemId}/ -> Item
-     *  - /item/{itemId}/comment -> Item\Comment.
-     *
-     * @param string $routePath
-     *
-     * @return string
-     */
-    protected function getRouteControllerClassName($routePath)
-    {
-        // remove URI parameters like controller/90/subcontroller/50
-        $controllerClassName = preg_replace('/\{[^}]+\}/', '', $routePath);
-        $controllerClassName = trim(str_replace('//', '/', $controllerClassName));
-        $controllerClassName = trim($controllerClassName, '/');
-        $controllerClassName = preg_replace('/[^a-zA-Z\d\/]/', '', $controllerClassName);
-
-        $chunks = explode('/', $controllerClassName);
-        $controllerClassName = ucwords($controllerClassName);
-
-        if (count($chunks) > 1) {
-            $chunks = array_map('ucwords', $chunks);
-            $controllerClassName = implode('\\', $chunks);
-        }
-
-        return $controllerClassName;
-    }
-
-    /**
-     * @param string $action
-     *
-     * @return string
-     */
-    public function getActionMethodName($action)
-    {
-        return strtolower($action).'Action';
-    }
-
-    /**
-     * @param string $controllerClassName
-     *
-     * @return string
-     */
-    public function getControllerNamespaceClass($controllerClassName)
-    {
-        return $this->controllerNamespace.'\\'.$controllerClassName;
-    }
-
-    /**
-     * Return the protocol (http or https) used.
-     *
-     * @return string
-     */
-    public function getProtocol()
-    {
-        $isSecure = false;
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-            $isSecure = true;
-        } elseif (
-            !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
-            $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ||
-            !empty($_SERVER['HTTP_X_FORWARDED_SSL']) &&
-            $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on'
-        ) {
-            $isSecure = true;
-        }
-
-        return $isSecure ? 'HTTPS' : 'HTTP';
-    }
-
-    /**
      * @param string   $mimeType
      * @param string[] $availableMimeTypes
      *
@@ -592,54 +431,5 @@ class RREST
         }
 
         return $castValue;
-    }
-
-    /**
-     * Find the best Accept header depending of priorities.
-     *
-     * @param string $acceptRaw
-     * @param array  $priorities
-     *
-     * @return string|null
-     */
-    private function getBestHeaderAccept($acceptRaw, array $priorities)
-    {
-        if (empty($acceptRaw)) {
-            return;
-        }
-
-        try {
-            $negotiaor = new Negotiator();
-            $accept = $negotiaor->getBest($acceptRaw, $priorities);
-        } catch (InvalidArgument $e) {
-            $accept = null;
-        }
-
-        if (is_null($accept)) {
-            return;
-        }
-
-        return $accept->getValue();
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    private function getHeader($name)
-    {
-        $name = strtolower($name);
-        if (empty($this->headers)) {
-            $this->headers = array_change_key_case(getallheaders(), CASE_LOWER);
-            if (empty($this->headers)) {
-                $this->headers = array_change_key_case($_SERVER, CASE_LOWER);
-            }
-        }
-        if (isset($this->headers[$name])) {
-            return $this->headers[$name];
-        }
-
-        return;
     }
 }
