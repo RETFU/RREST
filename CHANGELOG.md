@@ -1,5 +1,9 @@
 #  Changelog
 
+## v0.4.2 (2017-12-19)
+
+* fix: force default protocol if not defined for a route ([36c9486](https://github.com/RETFU/RREST/commit/36c9486))
+
 ## v0.4.1 (2017-12-19)
 
 * fix: protocol can't be override for a specific route ([5309218](https://github.com/RETFU/RREST/commit/5309218))
