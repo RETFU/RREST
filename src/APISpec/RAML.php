@@ -103,7 +103,12 @@ class RAML implements APISpecInterface
      */
     public function getProtocols()
     {
-        return $this->method->getProtocols();
+        $protocols = $this->method->getProtocols();
+        if(empty($protocols)) {
+            $protocols = $this->apiDefinition->getProtocols();
+        }
+
+        return $protocols;
     }
 
     /**
