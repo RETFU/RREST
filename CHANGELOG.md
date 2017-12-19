@@ -1,5 +1,9 @@
 #  Changelog
 
+## v0.4.1 (2017-12-19)
+
+* fix: protocol can't be override for a specific route ([5309218](https://github.com/RETFU/RREST/commit/5309218))
+
 ## v0.4.0 (2017-11-23)
 
 * refactor: add Util\HTTP::getHeader ([bcfb052](https://github.com/RETFU/RREST/commit/bcfb052))
