@@ -3,14 +3,14 @@
 namespace RREST;
 
 use RREST\APISpec\APISpecInterface;
-use RREST\Exception\InvalidParameterException;
 use RREST\Exception\InvalidRequestPayloadBodyException;
 use RREST\Router\RouterInterface;
+use RREST\Util\HTTP;
 use RREST\Validator\AcceptValidator;
 use RREST\Validator\ContentTypeValidator;
 use RREST\Validator\JsonValidator;
+use RREST\Validator\ParameterValidator;
 use RREST\Validator\ProtocolValidator;
-use RREST\Util\HTTP;
 
 /**
  * ApiSpec + Router = RREST.
@@ -62,35 +62,18 @@ class RREST
 
     /**
      * @param APISpecInterface $apiSpec
-     * @param RouterInterface  $router
-     * @param string           $controllerNamespace
+     * @param RouterInterface $router
+     * @param string $controllerNamespace
      */
-    public function __construct(APISpecInterface $apiSpec, RouterInterface $router, $controllerNamespace = 'Controllers')
-    {
+    public function __construct(
+        APISpecInterface $apiSpec,
+        RouterInterface $router,
+        $controllerNamespace = 'Controllers'
+    ) {
         $this->apiSpec = $apiSpec;
         $this->router = $router;
         $this->controllerNamespace = $controllerNamespace;
         $this->hintedHTTPParameters = [];
-    }
-
-    /**
-     * Define if the response will be validate against the APISpec
-     * schema or not. You can make it to false in production to have better
-     * performance on large response, like list of object.
-     *
-     * @param bool $assert
-     */
-    public function setAssertResponse($assert)
-    {
-        $this->assertResponse = $assert;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getAssertResponse()
-    {
-        return $this->assertResponse;
     }
 
     /**
@@ -110,7 +93,7 @@ class RREST
             HTTP::getHeader('Accept'),
             $this->apiSpec->getResponsePayloadBodyContentTypes()
         );
-        if($acceptValidator->fails()) {
+        if ($acceptValidator->fails()) {
             throw $acceptValidator->getException();
         }
         $accept = $acceptValidator->getBestAccept();
@@ -121,7 +104,7 @@ class RREST
             $contentType,
             $this->apiSpec->getRequestPayloadBodyContentTypes()
         );
-        if($contentTypeValidator->fails()) {
+        if ($contentTypeValidator->fails()) {
             throw $contentTypeValidator->getException();
         }
 
@@ -130,7 +113,7 @@ class RREST
             HTTP::getProtocol(),
             $this->apiSpec->getProtocols()
         );
-        if($protocolValidator->fails()) {
+        if ($protocolValidator->fails()) {
             throw $protocolValidator->getException();
         }
 
@@ -157,7 +140,7 @@ class RREST
                 function () use ($contentType, $requestSchema, $payloadBodyValue) {
                     $this->assertHTTPParameters();
                     $this->assertHTTPPayloadBody($contentType, $requestSchema, $payloadBodyValue);
-                    $this->hintHTTPParameterValue($this->hintedHTTPParameters);
+                    $this->httpParametersTypedValue($this->hintedHTTPParameters);
                     $this->hintHTTPPayloadBody($this->hintedPayloadBody);
                 }
             );
@@ -166,6 +149,59 @@ class RREST
         $route = new Route($routPath, $method, $this->apiSpec->getAuthTypes());
 
         return $route;
+    }
+
+    /**
+     * Find the sucess status code to apply at the end of the request.
+     *
+     * @return int
+     */
+    protected function getStatusCodeSuccess()
+    {
+        $statusCodes = $this->apiSpec->getStatusCodes();
+        //find a 20x code
+        $statusCodes20x = array_filter($statusCodes, function ($value) {
+            return preg_match('/20\d?/', $value);
+        });
+        if (count($statusCodes20x) === 1) {
+            return (int)array_pop($statusCodes20x);
+        } else {
+            throw new \RuntimeException('You can\'t define multiple 20x for one resource path!');
+        }
+    }
+
+    /**
+     * @param string $mimeType
+     * @param string[] $availableMimeTypes
+     *
+     * @return string|bool
+     */
+    private function getFormat($mimeType, $availableMimeTypes)
+    {
+        $format = false;
+        foreach ($availableMimeTypes as $format => $mimeTypes) {
+            if (in_array($mimeType, $mimeTypes)) {
+                break;
+            }
+        }
+
+        return $format;
+    }
+
+    /**
+     * @param string $format
+     * @param string[] $availableMimeTypes
+     *
+     * @return string|bool
+     */
+    private function getMimeType($format, $availableMimeTypes)
+    {
+        $mimeType = false;
+        if (array_key_exists($format, $availableMimeTypes)) {
+            $mimeType = $availableMimeTypes[$format][0];
+        }
+
+        return $mimeType;
     }
 
     /**
@@ -184,7 +220,7 @@ class RREST
         if (substr($apiSpecRoutePath, -1) === '/') {
             $routePaths[] = substr($apiSpecRoutePath, 0, -1);
         } else {
-            $routePaths[] = $apiSpecRoutePath.'/';
+            $routePaths[] = $apiSpecRoutePath . '/';
         }
 
         return $routePaths;
@@ -192,9 +228,9 @@ class RREST
 
     /**
      * @param RouterInterface $router
-     * @param string          $statusCodeSucess
-     * @param string          $format
-     * @param string          $mimeType
+     * @param string $statusCodeSucess
+     * @param string $format
+     * @param string $mimeType
      *
      * @return Response
      */
@@ -213,22 +249,23 @@ class RREST
     }
 
     /**
-     * Find the sucess status code to apply at the end of the request.
-     *
-     * @return int
+     * @return bool
      */
-    protected function getStatusCodeSuccess()
+    public function getAssertResponse()
     {
-        $statusCodes = $this->apiSpec->getStatusCodes();
-        //find a 20x code
-        $statusCodes20x = array_filter($statusCodes, function ($value) {
-            return preg_match('/20\d?/', $value);
-        });
-        if (count($statusCodes20x) === 1) {
-            return (int) array_pop($statusCodes20x);
-        } else {
-            throw new \RuntimeException('You can\'t define multiple 20x for one resource path!');
-        }
+        return $this->assertResponse;
+    }
+
+    /**
+     * Define if the response will be validate against the APISpec
+     * schema or not. You can make it to false in production to have better
+     * performance on large response, like list of object.
+     *
+     * @param bool $assert
+     */
+    public function setAssertResponse($assert)
+    {
+        $this->assertResponse = $assert;
     }
 
     /**
@@ -236,37 +273,17 @@ class RREST
      */
     protected function assertHTTPParameters()
     {
-        $invalidParametersError = [];
-        $parameters = $this->apiSpec->getParameters();
-        foreach ($parameters as $parameter) {
-            $value = $this->router->getParameterValue($parameter->getName());
-            try {
-                $castValue = $this->cast($value, $parameter->getType());
-            } catch (\Exception $e) {
-                throw new InvalidParameterException([
-                    new Error(
-                        $e->getMessage(),
-                        $e->getCode()
-                    ),
-                ]);
-            }
-            try {
-                $parameter->assertValue($castValue);
-                $this->hintedHTTPParameters[$parameter->getName()] = $castValue;
-            } catch (InvalidParameterException $e) {
-                $invalidParametersError = array_merge(
-                    $e->getErrors(),
-                    $invalidParametersError
-                );
-            }
-        }
+        $parameterValidator = new ParameterValidator($this->apiSpec, $this->router);
 
-        if (empty($invalidParametersError) == false) {
-            throw new InvalidParameterException($invalidParametersError);
+        if ($parameterValidator->fails()) {
+            throw $parameterValidator->getException();
         }
+        $this->httpParametersTypedValue(
+            $parameterValidator->getHTTPParametersTyped()
+        );
     }
 
-    protected function hintHTTPParameterValue($hintedHTTPParameters)
+    protected function httpParametersTypedValue($hintedHTTPParameters)
     {
         foreach ($hintedHTTPParameters as $key => $value) {
             $this->router->setParameterValue($key, $value);
@@ -305,6 +322,25 @@ class RREST
      * @param string $value
      * @param string $schema
      *
+     * @throws \RREST\Exception\InvalidJSONException
+     * @throws \RREST\Exception\InvalidRequestPayloadBodyException
+     */
+    protected function assertHTTPPayloadBodyJSON($value, $schema)
+    {
+        $validator = new JsonValidator($value, $schema);
+        if ($validator->fails()) {
+            throw new InvalidRequestPayloadBodyException(
+                $validator->getErrors()
+            );
+        }
+
+        $this->hintedPayloadBody = \json_decode($value);
+    }
+
+    /**
+     * @param string $value
+     * @param string $schema
+     *
      * @throws \RREST\Exception\InvalidXMLException
      * @throws \RREST\Exception\InvalidRequestPayloadBodyException
      */
@@ -316,7 +352,7 @@ class RREST
             libxml_clear_errors();
             if (empty($libXMLErrors) === false) {
                 foreach ($libXMLErrors as $libXMLError) {
-                    $message = $libXMLError->message.' (line: '.$libXMLError->line.')';
+                    $message = $libXMLError->message . ' (line: ' . $libXMLError->line . ')';
                     $invalidBodyError[] = new Error(
                         $message,
                         'invalid-payloadbody-xml'
@@ -347,89 +383,8 @@ class RREST
         $this->hintedPayloadBody = $valueJSON;
     }
 
-    /**
-     * @param string $value
-     * @param string $schema
-     *
-     * @throws \RREST\Exception\InvalidJSONException
-     * @throws \RREST\Exception\InvalidRequestPayloadBodyException
-     */
-    protected function assertHTTPPayloadBodyJSON($value, $schema)
-    {
-        $validator = new JsonValidator($value, $schema);
-        if($validator->fails()) {
-            throw new InvalidRequestPayloadBodyException(
-                $validator->getErrors()
-            );
-        }
-
-        $this->hintedPayloadBody = \json_decode($value);
-    }
-
     protected function hintHTTPPayloadBody($hintedPayloadBody)
     {
         $this->router->setPayloadBodyValue($hintedPayloadBody);
-    }
-
-    /**
-     * @param string   $mimeType
-     * @param string[] $availableMimeTypes
-     *
-     * @return string|bool
-     */
-    private function getFormat($mimeType, $availableMimeTypes)
-    {
-        $format = false;
-        foreach ($availableMimeTypes as $format => $mimeTypes) {
-            if (in_array($mimeType, $mimeTypes)) {
-                break;
-            }
-        }
-
-        return $format;
-    }
-
-    /**
-     * @param string   $format
-     * @param string[] $availableMimeTypes
-     *
-     * @return string|bool
-     */
-    private function getMimeType($format, $availableMimeTypes)
-    {
-        $mimeType = false;
-        if (array_key_exists($format, $availableMimeTypes)) {
-            $mimeType = $availableMimeTypes[$format][0];
-        }
-
-        return $mimeType;
-    }
-
-    /**
-     * @param mixed  $value
-     * @param string $type
-     *
-     * @return mixed
-     */
-    private function cast($value, $type)
-    {
-        $castValue = $value;
-        if ($type == 'number') {
-            $type = 'num';
-        }
-
-        if ($type != 'date') {
-            $castValue = \CastToType::cast($value, $type, false, true);
-        } else {
-            //Specific case for date
-            $castValue = new \DateTime($value);
-        }
-
-        //The cast not working, parameters is probably not this $type
-        if (is_null($castValue)) {
-            return $value;
-        }
-
-        return $castValue;
     }
 }
