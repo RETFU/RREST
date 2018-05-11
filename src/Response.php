@@ -310,7 +310,10 @@ class Response
                     );
                 }
                 if (empty($invalidBodyError) == false) {
-                    throw new $exceptionClassName($invalidBodyError);
+                    throw new $exceptionClassName(
+                        $invalidBodyError,
+                        "Invalid XML Response body"
+                    );
                 }
             }
         };
@@ -340,7 +343,8 @@ class Response
         $validator = new JsonValidator($value, $schema);
         if($validator->fails()) {
             throw new InvalidResponsePayloadBodyException(
-                $validator->getErrors()
+                $validator->getErrors(),
+                "Invalid JSON response body"
             );
         }
     }
