@@ -220,12 +220,11 @@ class RREST
     protected function getStatusCodeSuccess()
     {
         $statusCodes = $this->apiSpec->getStatusCodes();
-        //find a 20x code
-        $statusCodes20x = array_filter($statusCodes, function ($value) {
-            return preg_match('/20\d?/', $value);
+        $successfulStatusCodes = array_filter($statusCodes, function ($value) {
+            return preg_match('/^[23]0\d?$/', $value);
         });
-        if (count($statusCodes20x) === 1) {
-            return (int) array_pop($statusCodes20x);
+        if (count($successfulStatusCodes) === 1) {
+            return (int) array_pop($successfulStatusCodes);
         } else {
             throw new \RuntimeException('You can\'t define multiple 20x for one resource path!');
         }
