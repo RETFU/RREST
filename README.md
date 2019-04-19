@@ -114,17 +114,31 @@ At the end in the controller, you will have true json, xml for payload & integer
 
 ### Automatic binding route
 
-**RREST** bind the route to a controller by following this convention:
+**RREST** binds the route to a controller by following this convention:
 * `POST /item/` -> `Controllers\Item#postAction`
 * `GET /item/{itemId}/` -> `Controllers\Item#getAction`
 * `GET /item/{itemId}/comment` -> `Controllers\Item\Comment#getAction`
 * `PUT /item/{itemId}/comment/{commentId}` -> `Controllers\Item\Comment#putAction`
 
-> note you can define the controller namespace (here Controllers) in the RREST\RREST constructor
+> Note: You can define the controller namespace (here Controllers) in the RREST\RREST constructor
+
+#### Ordering route
+
+The order of API definitions matters. RREST will match the first definition that corresponds to the route called.
+
+To use plain route as well as route with parameters with the same base, precedence should be as follow :
+```raml
+# First, endpoints with params, then plain endpoints.
+/item/{itemId}
+/item/archive
+```
+
+> If done in the other way, calling `GET /item/archive` would be matched to `/item/{itemId}`, with value "archive" for {itemId}.  
+> To prevent this, simply order endpoint definitions.
 
 ###  Response
 
- A `RREST\Response` is injecting into the controller with pre-filled values based on the APISpec or errors/exceptions that occur during the handling of a request.
+ A `RREST\Response` is injected into the controller with pre-filled values based on the APISpec or errors/exceptions that occur during the handling of a request.
 
 You only need to fill response data to this object because the rest is configured:
 * status code: 200 , 201 for `POST`, 40x ...
