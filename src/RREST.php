@@ -23,6 +23,7 @@ class RREST
     public static $supportedMimeTypes = [
         'json' => ['application/json', 'application/x-json'],
         'xml' => ['text/xml', 'application/xml', 'application/x-xml'],
+        'csv' => ['text/csv', 'application/csv'],
     ];
 
     /**

@@ -82,7 +82,10 @@ Based on the APISpec description, **RREST** validate i/o:
 `Accept` is required for every request.  
 `Content-Type` is required for `POST` & `PUT` method.
 
-> **RREST** only support JSON & XML for input/output, so valid mime-types are: `application/json`, `application/x-json`, `text/xml`, `application/xml` & `application/x-xml`.
+> **RREST** supports JSON & XML for input/output and partially supports CSV for
+> output, so valid mime-types are: `application/json`, `application/x-json`,
+> `text/xml`, `application/xml`, `application/x-xml`, 'text/csv' and
+> 'application/csv'.
 
 #### Protocol
 
@@ -103,6 +106,7 @@ This will ensure that data input is valid.
 Depending of the `Accept` header, **RREST** will validate:
 * if the format (`JSON`or `XML`) is valid
 * if it follow the schema (`JSON Schema` or `XML Schema`)
+* there's no validation for `CSV`
 
 A schema is not required by **RREST** for a response. But this is a security to be sure that your response
 respect your APISpec and your documentation based on it.
@@ -188,6 +192,7 @@ class Resource
 ##### Format input/output
 * JSON
 * XML
+* CSV (output only)
 
 ##### APISPec
 * RAML
