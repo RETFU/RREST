@@ -36,7 +36,7 @@ class Response
     /**
      * @var string[]
      */
-    protected $supportedFormat = ['json', 'xml'];
+    protected $supportedFormat = ['json', 'xml', 'csv'];
 
     /**
      * @var RouterInterface
@@ -251,6 +251,14 @@ class Response
             $data = json_decode(json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true);
 
             return $serializer->serialize($data, $format);
+        } elseif ($format === 'csv') {
+            if (!is_string($data)) {
+                throw new \RuntimeException(
+                    'auto serialization for CSV format is not supported'
+                );
+            }
+
+            return $data;
         } else {
             throw new \RuntimeException(
                 'format not supported, only are '.implode(', ', $this->supportedFormat).' availables'
@@ -279,6 +287,9 @@ class Response
                 break;
             case strpos($format, 'xml') !== false:
                 $this->assertResponseXML($value, $schema);
+                break;
+            case strpos($format, 'csv') !== false:
+                // no validation for CSV
                 break;
             default:
                 throw new \RuntimeException(

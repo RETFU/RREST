@@ -93,6 +93,34 @@ class Response extends atoum
         ;
     }
 
+    public function testNoCsvSerialize()
+    {
+        $this->newTestedInstance($this->router, 'csv', 200);
+
+        $this
+            ->given($this->testedInstance)
+            ->exception(
+                function () {
+                    $this->testedInstance->serialize([], 'csv');
+                }
+            )
+            ->isInstanceOf('\RuntimeException')
+            ->message->contains('auto serialization for CSV format is not supported');
+    }
+
+    public function testSerializeForCsv()
+    {
+        $this->newTestedInstance($this->router, 'csv', 200);
+
+        $csv = "The Black Keys;El Camino\nFoo Fighters;Sonic Highways";
+
+        $this
+            ->given($this->testedInstance)
+            ->string($this->testedInstance->serialize($csv, 'csv'))
+            ->isEqualTo($csv);
+        ;
+    }
+
     public function testAssertReponseSchema()
     {
         $this->newTestedInstance($this->router, 'json', 200);
