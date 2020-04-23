@@ -215,4 +215,17 @@ class Response extends atoum
             ->isEqualTo('https://api.domain.com/items/uuid')
         ;
     }
+
+    public function testGetRouterResponseWithFile()
+    {
+        $this->newTestedInstance($this->router, 'json', 201);
+
+        $this
+            ->given($this->testedInstance)
+            ->and(
+                $this->testedInstance->setFile(__DIR__.'/../fixture/song.xml')
+            )
+            ->object($this->testedInstance->getRouterResponse())
+            ->isInstanceOf('Symfony\Component\HttpFoundation\BinaryFileResponse');
+    }
 }

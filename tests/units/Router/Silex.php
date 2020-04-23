@@ -54,6 +54,15 @@ class Silex extends atoum
             ->isInstanceOf('Symfony\Component\HttpFoundation\Response');
     }
 
+    public function testGetResponseWithFile()
+    {
+        $this->newTestedInstance($this->app);
+        $this
+            ->given($this->testedInstance)
+            ->object($this->testedInstance->getResponse('XXX', 200, [], __DIR__.'/../../fixture/song.xml'))
+            ->isInstanceOf('Symfony\Component\HttpFoundation\BinaryFileResponse');
+    }
+
     public function testGetPayloadBodyValue()
     {
         $this->newTestedInstance($this->app);

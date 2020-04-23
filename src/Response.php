@@ -21,6 +21,11 @@ class Response
     /**
      * @var string
      */
+    protected $file;
+
+    /**
+     * @var string
+     */
     protected $format;
 
     /**
@@ -60,6 +65,14 @@ class Response
         $this->setFormat($format);
         $this->setRouter($router);
         $this->setStatusCode($statusCode);
+    }
+
+    /**
+     * @param string
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
     }
 
     /**
@@ -226,7 +239,7 @@ class Response
         }
 
         return $this->router->getResponse(
-            $content, $this->getConfiguredHeaderstatusCode(), $this->getConfiguredHeaders()
+            $content, $this->getConfiguredHeaderstatusCode(), $this->getConfiguredHeaders(), $this->file
         );
     }
 
