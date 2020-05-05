@@ -2,6 +2,7 @@
 
 namespace RREST\Router;
 
+use Symfony\Component\HttpFoundation\BinaryFileResponse as HttpFoundationBinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
 use RREST\Response;
@@ -111,8 +112,11 @@ class Silex implements RouterInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponse($content = '', $statusCode = 200, $headers = array())
+    public function getResponse($content = '', $statusCode = 200, $headers = array(), $file = null)
     {
+        if (!empty($file)) {
+            return new HttpFoundationBinaryFileResponse($file, $statusCode, $headers);
+        }
         return new HttpFoundationResponse($content, $statusCode, $headers);
     }
 }

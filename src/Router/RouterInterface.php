@@ -55,8 +55,9 @@ interface RouterInterface
      * @param string   $content
      * @param int      $statusCode
      * @param string[] $headers
+     * @param string|null $file
      *
      * @return mixed
      */
-    public function getResponse($content = '', $statusCode = 200, $headers = array());
+    public function getResponse($content = '', $statusCode = 200, $headers = array(), $file = null);
 }
