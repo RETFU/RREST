@@ -2,6 +2,8 @@
 
 namespace RREST\APISpec;
 
+use Raml\BodyInterface;
+use Raml\WebFormBody;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Raml\ApiDefinition;
@@ -36,7 +38,7 @@ class RAML implements APISpecInterface
     /**
      * @param ApiDefinition $apiDefinition
      * @param string        $httpMethod
-     * @param strings       $routePath     (PHP_URL_PATH)
+     * @param string       $routePath     (PHP_URL_PATH)
      */
     public function __construct(ApiDefinition $apiDefinition, $httpMethod, $routePath)
     {
@@ -173,12 +175,23 @@ class RAML implements APISpecInterface
         $bodies = $this->method->getBodies();
         if (empty($bodies) === false) {
             try {
-                return (string) $this->method->getBodyByType($contentType)->getSchema();
+                $body = $this->method->getBodyByType($contentType);
+
+                if ($this->hasSchema($body)) {
+                    return (string)$body->getSchema();
+                }
+
+                return '';
             } catch (\Exception $e) {
             }
         }
 
         return false;
+    }
+
+    private function hasSchema(BodyInterface $body): bool
+    {
+        return !($body instanceof WebFormBody);
     }
 
     /**

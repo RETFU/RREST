@@ -418,7 +418,7 @@ class RREST
             $type = 'num';
         }
 
-        if ($type != 'date') {
+        if ($type != 'datetime') {
             $castValue = \CastToType::cast($value, $type, false, true);
         } else {
             //Specific case for date

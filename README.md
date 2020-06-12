@@ -10,6 +10,15 @@
 ## Versions
 > Important: **RREST 2.0** is in active development. It doesn't cover RAML 1.0 completely.
 
+### RAML 1.0
+RAML 1.0 is not covered completely.
+
+Known missing feature:
+- Support date format that are not `datetime`.
+
+Limitations of RAML handling can be found in its [Parameter handling](https://github.com/RETFU/RREST/blob/master/src/Parameter.php).
+
+### RAML 0.8
 For usage with RAML 0.8 please use RREST v1.x versions.
 
 

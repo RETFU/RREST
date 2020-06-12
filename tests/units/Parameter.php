@@ -126,8 +126,50 @@ class Parameter extends atoum
             ->isInstanceOf('RREST\Exception\InvalidParameterException')
         ;
 
-        //cast type date
-        $this->newTestedInstance('name', 'date', true);
+        //cast type datetime
+        $this->newTestedInstance('name', 'datetime', true);
+        $this
+            ->exception(
+                function () {
+                    $this
+                        ->testedInstance
+                        ->assertValue('test', 'test')
+                    ;
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidParameterException')
+        ;
+
+        //cast type date-only
+        $this->newTestedInstance('name', 'date-only', true);
+        $this
+            ->exception(
+                function () {
+                    $this
+                        ->testedInstance
+                        ->assertValue('test', 'test')
+                    ;
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidParameterException')
+        ;
+
+        //cast type time-only
+        $this->newTestedInstance('name', 'time-only', true);
+        $this
+            ->exception(
+                function () {
+                    $this
+                        ->testedInstance
+                        ->assertValue('test', 'test')
+                    ;
+                }
+            )
+            ->isInstanceOf('RREST\Exception\InvalidParameterException')
+        ;
+
+        //cast type datetime-only
+        $this->newTestedInstance('name', 'datetime-only', true);
         $this
             ->exception(
                 function () {
