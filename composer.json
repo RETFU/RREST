@@ -24,7 +24,11 @@
         "willdurand/negotiation": "^2.0",
         "ralouphie/getallheaders": "^2.0",
         "league/json-guard": "^1.0",
-        "league/json-reference": "^1.0"
+        "league/json-reference": "^1.0",
+        "ext-libxml": "*",
+        "ext-dom": "*",
+        "ext-json": "*",
+        "ext-simplexml": "*"
     },
     "suggest": {
         "silex/silex": "To use the Silex Router",
