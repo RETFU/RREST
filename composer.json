@@ -20,7 +20,7 @@
         "symfony/serializer": "^3.0",
         "symfony/property-access": "^3.0",
         "symfony/yaml": "^3.0",
-        "jrfnl/PHP-cast-to-type": "^2.0",
+        "jrfnl/php-cast-to-type": "^2.0",
         "willdurand/negotiation": "^2.0",
         "ralouphie/getallheaders": "^2.0",
         "league/json-guard": "^1.0",
