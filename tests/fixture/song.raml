@@ -72,7 +72,7 @@ schemas:
               type: integer
               minimum: 1
               maximum: 10
-              example: 55
+              example: 8
           price:
               description: Filter by price
               type: number
@@ -83,13 +83,13 @@ schemas:
               description: Filter by vendor
               type: string
               enum: [test1,test2,test3]
-              example: 55.6
+              example: test1
           email:
               description: Filter by email (test pattern)
               type: string
-              pattern: ^\w+@[a-zA-Z_]+?.[a-zA-Z]{2,3}$
+              pattern: (?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])
               minLength: 7
-              maxLength: 20
+              maxLength: 200
               example: diego.maradonna@argentina.com
           # array like parameters are not validated/converted
           choice[]:
