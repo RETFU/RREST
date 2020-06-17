@@ -229,10 +229,6 @@ I want:
 * to manage all the business logics by my own
 * to manage all the persistence layers by my own
 
-## Roadmap 1.0
-* validate headers like query parameters
-* ~~validate response like request~~
-
 ## Author
 
 Fabien Furet - http://fabienfuret.net
