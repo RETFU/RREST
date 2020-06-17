@@ -20,6 +20,7 @@
         "symfony/serializer": "^3.0",
         "symfony/property-access": "^3.0",
         "symfony/yaml": "^3.0",
+        "raml-org/raml-php-parser": "^2.2",
         "jrfnl/php-cast-to-type": "^2.0",
         "willdurand/negotiation": "^2.0",
         "ralouphie/getallheaders": "^2.0",
@@ -31,14 +32,12 @@
         "ext-simplexml": "*"
     },
     "suggest": {
-        "silex/silex": "To use the Silex Router",
-        "raml-org/raml-php-parser": "To use the RAML APISpec"
+        "silex/silex": "To use the Silex Router"
     },
     "require-dev": {
         "atoum/atoum": "^3.0",
         "atoum/stubs": "*",
         "silex/silex": "^2.0",
-        "raml-org/raml-php-parser": "^2.2",
         "friendsofphp/php-cs-fixer": "^2.0",
         "squizlabs/php_codesniffer": "^2.0",
         "atoum/reports-extension": "^3.0"
