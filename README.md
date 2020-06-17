@@ -6,7 +6,12 @@
 [![Coverage Status](https://coveralls.io/repos/github/RETFU/RREST/badge.svg?branch=master)](https://coveralls.io/github/RETFU/RREST?branch=master)
 ![WIP](https://img.shields.io/badge/unstable-master-red.svg)
 ![PHP7 supported](http://php7ready.timesplinter.ch/RETFU/RREST/badge.svg)
-> Important: **RREST** is in active development. The API is not frozen and BC break can happen at any time.
+
+## Versions
+> Important: **RREST 2.0** is in active development. It doesn't cover RAML 1.0 completely.
+
+For usage with RAML 0.8 please use RREST v1.x versions.
+
 
 **RREST** binds an [API specification language](https://en.wikipedia.org/wiki/Overview_of_RESTful_API_Description_Languages) (APISpec) and a Router. It also provides convention to follow best practice.
 
