@@ -16,4 +16,5 @@ script:
 
 matrix:
   allow_failures:
+    - php: 7.4
     - php: nightly
