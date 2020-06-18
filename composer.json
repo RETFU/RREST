@@ -20,7 +20,7 @@
         "symfony/serializer": "^3.0",
         "symfony/property-access": "^3.0",
         "symfony/yaml": "^3.0",
-        "raml-org/raml-php-parser": "^2.2",
+        "raml-org/raml-php-parser": "^4.6",
         "jrfnl/php-cast-to-type": "^2.0",
         "willdurand/negotiation": "^2.0",
         "ralouphie/getallheaders": "^2.0",

@@ -1,4 +1,4 @@
-#%RAML 0.8
+#%RAML 1.0
 
 title: World Music API
 baseUri: http://{bucketName}.api.com/{version}
@@ -9,7 +9,7 @@ baseUriParameters:
     required: false
 version: v1
 securitySchemes:
-    - JWT:
+    JWT:
         description: |
             https://jwt.io/introduction/
         type: x-jwt
@@ -23,9 +23,9 @@ securitySchemes:
                         ```
                     type: string
                     required: true
-schemas:
-  - Song: !include song.json
-  - Person: |
+types:
+  Song: !include song.json
+  Person: |
       {
         "$schema": "http://json-schema.org/schema",
         "type": "array",
@@ -95,10 +95,9 @@ schemas:
           choice[]:
               description: Filter by choice
               type: string
-              repeat: true
           modificationDate:
               description: Modification date
-              type: date
+              type: datetime
       responses:
         200:
           body:

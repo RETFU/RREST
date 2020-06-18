@@ -6,23 +6,29 @@ use RREST\Exception\InvalidParameterException;
 
 class Parameter
 {
-    const TYPE_STRING = 'string';
     const TYPE_NUMBER = 'number';
-    const TYPE_INTEGER = 'integer';
-    const TYPE_DATE = 'date';
     const TYPE_BOOLEAN = 'boolean';
+    const TYPE_STRING = 'string';
+    const TYPE_DATE_ONLY = 'date-only';
+    const TYPE_TIME_ONLY = 'time-only';
+    const TYPE_DATETIME_ONLY = 'datetime-only';
+    const TYPE_DATETIME = 'datetime';
     const TYPE_FILE = 'file';
+    const TYPE_INTEGER = 'integer';
 
     /**
      * @var string[]
      */
     protected $validTypes = [
-        self::TYPE_STRING,
         self::TYPE_NUMBER,
-        self::TYPE_INTEGER,
-        self::TYPE_DATE,
+        self::TYPE_STRING,
         self::TYPE_BOOLEAN,
+        self::TYPE_DATE_ONLY,
+        self::TYPE_TIME_ONLY,
+        self::TYPE_DATETIME_ONLY,
+        self::TYPE_DATETIME,
         self::TYPE_FILE,
+        self::TYPE_INTEGER,
     ];
 
     /**
@@ -266,10 +272,17 @@ class Parameter
                     $this->throwInvalidParameter($this->getName().' is not a boolean');
                 }
                 break;
-            case static::TYPE_DATE:
+            case static::TYPE_DATETIME:
                 if ($value instanceof \DateTime === false) {
                     $this->throwInvalidParameter($this->getName().' is not a valid date');
                 }
+                break;
+            case static::TYPE_DATE_ONLY:
+            case static::TYPE_TIME_ONLY:
+            case static::TYPE_DATETIME_ONLY:
+                $this->throwInvalidParameter(
+                    $this->getType().' is not supported yet in RREST. Use datetime or feel free to contribute it'
+                );
                 break;
             case static::TYPE_STRING:
                 if (!is_string($value)) {
