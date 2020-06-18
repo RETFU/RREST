@@ -40,7 +40,8 @@
         "silex/silex": "^2.0",
         "friendsofphp/php-cs-fixer": "^2.0",
         "squizlabs/php_codesniffer": "^2.0",
-        "atoum/reports-extension": "^3.0"
+        "atoum/reports-extension": "^3.0",
+        "atoum/deprecated-extension": "^1.0"
     },
     "scripts": {
         "post-install-cmd": [
