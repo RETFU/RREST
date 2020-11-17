@@ -121,6 +121,34 @@ class Response extends atoum
         ;
     }
 
+    public function testNoXlsxSerialize()
+    {
+        $this->newTestedInstance($this->router, 'xlsx', 200);
+
+        $this
+            ->given($this->testedInstance)
+            ->exception(
+                function () {
+                    $this->testedInstance->serialize([], 'xlsx');
+                }
+            )
+            ->isInstanceOf('\RuntimeException')
+            ->message->contains('auto serialization for XLSX format is not supported');
+    }
+
+    public function testSerializeForXlsx()
+    {
+        $this->newTestedInstance($this->router, 'xlsx', 200);
+
+        $xlsx = "Placeholder for binary content";
+
+        $this
+            ->given($this->testedInstance)
+            ->string($this->testedInstance->serialize($xlsx, 'xlsx'))
+            ->isEqualTo($xlsx);
+        ;
+    }
+
     public function testAssertReponseSchema()
     {
         $this->newTestedInstance($this->router, 'json', 200);

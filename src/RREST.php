@@ -24,6 +24,7 @@ class RREST
         'json' => ['application/json', 'application/x-json'],
         'xml' => ['text/xml', 'application/xml', 'application/x-xml'],
         'csv' => ['text/csv', 'application/csv'],
+        'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
     ];
 
     /**
