@@ -257,7 +257,7 @@ class Parameter
     public function assertValue($value)
     {
         // required?
-        if (empty($value)) {
+        if (!$this->hasValue($value)) {
             if ($this->getRequired()) {
                 $this->throwInvalidParameter($this->getName().' is required');
             }
@@ -360,5 +360,21 @@ class Parameter
         throw new InvalidParameterException([
             new Error($message, 'parameter-invalid'),
         ]);
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function hasValue($value): bool
+    {
+        return !empty($value) || $this->isBooleanWithValueFalse($value);
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function isBooleanWithValueFalse($value): bool
+    {
+        return $this->getType() === self::TYPE_BOOLEAN && is_bool($value) && $value === false;
     }
 }
