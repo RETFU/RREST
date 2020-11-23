@@ -250,4 +250,14 @@ class Parameter extends atoum
             ->isInstanceOf('\RuntimeException')
         ;
     }
+
+    public function testAssertValueOnMandatoryFalseBoolean()
+    {
+        $this->newTestedInstance('name', 'boolean', true);
+        $this
+            ->given($this->testedInstance)
+            ->variable($this->testedInstance->assertValue(false))
+            ->isNull
+        ;
+    }
 }
