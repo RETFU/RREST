@@ -127,6 +127,5 @@ class FormatConverter extends atoum
             ->hasSize(1)
             ->values
             ->object[0]->isInstanceOf('\RREST\Error');
-
     }
 }

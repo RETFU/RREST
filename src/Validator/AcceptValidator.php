@@ -61,7 +61,9 @@ class AcceptValidator implements ValidatorInterface
 
     public function validate()
     {
-        if ($this->isValidated) return;
+        if ($this->isValidated) {
+            return;
+        }
         $accept = $this->getBestAccept();
 
         if (empty($accept)) {
@@ -84,12 +86,14 @@ class AcceptValidator implements ValidatorInterface
      */
     public function getBestAccept()
     {
-        if (empty($this->accept)) return null;
+        if (empty($this->accept)) {
+            return null;
+        }
 
         try {
             $negotiaor = new Negotiator();
             $accept = $negotiaor->getBest($this->accept, $this->validAccepts);
-            if($accept instanceof AcceptHeader === false) {
+            if ($accept instanceof AcceptHeader === false) {
                 return $this->accept;
             }
         } catch (\Exception $e) {

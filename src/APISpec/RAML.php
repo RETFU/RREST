@@ -44,7 +44,8 @@ class RAML implements APISpecInterface
     {
         $this->apiDefinition = $apiDefinition;
         $resourcePath = $this->extractRessourcePathFromURL(
-            $routePath, $this->apiDefinition->getVersion()
+            $routePath,
+            $this->apiDefinition->getVersion()
         );
         $this->resource = $this->getResourceFromPath($resourcePath);
         $this->method = $this->getMethodFromResource($this->resource, $httpMethod);
@@ -106,7 +107,7 @@ class RAML implements APISpecInterface
     public function getProtocols()
     {
         $protocols = $this->method->getProtocols();
-        if(empty($protocols)) {
+        if (empty($protocols)) {
             $protocols = $this->apiDefinition->getProtocols();
         }
 

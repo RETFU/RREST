@@ -239,7 +239,10 @@ class Response
         }
 
         return $this->router->getResponse(
-            $content, $this->getConfiguredHeaderstatusCode(), $this->getConfiguredHeaders(), $this->file
+            $content,
+            $this->getConfiguredHeaderstatusCode(),
+            $this->getConfiguredHeaders(),
+            $this->file
         );
     }
 
@@ -254,9 +257,11 @@ class Response
         if ($format === 'json') {
             return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         } elseif ($format === 'xml') {
-            $serializer = new Serializer([
+            $serializer = new Serializer(
+                [
                     new ObjectNormalizer(),
-                ], [
+                ],
+                [
                     'xml' => new XmlEncoder(),
                 ]
             );
@@ -365,7 +370,7 @@ class Response
     public function assertResponseJSON($value, $schema)
     {
         $validator = new JsonValidator($value, $schema);
-        if($validator->fails()) {
+        if ($validator->fails()) {
             throw new InvalidResponsePayloadBodyException(
                 $validator->getErrors(),
                 "Invalid JSON response body"

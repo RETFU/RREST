@@ -33,9 +33,13 @@ class Silex extends atoum
             ->given($this->testedInstance)
             ->and(
                 $this->testedInstance->addRoute(
-                    '/', 'GET', 'RREST\tests\units\Router\Controller', 'getAction',
+                    '/',
+                    'GET',
+                    'RREST\tests\units\Router\Controller',
+                    'getAction',
                     new Response($this->testedInstance, 'json', 201),
-                    function () {}
+                    function () {
+                    }
                 ),
                 $request = Request::create('/', 'GET', [], [], [], [], 'YYY'),
                 $response = $this->app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
@@ -79,9 +83,13 @@ class Silex extends atoum
             ->given($this->testedInstance)
             ->and(
                 $this->testedInstance->addRoute(
-                    '/', 'GET', 'RREST\tests\units\Router\Controller', 'getAction',
+                    '/',
+                    'GET',
+                    'RREST\tests\units\Router\Controller',
+                    'getAction',
                     new Response($this->testedInstance, 'json', 201),
-                    function () {}
+                    function () {
+                    }
                 ),
                 $request = Request::create('/', 'GET', [], [], [], [], 'YYY'),
                 $response = $this->app->handle($request, HttpKernelInterface::MASTER_REQUEST, false)
@@ -97,9 +105,13 @@ class Silex extends atoum
             ->given($this->testedInstance)
             ->and(
                 $this->testedInstance->addRoute(
-                    '/', 'GET', 'RREST\tests\units\Router\Controller', 'getAction',
+                    '/',
+                    'GET',
+                    'RREST\tests\units\Router\Controller',
+                    'getAction',
                     new Response($this->testedInstance, 'json', 201),
-                    function () {}
+                    function () {
+                    }
                 ),
                 $parameters = ['parameter' => '5'],
                 $request = Request::create('/', 'GET', $parameters, [], [], [], 'YYY'),
@@ -119,9 +131,13 @@ class Silex extends atoum
             ->given($this->testedInstance)
             ->and(
                 $this->testedInstance->addRoute(
-                    '/', 'GET', 'RREST\tests\units\Router\Controller', 'getAction',
+                    '/',
+                    'GET',
+                    'RREST\tests\units\Router\Controller',
+                    'getAction',
                     new Response($this->testedInstance, 'json', 201),
-                    function () {}
+                    function () {
+                    }
                 ),
                 $parameters = ['parameter' => '5'],
                 $request = Request::create('/', 'GET', $parameters, [], [], [], 'YYY'),

@@ -13,7 +13,7 @@ class Converter extends atoum
     {
         $this
             ->given($this->newTestedInstance(
-                new \League\JsonGuard\ValidationError('a','b','c','d','e','f','g')
+                new \League\JsonGuard\ValidationError('a', 'b', 'c', 'd', 'e', 'f', 'g')
             ))
             ->array($this->testedInstance->getErrors())
             ->hasSize(1)
@@ -22,7 +22,7 @@ class Converter extends atoum
 
         $this
             ->given($this->newTestedInstance(
-                new \League\JsonGuard\ValidationError('a',Required::KEYWORD,'c',['d'],'e','f','g')
+                new \League\JsonGuard\ValidationError('a', Required::KEYWORD, 'c', ['d'], 'e', 'f', 'g')
             ))
             ->array($this->testedInstance->getErrors())
             ->hasSize(1)
