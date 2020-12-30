@@ -32,14 +32,12 @@ done
 
 if [ "$FILES" != "" ]
 then
-	echo "Check PHP code if is PSR2..."
-	vendor/bin/phpcs --standard=PSR2 src -n
-	if [ $? = 0 ]
+	echo "Checking PHP code style..."
+	vendor/bin/php-cs-fixer fix --dry-run $FILES --config=.php_cs -v
+	if [ $? != 0 ]
 	then
-		echo "You have some PHP PSR2 ERRORS, please run the following commands to fix them:"
-		echo "vendor/bin/php-cs-fixer fix . --level=symfony -vv"
-		echo "vendor/bin/phpcbf --standard=PSR2 src"
-		echo "vendor/bin/phpcs --standard=PSR2 src -n"
+		echo "You have some codestyle errors in your diff, please run the following command to fix them:"
+		echo "composer.phar cs"
 		exit 1
 	fi
 fi
