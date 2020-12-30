@@ -3,30 +3,15 @@
 namespace RREST\Exception;
 
 use RREST\Error;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class InvalidXMLException extends BadRequestHttpException implements ErrorExceptionInterface
+class InvalidXMLException extends ErrorException implements ErrorExceptionInterface
 {
-    /**
-     * @var Error[]
-     */
-    public $errors;
-
     /**
      * @param Error[]         $errors   List of errors
      * @param \Exception|null $previous
      */
     public function __construct(array $errors, $message = 'Invalid', \Exception $previous = null, $code = 0)
     {
-        $this->errors = $errors;
-        parent::__construct($message, $previous, $code);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrors()
-    {
-        return $this->errors;
+        parent::__construct($errors, 400, $message, $previous, [], $code);
     }
 }
