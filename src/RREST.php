@@ -112,7 +112,7 @@ class RREST
             HTTP::getHeader('Accept'),
             $this->apiSpec->getResponsePayloadBodyContentTypes()
         );
-        if($acceptValidator->fails()) {
+        if ($acceptValidator->fails()) {
             throw $acceptValidator->getException();
         }
         $accept = $acceptValidator->getBestAccept();
@@ -123,7 +123,7 @@ class RREST
             $contentType,
             $this->apiSpec->getRequestPayloadBodyContentTypes()
         );
-        if($contentTypeValidator->fails()) {
+        if ($contentTypeValidator->fails()) {
             throw $contentTypeValidator->getException();
         }
 
@@ -132,7 +132,7 @@ class RREST
             HTTP::getProtocol(),
             $this->apiSpec->getProtocols()
         );
-        if($protocolValidator->fails()) {
+        if ($protocolValidator->fails()) {
             throw $protocolValidator->getException();
         }
 
@@ -358,7 +358,7 @@ class RREST
     protected function assertHTTPPayloadBodyJSON($value, $schema)
     {
         $validator = new JsonValidator($value, $schema);
-        if($validator->fails()) {
+        if ($validator->fails()) {
             throw new InvalidRequestPayloadBodyException(
                 $validator->getErrors()
             );

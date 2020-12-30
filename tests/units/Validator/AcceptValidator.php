@@ -66,7 +66,7 @@ class AcceptValidator extends atoum
     {
         $this
             ->exception(
-                function() {
+                function () {
                     $this->newTestedInstance('application/json', []);
                 }
             )
@@ -74,7 +74,7 @@ class AcceptValidator extends atoum
 
         $this
             ->exception(
-                function() {
+                function () {
                     $this->newTestedInstance('application/json', null);
                 }
             )
@@ -82,7 +82,7 @@ class AcceptValidator extends atoum
 
         $this
             ->exception(
-                function() {
+                function () {
                     $this->newTestedInstance(null, null);
                 }
             )
@@ -91,7 +91,7 @@ class AcceptValidator extends atoum
 
         $this
             ->exception(
-                function() {
+                function () {
                     $this->newTestedInstance(null, []);
                 }
             )

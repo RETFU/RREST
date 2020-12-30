@@ -74,14 +74,13 @@ class Fakestatus
 {
     public function getAction()
     {
-
     }
 }
 namespace RREST\tests\units\Fakestatus;
+
 class Test
 {
     public function getAction()
     {
-
     }
 }

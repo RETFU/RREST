@@ -60,7 +60,9 @@ class JsonValidator implements ValidatorInterface
 
     public function validate()
     {
-        if ($this->isValidated) return;
+        if ($this->isValidated) {
+            return;
+        }
 
         $schema = Dereferencer::draft4()->dereference(
             $this->getJsonFromString($this->jsonSchema)
@@ -95,5 +97,4 @@ class JsonValidator implements ValidatorInterface
 
         return $json;
     }
-
 }

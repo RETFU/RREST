@@ -55,7 +55,9 @@ class ProtocolValidator implements ValidatorInterface
 
     public function validate()
     {
-        if ($this->isValidated) return;
+        if ($this->isValidated) {
+            return;
+        }
 
         if (in_array($this->protocol, $this->availableProtocols) === false) {
             $this->exception = new AccessDeniedHttpException();

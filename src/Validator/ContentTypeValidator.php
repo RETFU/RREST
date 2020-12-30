@@ -55,7 +55,9 @@ class ContentTypeValidator implements ValidatorInterface
 
     public function validate()
     {
-        if ($this->isValidated) return;
+        if ($this->isValidated) {
+            return;
+        }
 
         if (empty($this->availableContentTypes) === false) {
             foreach ($this->availableContentTypes as $availableContentType) {
