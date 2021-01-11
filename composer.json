@@ -47,6 +47,7 @@
             "test -d .git && cp contrib/pre-commit .git/hooks/pre-commit",
             "test -d .git && chmod +x .git/hooks/pre-commit"
         ],
-        "cs": "php-cs-fixer fix --config=.php_cs"
+        "cs": "php-cs-fixer fix --config=.php_cs",
+        "test": "atoum"
     }
 }

@@ -2,6 +2,9 @@
 
 namespace RREST\Exception;
 
+/**
+ * @deprecated use ErrorException instead.
+ */
 interface ErrorExceptionInterface
 {
     /**

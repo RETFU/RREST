@@ -2,15 +2,8 @@
 
 namespace RREST\Exception;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
-class InvalidResponsePayloadBodyException extends HttpException implements ErrorExceptionInterface
+class InvalidResponsePayloadBodyException extends ErrorException implements ErrorExceptionInterface
 {
-    /**
-     * @var \RREST\Error[]
-     */
-    public $errors;
-
     /**
      * @param \RREST\Error[] $errors   List of errors
      * @param string         $message
@@ -19,15 +12,6 @@ class InvalidResponsePayloadBodyException extends HttpException implements Error
      */
     public function __construct(array $errors, $message = 'Invalid', \Exception $previous = null, $code = 0)
     {
-        $this->errors = $errors;
-        parent::__construct(500, $message, $previous, [], $code);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrors()
-    {
-        return $this->errors;
+        parent::__construct($errors, 500, $message, $previous, [], $code);
     }
 }
