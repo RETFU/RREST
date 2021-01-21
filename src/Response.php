@@ -41,7 +41,7 @@ class Response
     /**
      * @var string[]
      */
-    protected $supportedFormat = ['json', 'xml', 'csv', 'xlsx'];
+    protected $supportedFormat = ['json', 'xml', 'csv', 'zip', 'xlsx'];
 
     /**
      * @var RouterInterface
@@ -269,7 +269,7 @@ class Response
             $data = json_decode(json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true);
 
             return $serializer->serialize($data, $format);
-        } elseif ($format === 'csv' || $format === 'xlsx') {
+        } elseif ($format === 'csv' || $format === 'xlsx' || $format === 'zip') {
             if (!is_string($data)) {
                 throw new \RuntimeException(
                     'auto serialization for '.strtoupper($format).' format is not supported'

@@ -149,6 +149,34 @@ class Response extends atoum
         ;
     }
 
+    public function testNoZipSerialize()
+    {
+        $this->newTestedInstance($this->router, 'zip', 200);
+
+        $this
+            ->given($this->testedInstance)
+            ->exception(
+                function () {
+                    $this->testedInstance->serialize([], 'zip');
+                }
+            )
+            ->isInstanceOf('\RuntimeException')
+            ->message->contains('auto serialization for ZIP format is not supported');
+    }
+
+    public function testSerializeForZip()
+    {
+        $this->newTestedInstance($this->router, 'zip', 200);
+
+        $zip = "Placeholder for binary content";
+
+        $this
+            ->given($this->testedInstance)
+            ->string($this->testedInstance->serialize($zip, 'zip'))
+            ->isEqualTo($zip);
+        ;
+    }
+
     public function testAssertReponseSchema()
     {
         $this->newTestedInstance($this->router, 'json', 200);
