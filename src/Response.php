@@ -192,7 +192,7 @@ class Response
         $this->assertReponseSchema(
             $this->getFormat(),
             $this->getSchema(),
-            \json_encode($content)
+            $content
         );
     }
 
@@ -296,7 +296,7 @@ class Response
 
         switch (true) {
             case strpos($format, 'json') !== false:
-                $this->assertResponseJSON($value, $schema);
+                $this->assertResponseJSON(json_encode($value), $schema);
                 break;
             case strpos($format, 'xml') !== false:
                 $this->assertResponseXML($value, $schema);
