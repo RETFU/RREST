@@ -1,3 +1,8 @@
+> ⚠️   
+> We used RREST at [IWD](https://www.iwd.io) to build the early stage of our API and then we internalized the development.  
+> My initial idea was to support this project but I already had enough on my plate!  
+> Thanks for everybody that was part of this project 🙌
+
 # RREST
 
 **RREST** helps to build a REST API in PHP.
